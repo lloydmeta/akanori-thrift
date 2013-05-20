@@ -21,7 +21,7 @@ object TestScalaMecab extends App {
     var tagger = new Tagger
 
     val str = "まず、僕のsbt のバージョンはくず"
-    println(tagger.parse(str))
+    println(tagger.parse(""))
 
     val node = tagger.parseToNode(str)
     val container = new NodeContainer(node)
