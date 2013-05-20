@@ -1,5 +1,4 @@
 import org.chasen.mecab.{Tagger, Node, MeCab}
-import collection.immutable._
 
 class NodeContainer(node: Node) {
 
@@ -10,7 +9,7 @@ class NodeContainer(node: Node) {
     working_node =  working_node.getNext
   }
 
-  def list: List[Node] = nodes
+  def list = nodes
 
 }
 
