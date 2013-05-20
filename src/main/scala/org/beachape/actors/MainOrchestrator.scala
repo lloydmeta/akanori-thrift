@@ -19,7 +19,6 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
 
   implicit val timeout = Timeout(600 seconds)
 
-  val fileToRedisRoundRobin = context.actorOf(Props(new FileToRedisActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(RoundRobinRouter(4)), "fileRouter")
   val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
   val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorMorphemesAnalyzerRoundRobin")
   val stringToRedisRoundRobin = context.actorOf(Props(new StringToRedisActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorStringToRedisRoundRobin")
@@ -27,23 +26,6 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
   val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemesTrendDetectRoundRobin")
 
   def receive = {
-
-    case List('detectTrends, oldSet: RedisKeySet, newSet: RedisKeySet) => {
-      val listOfStoredRankedTrendsKeysFutures = List(
-        ask(morphemeRetrieveRoundRobin, (oldSet, minOccurrence)).mapTo[RedisKey],
-        ask(morphemeRetrieveRoundRobin, (newSet, minOccurrence)).mapTo[RedisKey])
-
-      val futureListOfStoredRankedTrendsKeys = Future.sequence(listOfStoredRankedTrendsKeysFutures)
-
-      futureListOfStoredRankedTrendsKeys map { storedRankKeyList =>
-        storedRankKeyList match {
-          case List(olderMorphemesKey: RedisKey, newerMorphemesKey: RedisKey) => {
-            self ! List('retrieveChiChi, RedisKeySet(olderMorphemesKey, newerMorphemesKey))
-          }
-          case _ => exit(1)
-        }
-      }
-    }
 
     case List('retrieveChiChi, redisKeySet: RedisKeySet) => {
       redisKeySet match {
@@ -56,11 +38,6 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
       }
 
       morphemeRetrieveRoundRobin ! List('printChiChi, redisKeySet, minOccurrence, minLength, maxLength, top)
-    }
-
-    case 'allDone => {
-      println("That's all folks!")
-      //      context.system.shutdown()
     }
 
     case 'getTrendsDefault => {

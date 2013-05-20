@@ -3,7 +3,6 @@ package org.beachape.actors
 import akka.actor.Actor
 import akka.event.Logging
 import com.redis._
-import org.beachape.analyze.FileMorphemesToRedis
 import akka.actor.Props
 import akka.pattern.ask
 import akka.routing.RoundRobinRouter

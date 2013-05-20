@@ -3,7 +3,6 @@ package org.beachape.actors
 import akka.actor.{Actor, Props}
 import akka.event.Logging
 import com.redis._
-import org.beachape.analyze.FileMorphemesToRedis
 import akka.pattern.ask
 import akka.routing.RoundRobinRouter
 import scala.concurrent.{ Await, Future }

@@ -1,5 +1,5 @@
 import org.chasen.mecab.{ Tagger, Node, MeCab }
-import org.beachape.analyze.{ Morpheme, MorphemesRedisRetriever, FileMorphemesToRedis }
+import org.beachape.analyze.{ Morpheme, MorphemesRedisRetriever }
 import akka.actor.Actor
 import akka.actor.ActorSystem
 import akka.actor.Props
@@ -17,11 +17,7 @@ object TrendApp {
 
 
   val usage = """
-      Usage: TrendApp
-          --file-older-expected path
-          --file-older-observed path
-          --file-newer-expected path
-          --file-newer-observed path
+      Usage: Akanori-thrift (options are for currentTrendsDefault)
           [--min-occurrence Int, defaults to 10]
           [--min-length Int, defaults to 1]
           [--max-length Int, defaults to 50]
@@ -49,14 +45,6 @@ object TrendApp {
       def isSwitch(s: String) = (s(0) == '-')
       list match {
         case Nil => map
-        case "--file-older-expected" :: value :: tail =>
-          nextOption(map ++ Map('fileOlderExpected -> value), tail)
-        case "--file-older-observed" :: value :: tail =>
-          nextOption(map ++ Map('fileOlderObserved -> value), tail)
-        case "--file-newer-expected" :: value :: tail =>
-          nextOption(map ++ Map('fileNewerExpected -> value), tail)
-        case "--file-newer-observed" :: value :: tail =>
-          nextOption(map ++ Map('fileNewerObserved -> value), tail)
         case "--min-occurrence" :: value :: tail =>
           nextOption(map ++ Map('minOccurrence -> value.toDouble), tail)
         case "--min-length" :: value :: tail =>
@@ -82,26 +70,6 @@ object TrendApp {
     }
 
     val options = nextOption(Map(), arglist)
-
-    val oldExpectedFilePath: String = options.get('fileOlderExpected) match {
-      case Some(x: String) => x
-      case _ => printUsageAndExit()
-    }
-
-    val oldObservedFilePath: String = options.get('fileOlderObserved) match {
-      case Some(x: String) => x
-      case _ => printUsageAndExit()
-    }
-
-    val newExpectedFilePath: String = options.get('fileNewerExpected) match {
-      case Some(x: String) => x
-      case _ => printUsageAndExit()
-    }
-
-    val newObservedFilePath: String = options.get('fileNewerObserved) match {
-      case Some(x: String) => x
-      case _ => printUsageAndExit()
-    }
 
     val minLength = options.getOrElse('minLength, 1).asInstanceOf[Int]
     val maxLength = options.getOrElse('maxLength, 50).asInstanceOf[Int]
