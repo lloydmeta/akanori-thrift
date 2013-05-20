@@ -13,21 +13,10 @@ class MorphemeRedisRetrieverActor(redisPool: RedisClientPool) extends Actor {
       sender ! RedisKey(morphemesRetriever.storeChiSquared)
     }
 
-    case List('printChiChi, RedisKeySet(RedisKey(expectedKey), RedisKey(observedKey)), minOccurence: Double, minLength: Int, maxLength: Int, top: Int) => {
-      println("ChiSquared")
-      println("**********")
-      val morphemesRetriever = MorphemesRedisRetriever(redisPool, expectedKey, observedKey, minScore = Double.NegativeInfinity)
-      for ((term, chiScore) <- morphemesRetriever.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
-        println(s"Term: [$term], χ² of χ² score $chiScore")
-      sender ! 'allDone
-    }
-
     case List('retrieveChiChi, RedisKeySet(RedisKey(expectedKey), RedisKey(observedKey)), minOccurence: Double, minLength: Int, maxLength: Int, top: Int) => {
       println("Retreiving ChiSquared")
       println("*********************")
 
-      println(s"expected $expectedKey")
-      println(s"observedKey $observedKey")
       val morphemesRetriever = MorphemesRedisRetriever(redisPool, expectedKey, observedKey, minScore = Double.NegativeInfinity)
 
       val listOfReverseSortedTermsAndScores = for ((term, chiScore) <- morphemesRetriever.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top)) yield {

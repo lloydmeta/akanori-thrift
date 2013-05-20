@@ -28,27 +28,6 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
 
   def receive = {
 
-    case FullFilePathSet(FilePathSet(oldExpectedPath: FilePath, oldObservedSet: FilePath), FilePathSet(newExpectedPath: FilePath, newObservedPath: FilePath)) => {
-
-      println("Lets get cracking")
-      println("*****************\n")
-
-      val listOfRedisKeyFutures = List(
-        ask(fileToRedisRoundRobin, oldExpectedPath).mapTo[RedisKey],
-        ask(fileToRedisRoundRobin, oldObservedSet).mapTo[RedisKey],
-        ask(fileToRedisRoundRobin, newExpectedPath).mapTo[RedisKey],
-        ask(fileToRedisRoundRobin, newObservedPath).mapTo[RedisKey])
-      val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
-      futureListOfRedisKeys map { redisKeysList =>
-        redisKeysList match {
-          case List(oldExpectedKey: RedisKey, oldObservedKey: RedisKey, newExpectedKey: RedisKey, newObservedKey: RedisKey) => {
-            self ! List('detectTrends, RedisKeySet(oldExpectedKey, oldObservedKey), RedisKeySet(newExpectedKey, newObservedKey))
-          }
-          case _ => exit(1)
-        }
-      }
-    }
-
     case List('detectTrends, oldSet: RedisKeySet, newSet: RedisKeySet) => {
       val listOfStoredRankedTrendsKeysFutures = List(
         ask(morphemeRetrieveRoundRobin, (oldSet, minOccurrence)).mapTo[RedisKey],

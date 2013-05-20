@@ -42,7 +42,6 @@ class RedisStringSetToMorphemesActor(redisPool: RedisClientPool) extends Actor w
   }
 
   def listOfTermsInRedisStoredSetBetweenUnixTimeSpan(timeSpan: UnixTimeSpan): List[String] = {
-    println(s"hmmm trying to retrieve, $timeSpan")
     redisPool.withClient { redis =>
       redis.zrangebyscore(storedStringsSetKey, timeSpan.start.time.toDouble, true, timeSpan.end.time.toDouble, true, None) match {
         case Some(x: List[String]) => {

@@ -120,8 +120,6 @@ object TrendApp {
 
     val mainOrchestrator = system.actorOf(MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, minOccurrence, minLength, maxLength, top), "mainOrchestrator")
 
-    mainOrchestrator ! FullFilePathSet(FilePathSet(FilePath(oldExpectedFilePath), FilePath(oldObservedFilePath)), FilePathSet(FilePath(newExpectedFilePath), FilePath(newObservedFilePath)))
-
     val st = new TServerSocket(9090)
     val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestrator))
     val arg = new TThreadPoolServer.Args(st)

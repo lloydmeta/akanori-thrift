@@ -40,15 +40,6 @@ class RedisStringSetToMorphemesOrchestrator(redisPool: RedisClientPool) extends 
       val oldObservedSetUnixTimeSpan = UnixTimeSpan(UnixTime(oldObservedSetStartScore.toInt), UnixTime(oldObservedSetEndScore.toInt))
       val oldExpectedSetUnixTimeSpan = UnixTimeSpan(UnixTime(oldExpectedSetStartScore.toInt), UnixTime(oldExpectedSetEndScore.toInt))
 
-      val timespan = (1.week.millis / 1000).toDouble
-      println(s"spanInSeconds $spanInSeconds")
-      println(f"(1.week.millis / 1000).toDouble $timespan%f")
-
-      println(s"newObservedSetUnixTimeSpan $newObservedSetUnixTimeSpan")
-      println(s"newExpectedSetUnixTimeSpan $newExpectedSetUnixTimeSpan")
-      println(s"oldObservedSetUnixTimeSpan $oldObservedSetUnixTimeSpan")
-      println(s"oldExpectedSetUnixTimeSpan $oldExpectedSetUnixTimeSpan")
-
       val listOfRedisKeyFutures = List(
         ask(redisStringSetToMorphemesActorsRoundRobin, (oldExpectedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey],
         ask(redisStringSetToMorphemesActorsRoundRobin, (oldObservedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey],
