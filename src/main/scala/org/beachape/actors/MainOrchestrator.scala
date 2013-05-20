@@ -24,7 +24,7 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
   val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorMorphemesAnalyzerRoundRobin")
   val stringToRedisRoundRobin = context.actorOf(Props(new StringToRedisActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorStringToRedisRoundRobin")
   val redisStringSetToMorphemesOrchestrator = context.actorOf(Props(new RedisStringSetToMorphemesOrchestrator(redisPool)))
-  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
+  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemesTrendDetectRoundRobin")
 
   def receive = {
 
@@ -105,13 +105,14 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
     }
 
     case message @ List('getTrendsEndingAt, (unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
+
       val zender = sender
-      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateTrendsFor, (unixEndAtTime: Int, spanInSeconds: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)))
+      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateTrendsFor, (unixEndAtTime, spanInSeconds, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)))
 
       listOfRedisKeysFuture map { listOfRedisKeys =>
         listOfRedisKeys match {
           case List(oldSet: RedisKeySet, newSet: RedisKeySet) => {
-            val oldNewMorphemesSetKeys = ask(morphemesTrendDetectRoundRobin, List('detectTrends, oldSet, newSet, callMinOccurrence))
+            val oldNewMorphemesSetKeys = ask(morphemesTrendDetectRoundRobin, List('detectTrends, (oldSet, newSet, callMinOccurrence)))
             oldNewMorphemesSetKeys map { keySet =>
               keySet match {
                 case newlyGeneratedSet:RedisKeySet => {

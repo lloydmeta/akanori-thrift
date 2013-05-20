@@ -17,7 +17,7 @@ class RedisStringSetToMorphemesOrchestrator(redisPool: RedisClientPool) extends 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val redisStringSetToMorphemesActorsRoundRobin = context.actorOf(Props(new RedisStringSetToMorphemesActor(redisPool)).withRouter(RoundRobinRouter(4)), "reidsStringSetToMorphemesActorsRoundRobin")
+  val redisStringSetToMorphemesActorsRoundRobin = context.actorOf(Props(new RedisStringSetToMorphemesActor(redisPool)).withRouter(RoundRobinRouter(4)), "redisStringSetToMorphemesActorsRoundRobin")
 
   def receive = {
 
@@ -30,7 +30,7 @@ class RedisStringSetToMorphemesOrchestrator(redisPool: RedisClientPool) extends 
       val newExpectedSetEndScore = newObservedSetStartScore
       val newExpectedSetStartScore = newExpectedSetEndScore - spanInSeconds
 
-      val oldObservedSetEndScore = newObservedSetEndScore - (1.week.millis / 1000).toDouble
+      val oldObservedSetEndScore = newObservedSetEndScore - (RichInt(7 * 24).hours.millis / 1000) .toDouble // week
       val oldObservedSetStartScore = oldObservedSetEndScore - spanInSeconds
       val oldExpectedSetEndScore = oldObservedSetStartScore
       val oldExpectedSetStartScore = oldObservedSetStartScore - spanInSeconds
@@ -40,16 +40,26 @@ class RedisStringSetToMorphemesOrchestrator(redisPool: RedisClientPool) extends 
       val oldObservedSetUnixTimeSpan = UnixTimeSpan(UnixTime(oldObservedSetStartScore.toInt), UnixTime(oldObservedSetEndScore.toInt))
       val oldExpectedSetUnixTimeSpan = UnixTimeSpan(UnixTime(oldExpectedSetStartScore.toInt), UnixTime(oldExpectedSetEndScore.toInt))
 
+      val timespan = (1.week.millis / 1000).toDouble
+      println(s"spanInSeconds $spanInSeconds")
+      println(f"(1.week.millis / 1000).toDouble $timespan%f")
+
+      println(s"newObservedSetUnixTimeSpan $newObservedSetUnixTimeSpan")
+      println(s"newExpectedSetUnixTimeSpan $newExpectedSetUnixTimeSpan")
+      println(s"oldObservedSetUnixTimeSpan $oldObservedSetUnixTimeSpan")
+      println(s"oldExpectedSetUnixTimeSpan $oldExpectedSetUnixTimeSpan")
+
       val listOfRedisKeyFutures = List(
-        ask(redisStringSetToMorphemesActorsRoundRobin, oldExpectedSetUnixTimeSpan).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, oldObservedSetUnixTimeSpan).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, newExpectedSetUnixTimeSpan).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, newObservedSetUnixTimeSpan).mapTo[RedisKey])
+        ask(redisStringSetToMorphemesActorsRoundRobin, (oldExpectedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, (oldObservedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, (newExpectedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, (newObservedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey])
 
       val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
       futureListOfRedisKeys map { redisKeysList =>
         redisKeysList match {
-          case List(oldExpectedKey: RedisKey, oldObservedKey: RedisKey, newExpectedKey: RedisKey, newObservedKey: RedisKey) => {
+          case thing @ List(oldExpectedKey: RedisKey, oldObservedKey: RedisKey, newExpectedKey: RedisKey, newObservedKey: RedisKey) => {
+            println(thing)
             zender ! List(RedisKeySet(oldExpectedKey, oldObservedKey), RedisKeySet(newExpectedKey, newObservedKey))
           }
           case _ => exit(1)

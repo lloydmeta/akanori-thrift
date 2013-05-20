@@ -20,7 +20,7 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
   def receive = {
 
-    case List('detectTrends, oldSet: RedisKeySet, newSet: RedisKeySet, minOccurrence: Boolean) => {
+    case List('detectTrends, (oldSet: RedisKeySet, newSet: RedisKeySet, minOccurrence: Double)) => {
 
       val zender = sender
       val listOfStoredRankedTrendsKeysFutures = List(
@@ -39,7 +39,7 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
       }
     }
 
-    case _ => println("morphemeRetrieveRoundRobin says 'huh???'")
+    case _ => println("MorphemesTrendDetectActor says 'huh???'")
   }
 
 

@@ -15,7 +15,7 @@ class RedisStringSetToMorphemesActor(redisPool: RedisClientPool) extends Actor w
   import context.dispatcher
   implicit val timeout = Timeout(600 seconds)
 
-  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "morphemesAnalyzerRoundRobin")
+  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "redisStringSetToMorphemesMorphemesAnalyzerRoundRobin")
 
   def receive = {
 
@@ -42,9 +42,12 @@ class RedisStringSetToMorphemesActor(redisPool: RedisClientPool) extends Actor w
   }
 
   def listOfTermsInRedisStoredSetBetweenUnixTimeSpan(timeSpan: UnixTimeSpan): List[String] = {
+    println(s"hmmm trying to retrieve, $timeSpan")
     redisPool.withClient { redis =>
       redis.zrangebyscore(storedStringsSetKey, timeSpan.start.time.toDouble, true, timeSpan.end.time.toDouble, true, None) match {
-        case Some(x: List[String]) => x
+        case Some(x: List[String]) => {
+          x map (storedStringToString(_))
+        }
         case _ => Nil
       }
     }
