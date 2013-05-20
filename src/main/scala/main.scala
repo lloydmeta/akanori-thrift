@@ -22,9 +22,9 @@ object TestScalaMecab extends App {
     var tagger = new Tagger
 
     val str = "まず、僕のsbt のバージョンはくず"
-    println(tagger.parse(str));
+    println(tagger.parse(str))
 
-    val node = tagger.parseToNode(str);
+    val node = tagger.parseToNode(str)
     val container = new NodeContainer(node)
     for (n <- container.list ) {
       println(n.getSurface)
