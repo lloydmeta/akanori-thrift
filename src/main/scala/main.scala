@@ -15,9 +15,10 @@ import org.apache.thrift.transport._
 
 object TrendApp {
 
-
   val usage = """
       Usage: Akanori-thrift (options are for currentTrendsDefault)
+          --clear-redis Boolean
+          [--span-in-seconds Int, defaults to 3 hours (10800)]
           [--min-occurrence Int, defaults to 10]
           [--min-length Int, defaults to 1]
           [--max-length Int, defaults to 50]
@@ -45,8 +46,12 @@ object TrendApp {
       def isSwitch(s: String) = (s(0) == '-')
       list match {
         case Nil => map
+        case "--clear-redis" :: value :: tail =>
+          nextOption(map ++ Map('clearRedis -> value.toBoolean), tail)
         case "--min-occurrence" :: value :: tail =>
           nextOption(map ++ Map('minOccurrence -> value.toDouble), tail)
+        case "--span-in-seconds" :: value :: tail =>
+          nextOption(map ++ Map('spanInSeconds -> value.toInt), tail)
         case "--min-length" :: value :: tail =>
           nextOption(map ++ Map('minLength -> value.toInt), tail)
         case "--max-length" :: value :: tail =>
@@ -71,6 +76,11 @@ object TrendApp {
 
     val options = nextOption(Map(), arglist)
 
+    val clearRedis: Boolean = options.get('clearRedis) match {
+      case Some(x) => x.asInstanceOf[Boolean]
+      case _ => printUsageAndExit(true)
+    }
+    val spanInSeconds = options.getOrElse('spanInSeconds, 1).asInstanceOf[Int]
     val minLength = options.getOrElse('minLength, 1).asInstanceOf[Int]
     val maxLength = options.getOrElse('maxLength, 50).asInstanceOf[Int]
     val top = options.getOrElse('top, 50).asInstanceOf[Int]
@@ -81,20 +91,17 @@ object TrendApp {
     val redisPort = options.getOrElse('redisPort, 6379).asInstanceOf[Int]
     val redisDb = options.getOrElse('redisPort, 7).asInstanceOf[Int]
 
-    val redisPool = new RedisClientPool(redisHost, redisPort, database= redisDb)
-    redisPool.withClient {_.flushdb}
+    val redisPool = new RedisClientPool(redisHost, redisPort, database = redisDb)
+    if (clearRedis) redisPool.withClient { _.flushdb }
 
     val system = ActorSystem("akanoriSystem")
-
-    val mainOrchestrator = system.actorOf(MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, minOccurrence, minLength, maxLength, top), "mainOrchestrator")
+    val mainOrchestrator = system.actorOf(MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top), "mainOrchestrator")
 
     val st = new TServerSocket(9090)
     val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestrator))
     val arg = new TThreadPoolServer.Args(st)
     arg.processor(processor)
-
     val server = new TThreadPoolServer(arg)
-
     server.serve()
 
   }

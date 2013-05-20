@@ -8,80 +8,80 @@ import akka.routing.RoundRobinRouter
 import com.redis._
 import akka.util.Timeout
 import scala.concurrent.duration._
+import com.redis.RedisClient._
 
 object MainOrchestrator {
-  def apply(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int): Props = Props(new MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, minOccurrence, minLength, maxLength, top))
+  def apply(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int): Props = Props(new MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top))
 }
 
-class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) extends Actor {
+class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
 
   implicit val timeout = Timeout(600 seconds)
 
-  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
-  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorMorphemesAnalyzerRoundRobin")
   val stringToRedisRoundRobin = context.actorOf(Props(new StringToRedisActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorStringToRedisRoundRobin")
   val redisStringSetToMorphemesOrchestrator = context.actorOf(Props(new RedisStringSetToMorphemesOrchestrator(redisPool)))
   val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemesTrendDetectRoundRobin")
+  val trendGeneratorRoundRobin = context.actorOf(Props(new TrendGeneratorActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(RoundRobinRouter(2)), "trendGeneratorRoundRobin")
 
   def receive = {
-
-    case List('retrieveChiChi, redisKeySet: RedisKeySet) => {
-      redisKeySet match {
-        case RedisKeySet(expectedKey, observedKey) => {
-          redisPool.withClient { redis =>
-            redis.hmset(hashOfLatestTrendKeysKey, Map("expected" -> expectedKey.redisKey, "observed" -> observedKey.redisKey))
-          }
-        }
-        case _ =>
-      }
-
-      morphemeRetrieveRoundRobin ! List('printChiChi, redisKeySet, minOccurrence, minLength, maxLength, top)
-    }
-
-    case 'getTrendsDefault => {
-      val zender = sender
-      val listOfReverseSortedTermsAndScoresFuture = morphemeRetrieveRoundRobin ? List('retrieveChiChi, latestTrendsRedisKeySet, minOccurrence, minLength, maxLength, top)
-      listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
-        zender ! listOfReverseSortedTermsAndScores
-      }
-    }
-
-    case List('getTrends, (callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
-      val zender = sender
-      val listOfReverseSortedTermsAndScoresFuture = morphemeRetrieveRoundRobin ? List('retrieveChiChi, latestTrendsRedisKeySet, callMinOccurrence, callMinLength, callMaxLength, callTop)
-      listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
-        zender ! listOfReverseSortedTermsAndScores
-      }
-    }
 
     case message @ List('storeString, (stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)) => {
       stringToRedisRoundRobin ! message
     }
 
-    case message @ List('getTrendsEndingAt, (unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
+    case 'getTrendsDefault => {
+      val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
+        redis.zrangebyscoreWithScore(defaultTrendCacheKey, Double.NegativeInfinity, limit = None, sortAs = DESC) match {
+          case Some(x: List[(String, Double)]) => x
+          case _ => Nil
+        }
+      }
+      sender ! listOfReverseSortedTermsAndScores
+    }
 
+    case List('getTrends, (spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
+      // If the cachedKey exists, use the cached results and return it
+      // Otherwise, call trendGeneratorRoundRobin and wait
       val zender = sender
-      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateTrendsFor, (unixEndAtTime, spanInSeconds, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)))
+      val cachedKey = f"$customTrendCacheKeyEndingNow%s-span$spanInSeconds%s-minOccurence$callMinOccurrence%f-minLength-$callMinLength%d-maxLength$callMaxLength%d-callTop$callTop%d"
+      val keyExists = cachedKeyExists(cachedKey)
 
-      listOfRedisKeysFuture map { listOfRedisKeys =>
-        listOfRedisKeys match {
-          case List(oldSet: RedisKeySet, newSet: RedisKeySet) => {
-            val oldNewMorphemesSetKeys = ask(morphemesTrendDetectRoundRobin, List('detectTrends, (oldSet, newSet, callMinOccurrence)))
-            oldNewMorphemesSetKeys map { keySet =>
-              keySet match {
-                case newlyGeneratedSet:RedisKeySet => {
-                  val listOfReverseSortedTermsAndScoresFuture = morphemeRetrieveRoundRobin ? List('retrieveChiChi, newlyGeneratedSet, callMinOccurrence, callMinLength, callMaxLength, callTop)
-                  listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
-                    zender ! listOfReverseSortedTermsAndScores
-                  }
-                }
-                case _ => print("daaamn")
-              }
-            }
+      if (keyExists) {
+        val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
+          redis.zrangebyscoreWithScore(cachedKey, Double.NegativeInfinity, limit = None, sortAs = DESC) match {
+            case Some(x: List[(String, Double)]) => x
+            case _ => Nil
           }
-          case _ =>
+        }
+        sender ! listOfReverseSortedTermsAndScores
+      } else {
+        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? List('generateTrendsFor, (RedisKey(cachedKey), (System.currentTimeMillis / 1000).toInt, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop))
+        listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
+          zender ! listOfReverseSortedTermsAndScores
+        }
+      }
+    }
+
+    // Heavy code duplication with the default case
+    case message @ List('getTrendsEndingAt, (unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
+      val zender = sender
+      val cachedKey = f"$customTrendCacheKeyEndingNow%s-unixEndAtTime$unixEndAtTime%d-span$spanInSeconds%s-minOccurence$callMinOccurrence%f-minLength-$callMinLength%d-maxLength$callMaxLength%d-callTop$callTop%d"
+      val keyExists = cachedKeyExists(cachedKey)
+
+      if (keyExists) {
+        val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
+          redis.zrangebyscoreWithScore(cachedKey, Double.NegativeInfinity, limit = None, sortAs = DESC) match {
+            case Some(x: List[(String, Double)]) => x
+            case _ => Nil
+          }
+        }
+        sender ! listOfReverseSortedTermsAndScores
+      } else {
+        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? List('generateTrendsFor, (RedisKey(cachedKey), unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop))
+        listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
+          zender ! listOfReverseSortedTermsAndScores
         }
       }
 
@@ -90,15 +90,9 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
     case _ => System.exit(1)
   }
 
-  def hashOfLatestTrendKeysKey = "trends:latest_keys"
-
-  def latestTrendsRedisKeySet: RedisKeySet = {
+  def cachedKeyExists(key: String) = {
     redisPool.withClient { redis =>
-      redis.hmget(hashOfLatestTrendKeysKey, "expected", "observed")
-    } match {
-      case Some(x: Map[String, String]) if (x.contains("expected") && x.contains("observed")) =>
-        RedisKeySet(RedisKey(x.getOrElse("expected", "")), RedisKey(x.getOrElse("observed", "")))
-      case _ => RedisKeySet(RedisKey(""), RedisKey(""))
+      redis.exists(key)
     }
   }
 }
