@@ -27,12 +27,9 @@ object Morpheme {
 
   def stringToMorphemes(str: String): List[Morpheme] = {
     System.loadLibrary("MeCab");
-
     val tagger = new Tagger
     val node= tagger.parseToNode(str)
-
-    val morphemes = nodeListFromNode(node) map ( x => parseMorpheme(x.getSurface, x.getFeature))
-
+    val morphemes = nodeListFromNode(node) map ( x => parseMorpheme(x.getSurface, x.getFeature) )
     morphemes dropRight 1 drop 1
   }
 
