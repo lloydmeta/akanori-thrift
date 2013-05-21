@@ -9,8 +9,7 @@ case class FileMorphemesToRedis(path: String, redis: RedisClient, redisKey: Stri
     val morphemes = Source.fromFile(path).getLines().flatMap(line =>
       Morpheme.stringToMorphemes(line, dropBlacklisted, onlyWhitelisted)
     ).toList
-    for (m <- morphemes)
-      println(m)
+
     val morphemeTracker = MorphemesRedisTracker(morphemes, redis, redisKey)
     morphemeTracker.storeAllInRedis
   }

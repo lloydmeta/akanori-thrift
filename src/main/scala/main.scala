@@ -43,14 +43,18 @@ object TrendApp {
     val oldFilePath: String = {
       options.get('fileOlder) match {
         case Some(x:String) => x
-        case _ => ""
+        case _ =>
+          println(usage)
+          exit(1)
       }
     }
 
     val newFilePath: String = {
       options.get('fileNewer) match {
         case Some(x:String) => x
-        case _ => ""
+        case _ =>
+          println(usage)
+          exit(1)
       }
     }
 
@@ -105,7 +109,8 @@ object TrendApp {
     newFileOrchestrator.dumpToRedis
 
     val retriever = MorphemesRedisRetriever(redis, oldSetRedisKey, newSetRedisKey)
-    println(retriever.byChiSquaredReversed)
+    for ((term, chiScore) <- retriever.byChiSquaredReversed)
+      println(s"Term: $term, χ² score $chiScore")
 
   }
 }
