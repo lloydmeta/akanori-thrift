@@ -6,7 +6,7 @@ import java.io._
 object TrendApp {
 
   val usage = """
-      Usage: TrendApp --file-older path --file-newer path [--drop-blacklisted boolean, defaults to true] [--only-whitelisted boolean, defaults to false] [--redis-host address, defaults to localhost] [--redis-db integer, defaults to 0] [--redis-port integer, defaults to 6379]
+      Usage: TrendApp --file-older path --file-newer path [--min-length Int, defaults to 1] [--max-length Int, defaults to 50] [--top Int, defaults to 50] [--drop-blacklisted boolean, defaults to true] [--only-whitelisted boolean, defaults to false] [--redis-host address, defaults to localhost] [--redis-db integer, defaults to 0] [--redis-port integer, defaults to 6379]
     """
 
   def main(args: Array[String]) {
@@ -23,6 +23,12 @@ object TrendApp {
                                nextOption(map ++ Map('fileOlder -> value), tail)
         case "--file-newer" :: value :: tail =>
                                nextOption(map ++ Map('fileNewer -> value), tail)
+        case "--min-length" :: value :: tail =>
+                               nextOption(map ++ Map('minLength -> value.toInt), tail)
+        case "--max-length" :: value :: tail =>
+                               nextOption(map ++ Map('maxLength -> value.toInt), tail)
+        case "--top" :: value :: tail =>
+                               nextOption(map ++ Map('top -> value.toInt), tail)
         case "--drop-blacklisted" :: value :: tail =>
                                nextOption(map ++ Map('dropBlacklisted -> value.toBoolean), tail)
         case "--only-whitelisted" :: value :: tail =>
@@ -55,6 +61,27 @@ object TrendApp {
         case _ =>
           println(usage)
           exit(1)
+      }
+    }
+
+    val minLength: Int = {
+      options.get('minLength) match {
+        case Some(x:Int) => x
+        case _ => 1
+      }
+    }
+
+    val maxLength: Int = {
+      options.get('maxLength) match {
+        case Some(x:Int) => x
+        case _ => 50
+      }
+    }
+
+    val top: Int = {
+      options.get('top) match {
+        case Some(x:Int) => x
+        case _ => 50
       }
     }
 
@@ -109,7 +136,7 @@ object TrendApp {
     newFileOrchestrator.dumpToRedis
 
     val retriever = MorphemesRedisRetriever(redis, oldSetRedisKey, newSetRedisKey)
-    for ((term, chiScore) <- retriever.byChiSquaredReversed)
+    for ((term, chiScore) <- retriever.byChiSquaredReversed.filter( x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
       println(s"Term: $term, χ² score $chiScore")
 
   }
