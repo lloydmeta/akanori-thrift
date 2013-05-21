@@ -32,7 +32,7 @@ case class MorphemesRedisRetriever(redis: RedisClient, redisKeyOlder: String, re
       case Some(x) => x
     }
 
-    pow( ((termScore - oldScoreForTerm).abs - 0.5), 2) / (oldScoreForTerm + 1)
+    pow(((termScore - oldScoreForTerm).abs - 0.5), 2) / (oldScoreForTerm + 1)
   }
 
 }

@@ -6,7 +6,7 @@ import java.io._
 object TrendApp {
 
   val usage = """
-      Usage: TrendApp --file-older path --file-newer path [--redis-host address, defaults to localhost] [--redis-db integer, defaults to 0] [--redis-port integer, defaults to 6379]
+      Usage: TrendApp --file-older path --file-newer path [--drop-blacklisted boolean, defaults to true] [--only-whitelisted boolean, defaults to false] [--redis-host address, defaults to localhost] [--redis-db integer, defaults to 0] [--redis-port integer, defaults to 6379]
     """
 
   def main(args: Array[String]) {
@@ -23,21 +23,50 @@ object TrendApp {
                                nextOption(map ++ Map('fileOlder -> value), tail)
         case "--file-newer" :: value :: tail =>
                                nextOption(map ++ Map('fileNewer -> value), tail)
+        case "--drop-blacklisted" :: value :: tail =>
+                               nextOption(map ++ Map('dropBlacklisted -> value.toBoolean), tail)
+        case "--only-whitelisted" :: value :: tail =>
+                               nextOption(map ++ Map('onlyWhitelisted -> value.toBoolean), tail)
         case "--redis-host" :: value :: tail =>
                                nextOption(map ++ Map('redisHost -> value), tail)
         case "--redis-port" :: value :: tail =>
                                nextOption(map ++ Map('redisPort -> value.toInt), tail)
         case "--redis-db" :: value :: tail =>
                                nextOption(map ++ Map('redisDb -> value.toInt), tail)
-        // case string :: opt2 :: tail if isSwitch(opt2) =>
-        //                        nextOption(map ++ Map('infile -> string), list.tail)
-        // case string :: Nil =>  nextOption(map ++ Map('infile -> string), list.tail)
         case option :: tail => println("Unknown option "+option)
                                exit(1)
       }
     }
 
     val options = nextOption(Map(),arglist)
+
+    val oldFilePath: String = {
+      options.get('fileOlder) match {
+        case Some(x:String) => x
+        case _ => ""
+      }
+    }
+
+    val newFilePath: String = {
+      options.get('fileNewer) match {
+        case Some(x:String) => x
+        case _ => ""
+      }
+    }
+
+    val onlyWhitelisted: Boolean = {
+      options.get('onlyWhitelisted) match {
+        case Some(x:Boolean) => x
+        case _ => false
+      }
+    }
+
+    val dropBlacklisted: Boolean = {
+      options.get('dropBlacklisted) match {
+        case Some(x:Boolean) => x
+        case _ => true
+      }
+    }
 
     val redisHost = {
       options.get('redisHost) match {
@@ -60,20 +89,6 @@ object TrendApp {
       }
     }
 
-    val oldFilePath: String = {
-      options.get('fileOlder) match {
-        case Some(x:String) => x
-        case _ => ""
-      }
-    }
-
-    val newFilePath: String = {
-      options.get('fileNewer) match {
-        case Some(x:String) => x
-        case _ => ""
-      }
-    }
-
     val redis = new RedisClient(redisHost, redisPort)
     redis.select(redisDb)
     redis.flushdb
@@ -81,8 +96,8 @@ object TrendApp {
     val oldSetRedisKey = "trends:older"
     val newSetRedisKey = "trends:newer"
 
-    val oldFileOrchestrator = FileMorphemesToRedis(oldFilePath, redis, oldSetRedisKey)
-    val newFileOrchestrator = FileMorphemesToRedis(newFilePath, redis, newSetRedisKey)
+    val oldFileOrchestrator = FileMorphemesToRedis(oldFilePath, redis, oldSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
+    val newFileOrchestrator = FileMorphemesToRedis(newFilePath, redis, newSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
 
     println("Dumping old set to Redis...")
     oldFileOrchestrator.dumpToRedis
