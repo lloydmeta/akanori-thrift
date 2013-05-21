@@ -64,61 +64,14 @@ object TrendApp {
       }
     }
 
-    val minLength: Int = {
-      options.get('minLength) match {
-        case Some(x:Int) => x
-        case _ => 1
-      }
-    }
-
-    val maxLength: Int = {
-      options.get('maxLength) match {
-        case Some(x:Int) => x
-        case _ => 50
-      }
-    }
-
-    val top: Int = {
-      options.get('top) match {
-        case Some(x:Int) => x
-        case _ => 50
-      }
-    }
-
-    val onlyWhitelisted: Boolean = {
-      options.get('onlyWhitelisted) match {
-        case Some(x:Boolean) => x
-        case _ => false
-      }
-    }
-
-    val dropBlacklisted: Boolean = {
-      options.get('dropBlacklisted) match {
-        case Some(x:Boolean) => x
-        case _ => true
-      }
-    }
-
-    val redisHost = {
-      options.get('redisHost) match {
-        case Some(x:String) => x
-        case _ => "localhost"
-      }
-    }
-
-    val redisPort = {
-      options.get('redisPort) match {
-        case Some(x:Int) => x
-        case _ => 6379
-      }
-    }
-
-    val redisDb = {
-      options.get('redisDb) match {
-        case Some(x:Int) => x
-        case _ => 7
-      }
-    }
+    val minLength = options.getOrElse('minLength, 1).asInstanceOf[Int]
+    val maxLength = options.getOrElse('maxLength, 50).asInstanceOf[Int]
+    val top = options.getOrElse('top, 50).asInstanceOf[Int]
+    val onlyWhitelisted = options.getOrElse('onlyWhitelisted, false).asInstanceOf[Boolean]
+    val dropBlacklisted = options.getOrElse('dropBlacklisted, true).asInstanceOf[Boolean]
+    val redisHost = options.getOrElse('redisHost, "localhost").toString
+    val redisPort = options.getOrElse('redisPort, 6379).asInstanceOf[Int]
+    val redisDb = options.getOrElse('redisPort, 7).asInstanceOf[Int]
 
     val redis = new RedisClient(redisHost, redisPort)
     redis.select(redisDb)
