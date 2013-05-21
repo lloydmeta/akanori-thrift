@@ -8,7 +8,7 @@ object Morpheme {
   type Words = List[String]
 
   def stringToMorphemes(str: String): List[Morpheme] = {
-    System.loadLibrary("MeCab");
+    System.loadLibrary("MeCab")
     val tagger = new Tagger
     val node = {
       tagger.parseToNode(str) //wtf

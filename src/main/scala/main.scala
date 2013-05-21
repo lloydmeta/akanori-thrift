@@ -1,6 +1,5 @@
 import org.chasen.mecab.{Tagger, Node, MeCab}
 import org.beachape.analyze.{Morpheme, MorphemesRedisRetriever, FileMorphemesToRedis}
-import org.beachape.support.FileWrite.printToFile
 import com.redis._
 import java.io._
 
@@ -77,6 +76,7 @@ object TrendApp {
 
     val redis = new RedisClient(redisHost, redisPort)
     redis.select(redisDb)
+    redis.flushdb
 
     val oldSetRedisKey = "trends:older"
     val newSetRedisKey = "trends:newer"
