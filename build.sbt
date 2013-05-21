@@ -1,6 +1,6 @@
 seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
 
-name := "mecab_test"
+name := "mecab_trends"
 
 version := "1.0"
 
