@@ -17,8 +17,31 @@ class MorphemeSpec extends FunSpec
 
       it ("should return a List[Morpheme]") {
         val morphemes = Morpheme.stringToMorphemes(stringToAnalyse)
-        for (m <- morphemes)
-          m.isInstanceOf[Morpheme] should be (true)
+        morphemes.isInstanceOf[List[Morpheme]] should be (true)
+      }
+
+      describe("each morpheme in the list") {
+
+        val morphemes = Morpheme.stringToMorphemes(stringToAnalyse)
+
+        describe(".surface") {
+
+          it("should be a string") {
+            for (m <- morphemes)
+              m.surface.isInstanceOf[String] should be (true)
+          }
+
+        }
+
+      }
+
+    }
+
+    describe(".stringToWords({anyString})") {
+
+      it("should return a List[String]"){
+        val words = Morpheme.stringToWords(stringToAnalyse)
+        words.isInstanceOf[List[String]] should be (true)
       }
 
     }
