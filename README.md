@@ -17,7 +17,9 @@ Usage: TrendApp
           --file-older-observed path
           --file-newer-expected path
           --file-newer-observed path
+          [--report-older-chisquared Boolean, defaults to false]
           [--report-newer-chisquared Boolean, defaults to false]
+          [--min-occurence Int, defaults to 10]
           [--min-length Int, defaults to 1]
           [--max-length Int, defaults to 50]
           [--top Int, defaults to 50]
@@ -26,6 +28,7 @@ Usage: TrendApp
           [--redis-host String, defaults to localhost]
           [--redis-db Int, defaults to 0]
           [--redis-port Int, defaults to 6379]
+
 ```
 
 Example

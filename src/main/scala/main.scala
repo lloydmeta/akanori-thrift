@@ -11,7 +11,9 @@ object TrendApp {
           --file-older-observed path
           --file-newer-expected path
           --file-newer-observed path
+          [--report-older-chisquared Boolean, defaults to false]
           [--report-newer-chisquared Boolean, defaults to false]
+          [--min-occurence Int, defaults to 10]
           [--min-length Int, defaults to 1]
           [--max-length Int, defaults to 50]
           [--top Int, defaults to 50]
@@ -48,6 +50,10 @@ object TrendApp {
           nextOption(map ++ Map('fileNewerObserved -> value), tail)
         case "--report-newer-chisquared" :: value :: tail =>
           nextOption(map ++ Map('reportNewerChiSquared -> value.toBoolean), tail)
+        case "--report-older-chisquared" :: value :: tail =>
+          nextOption(map ++ Map('reportOlderChiSquared -> value.toBoolean), tail)
+        case "--min-occurence" :: value :: tail =>
+          nextOption(map ++ Map('minOccurence -> value.toDouble), tail)
         case "--min-length" :: value :: tail =>
           nextOption(map ++ Map('minLength -> value.toInt), tail)
         case "--max-length" :: value :: tail =>
@@ -98,6 +104,8 @@ object TrendApp {
     val onlyWhitelisted = options.getOrElse('onlyWhitelisted, false).asInstanceOf[Boolean]
     val dropBlacklisted = options.getOrElse('dropBlacklisted, true).asInstanceOf[Boolean]
     val reportNewerChiSquared = options.getOrElse('reportNewerChiSquared, true).asInstanceOf[Boolean]
+    val reportOlderChiSquared = options.getOrElse('reportOlderChiSquared, true).asInstanceOf[Boolean]
+    val minOccurence = options.getOrElse('minOccurence, 10.0).asInstanceOf[Double]
     val redisHost = options.getOrElse('redisHost, "localhost").toString
     val redisPort = options.getOrElse('redisPort, 6379).asInstanceOf[Int]
     val redisDb = options.getOrElse('redisPort, 7).asInstanceOf[Int]
@@ -125,8 +133,8 @@ object TrendApp {
     println("Dumping new observed set to Redis...")
     newObservedFileOrchestrator.dumpToRedis
 
-    val oldChiSquaredRetriever = MorphemesRedisRetriever(redis, oldExpectedSetRedisKey, oldObservedSetRedisKey)
-    val newChiSquaredRetriever = MorphemesRedisRetriever(redis, newExpectedSetRedisKey, newObservedSetRedisKey)
+    val oldChiSquaredRetriever = MorphemesRedisRetriever(redis, oldExpectedSetRedisKey, oldObservedSetRedisKey, minOccurence)
+    val newChiSquaredRetriever = MorphemesRedisRetriever(redis, newExpectedSetRedisKey, newObservedSetRedisKey, minOccurence)
 
     println("Generating ChiSquare for Old expected vs observed and dumping to Redis")
     val oldChiSquaredKey = oldChiSquaredRetriever.storeChiSquared
@@ -134,7 +142,15 @@ object TrendApp {
     println("Generating ChiSquare for New expected vs observed and dumping to Redis")
     val newChiSquaredKey = newChiSquaredRetriever.storeChiSquared
 
-    val chiSquaredRetreiver = MorphemesRedisRetriever(redis, oldChiSquaredKey, newChiSquaredKey)
+    val chiSquaredRetreiver = MorphemesRedisRetriever(redis, oldChiSquaredKey, newChiSquaredKey, minScore = Double.NegativeInfinity)
+
+    if (reportOlderChiSquared) {
+      println("\nChiSquared for Old Set")
+      println("**********************")
+      for ((term, chiScore) <- oldChiSquaredRetriever.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
+        println(s"Term: [$term], χ² score $chiScore")
+      println("**********************\n")
+    }
 
     if (reportNewerChiSquared) {
       println("\nChiSquared for New Set")

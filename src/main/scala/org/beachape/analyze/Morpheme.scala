@@ -9,7 +9,7 @@ object Morpheme {
 
   val attributeValueBlackistMap = Map(
     'surface -> (
-        List("ﾟ", "д", "Д", "ーーー", "ーー", "ー", "ｰ", "m", "目", "о")
+        List("ﾟ", "д", "Д", "ーーー", "ーー", "ー", "ｰ", "m", "目", "о", "ぐはじめました")
         ::: ('A' until 'z').toList
         ::: ('ぁ' until 'ゟ').toList
         ::: ('゠' until 'ヿ').toList

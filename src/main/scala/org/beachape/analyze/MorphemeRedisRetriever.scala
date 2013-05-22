@@ -3,7 +3,7 @@ import com.redis._
 import com.redis.RedisClient._
 import scala.math.pow
 
-case class MorphemesRedisRetriever(redis: RedisClient, redisKeyOlder: String, redisKeyNewer: String) extends ChiSquare with RedisHelper{
+case class MorphemesRedisRetriever(redis: RedisClient, redisKeyOlder: String, redisKeyNewer: String, minScore: Double = 10) extends ChiSquare with RedisHelper {
 
   def byChiSquaredReversed = {
     byChiSquared.reverse
@@ -30,20 +30,23 @@ case class MorphemesRedisRetriever(redis: RedisClient, redisKeyOlder: String, re
     }
 
     val morphemeChiSquaredList: List[(String, Double)] = {
-      newTermsWithScoresList map { x =>
-        val oldScoreForTerm = redis.zscore(redisKeyOlder, x._1) match {
-          case Some(y) if y > 0 => y
+      for ((term, newForTermScore) <- newTermsWithScoresList) yield {
+        val oldScoreForTerm = redis.zscore(redisKeyOlder, term) match {
+          case Some(y) => y
           case _ => 1
         }
-        (x._1, calculateChiSquaredForTerm(oldScoreForTerm, x._2, oldSetTotalScore, newSetTotalScore))
+        if (newForTermScore > oldScoreForTerm)
+          (term, calculateChiSquaredForTerm(oldScoreForTerm, newForTermScore, oldSetTotalScore, newSetTotalScore))
+        else
+          (term, -55378008.0)
       }
     }
 
-    morphemeChiSquaredList.sortBy(_._2)
+    morphemeChiSquaredList.filter(_._2 != -55378008.0).sortBy(_._2)
   }
 
   def newTermsWithScoresList: List[(String, Double)] = {
-    redis.zrangebyscoreWithScore(redisKeyNewer, limit = None, sortAs = DESC) match {
+    redis.zrangebyscoreWithScore(redisKeyNewer, minScore, limit = None, sortAs = DESC) match {
       case Some(x: List[(String, Double)]) => x.filter(_._1 != zSetTotalScoreKey)
       case _ => Nil
     }
