@@ -163,7 +163,7 @@ object TrendApp {
     println("ChiSquared")
     println("**********")
     for ((term, chiScore) <- chiSquaredRetreiver.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
-      println(s"Term: [$term], χ² score $chiScore")
+      println(s"Term: [$term], χ² of χ² score $chiScore")
 
   }
 }
