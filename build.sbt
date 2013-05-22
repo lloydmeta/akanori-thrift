@@ -1,6 +1,6 @@
 seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
 
-name := "mecab_trends"
+name := "akanori"
 
 version := "1.0"
 
