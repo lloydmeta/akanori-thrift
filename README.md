@@ -11,7 +11,21 @@ Compiling
 Usage
 =====
 
-`Usage: TrendApp --file-older path --file-newer path [--min-length Int, defaults to 1] [--max-length Int, defaults to 50] [--top Int, defaults to 50] [--drop-blacklisted boolean, defaults to true] [--only-whitelisted boolean, defaults to false] [--redis-host address, defaults to localhost] [--redis-db integer, defaults to 0] [--redis-port integer, defaults to 6379]`
+```
+Usage: TrendApp
+      --file-older-expected path
+      --file-older-observed path
+      --file-newer-expected path
+      --file-newer-observed path
+      [--min-length Int, defaults to 1]
+      [--max-length Int, defaults to 50]
+      [--top Int, defaults to 50]
+      [--drop-blacklisted boolean, defaults to true]
+      [--only-whitelisted boolean, defaults to false]
+      [--redis-host address, defaults to localhost]
+      [--redis-db integer, defaults to 0]
+      [--redis-port integer, defaults to 6379]
+```
 
 
 ## License
