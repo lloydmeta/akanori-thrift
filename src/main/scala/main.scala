@@ -11,14 +11,15 @@ object TrendApp {
 		  --file-older-observed path
 		  --file-newer-expected path
 		  --file-newer-observed path
+          [--report-newer-chisquared Boolean, defaults to false]
 		  [--min-length Int, defaults to 1]
 		  [--max-length Int, defaults to 50]
 		  [--top Int, defaults to 50]
-		  [--drop-blacklisted boolean, defaults to true]
-		  [--only-whitelisted boolean, defaults to false]
-		  [--redis-host address, defaults to localhost]
-		  [--redis-db integer, defaults to 0]
-		  [--redis-port integer, defaults to 6379]
+		  [--drop-blacklisted Boolean, defaults to true]
+		  [--only-whitelisted Boolean, defaults to false]
+		  [--redis-host String, defaults to localhost]
+		  [--redis-db Int, defaults to 0]
+		  [--redis-port Int, defaults to 6379]
     """
 
   def main(args: Array[String]) {
@@ -45,6 +46,8 @@ object TrendApp {
           nextOption(map ++ Map('fileNewerExpected -> value), tail)
         case "--file-newer-observed" :: value :: tail =>
           nextOption(map ++ Map('fileNewerObserved -> value), tail)
+        case "--report-newer-chisquared" :: value :: tail =>
+          nextOption(map ++ Map('reportNewerChiSquared -> value.toBoolean), tail)
         case "--min-length" :: value :: tail =>
           nextOption(map ++ Map('minLength -> value.toInt), tail)
         case "--max-length" :: value :: tail =>
@@ -94,6 +97,7 @@ object TrendApp {
     val top = options.getOrElse('top, 50).asInstanceOf[Int]
     val onlyWhitelisted = options.getOrElse('onlyWhitelisted, false).asInstanceOf[Boolean]
     val dropBlacklisted = options.getOrElse('dropBlacklisted, true).asInstanceOf[Boolean]
+    val reportNewerChiSquared = options.getOrElse('reportNewerChiSquared, true).asInstanceOf[Boolean]
     val redisHost = options.getOrElse('redisHost, "localhost").toString
     val redisPort = options.getOrElse('redisPort, 6379).asInstanceOf[Int]
     val redisDb = options.getOrElse('redisPort, 7).asInstanceOf[Int]
@@ -132,6 +136,16 @@ object TrendApp {
 
     val chiSquaredRetreiver = MorphemesRedisRetriever(redis, oldChiSquaredKey, newChiSquaredKey)
 
+    if (reportNewerChiSquared) {
+      println("\nChiSquared for New Set")
+      println("**********************")
+      for ((term, chiScore) <- newChiSquaredRetriever.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
+        println(s"Term: [$term], χ² score $chiScore")
+      println("**********************\n")
+    }
+
+    println("ChiSquared")
+    println("**********")
     for ((term, chiScore) <- chiSquaredRetreiver.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
       println(s"Term: [$term], χ² score $chiScore")
 

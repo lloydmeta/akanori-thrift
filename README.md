@@ -27,6 +27,8 @@ Usage: TrendApp
       [--redis-port integer, defaults to 6379]
 ```
 
+Example
+`$java -jar target/scala-2.10/akanori_2.10-1.0-one-jar.jar --file-newer-expected timeSliceData/post_content_2013-05-19-1200-1800.csv --file-newer-observed timeSliceData/post_content_2013-05-19-1800-2400.csv --file-older-expected timeSliceData/post_content_2013-05-18-1200-1800.csv --file-older-observed timeSliceData/post_content_2013-05-18-1800-2400.csv --drop-blacklisted true --only-whitelisted true --report-newer-chisquared true`
 
 ## License
 
