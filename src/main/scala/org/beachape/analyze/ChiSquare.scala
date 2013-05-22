@@ -11,15 +11,13 @@ trait ChiSquare {
     val otherObservedFrequency = (newSetTotalScore - termScore) / newSetTotalScore
     val otherExpectedFrequency = (oldSetTotalScore - oldTermScore) / oldSetTotalScore
 
-    val normalizer = List(newSetTotalScore, oldSetTotalScore).max
-
-    val termChiSquaredPart = calculateChiSquaredPart(expectedTermFrequency, observedTermFrequency, normalizer)
-    val otherChiSquaredPart = calculateChiSquaredPart(otherExpectedFrequency, otherObservedFrequency, normalizer)
+    val termChiSquaredPart = calculateChiSquaredPart(expectedTermFrequency, observedTermFrequency)
+    val otherChiSquaredPart = calculateChiSquaredPart(otherExpectedFrequency, otherObservedFrequency)
 
     termChiSquaredPart + otherChiSquaredPart
   }
 
-  private def calculateChiSquaredPart(expectedFrequency: Double, observedFrequency: Double, normalizer: Double) = {
+  private def calculateChiSquaredPart(expectedFrequency: Double, observedFrequency: Double) = {
     pow(((observedFrequency * 100 - expectedFrequency * 100).abs - 0.5), 2) / (100 * expectedFrequency)
   }
 }
