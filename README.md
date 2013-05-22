@@ -13,18 +13,19 @@ Usage
 
 ```
 Usage: TrendApp
-      --file-older-expected path
-      --file-older-observed path
-      --file-newer-expected path
-      --file-newer-observed path
-      [--min-length Int, defaults to 1]
-      [--max-length Int, defaults to 50]
-      [--top Int, defaults to 50]
-      [--drop-blacklisted boolean, defaults to true]
-      [--only-whitelisted boolean, defaults to false]
-      [--redis-host address, defaults to localhost]
-      [--redis-db integer, defaults to 0]
-      [--redis-port integer, defaults to 6379]
+          --file-older-expected path
+          --file-older-observed path
+          --file-newer-expected path
+          --file-newer-observed path
+          [--report-newer-chisquared Boolean, defaults to false]
+          [--min-length Int, defaults to 1]
+          [--max-length Int, defaults to 50]
+          [--top Int, defaults to 50]
+          [--drop-blacklisted Boolean, defaults to true]
+          [--only-whitelisted Boolean, defaults to false]
+          [--redis-host String, defaults to localhost]
+          [--redis-db Int, defaults to 0]
+          [--redis-port Int, defaults to 6379]
 ```
 
 Example

@@ -7,19 +7,19 @@ object TrendApp {
 
   val usage = """
       Usage: TrendApp
-		  --file-older-expected path
-		  --file-older-observed path
-		  --file-newer-expected path
-		  --file-newer-observed path
+          --file-older-expected path
+          --file-older-observed path
+          --file-newer-expected path
+          --file-newer-observed path
           [--report-newer-chisquared Boolean, defaults to false]
-		  [--min-length Int, defaults to 1]
-		  [--max-length Int, defaults to 50]
-		  [--top Int, defaults to 50]
-		  [--drop-blacklisted Boolean, defaults to true]
-		  [--only-whitelisted Boolean, defaults to false]
-		  [--redis-host String, defaults to localhost]
-		  [--redis-db Int, defaults to 0]
-		  [--redis-port Int, defaults to 6379]
+          [--min-length Int, defaults to 1]
+          [--max-length Int, defaults to 50]
+          [--top Int, defaults to 50]
+          [--drop-blacklisted Boolean, defaults to true]
+          [--only-whitelisted Boolean, defaults to false]
+          [--redis-host String, defaults to localhost]
+          [--redis-db Int, defaults to 0]
+          [--redis-port Int, defaults to 6379]
     """
 
   def main(args: Array[String]) {
