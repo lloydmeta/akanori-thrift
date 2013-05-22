@@ -8,7 +8,13 @@ object Morpheme {
   type Words = List[String]
 
   val attributeValueBlackistMap = Map(
-    'surface -> List("ﾟ", "д", "ーーー", "ーー", "ー", "A", "ｰ", "m", "目", "w"),
+    'surface -> (
+        List("ﾟ", "д", "Д", "ーーー", "ーー", "ー", "ｰ", "m", "目", "о")
+        ::: ('A' until 'z').toList
+        ::: ('ぁ' until 'ゟ').toList
+        ::: ('゠' until 'ヿ').toList
+        ::: ('ｦ' until '￮').toList
+        ).map(_.toString),
     'hinsi -> List("代名詞", "助詞", "記号", "接続詞", "形容詞", "助動詞"),
     'hinsi1 -> List("助数詞", "接尾", "数", "サ変接続", "非自立")
   )
@@ -34,7 +40,7 @@ object Morpheme {
       tagger.parseToNode(str) //wtf
       tagger.parseToNode(str)
     }
-    val morphemes = nodeListFromNode(node) map ( x => parseMorpheme(x.getSurface, x.getFeature) )
+    val morphemes = nodeListFromNode(node) map ( x => parseMorpheme(x.getSurface.trim, x.getFeature) )
 
     val justMorphemes = morphemes dropRight 1 drop 1
 

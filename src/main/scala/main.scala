@@ -89,8 +89,9 @@ object TrendApp {
     newFileOrchestrator.dumpToRedis
 
     val retriever = MorphemesRedisRetriever(redis, oldSetRedisKey, newSetRedisKey)
+
     for ((term, chiScore) <- retriever.byChiSquaredReversed.filter( x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
-      println(s"Term: $term, χ² score $chiScore")
+      println(s"Term: [$term], χ² score $chiScore")
 
   }
 }
