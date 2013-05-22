@@ -10,9 +10,19 @@ case class MorphemesRedisRetriever(redis: RedisClient, redisKeyOlder: String, re
   }
 
   def byChiSquared: List[(String, Double)] = {
+    val oldSetTotalScore = redis.zscore(redisKeyOlder, f"$redisKeyOlder%s__akanori_score_counter__") match {
+      case None => 0
+      case Some(x) => x
+    }
+
+    val newSetTotalScore = redis.zscore(redisKeyNewer, f"$redisKeyNewer%s__akanori_score_counter__") match {
+      case None => 0
+      case Some(x) => x
+    }
+
     val morphemeChiSquaredList: List[(String, Double)] = {
-      newTermsWithScoresList map {x =>
-        (x._1, calculateChiSquaredForTerm(x._1, x._2))
+      newTermsWithScoresList map { x =>
+        (x._1, calculateChiSquaredForTerm(x._1, x._2, oldSetTotalScore, newSetTotalScore))
       }
     }
 
@@ -26,13 +36,28 @@ case class MorphemesRedisRetriever(redis: RedisClient, redisKeyOlder: String, re
     }
   }
 
-  def calculateChiSquaredForTerm(term: String, termScore: Double): Double = {
-     val oldScoreForTerm = redis.zscore(redisKeyOlder, term) match {
-      case None => 0
-      case Some(x) => x
+  def calculateChiSquaredForTerm(term: String, termScore: Double, oldSetTotalScore: Double, newSetTotalScore: Double): Double = {
+    val oldScoreForTerm = redis.zscore(redisKeyOlder, term) match {
+      case Some(x) if x > 0 => x
+      case _ => 1
     }
 
-    pow(((termScore - oldScoreForTerm).abs - 0.5), 2) / (oldScoreForTerm + 1)
+    // Calculate frequencies
+    val observedTermFrequency = termScore / newSetTotalScore
+    val expectedTermFrequency = oldScoreForTerm / oldSetTotalScore
+    val otherObservedFrequency = (newSetTotalScore - termScore) / newSetTotalScore
+    val otherExpectedFrequency = (oldSetTotalScore - oldScoreForTerm) / oldSetTotalScore
+
+    val normalizer = List(newSetTotalScore, oldSetTotalScore).max
+
+    val termChiSquaredPart = calculateChiSquaredPart(expectedTermFrequency, observedTermFrequency, normalizer)
+    val otherChiSquaredPart = calculateChiSquaredPart(otherExpectedFrequency, otherObservedFrequency, normalizer)
+
+    termChiSquaredPart + otherChiSquaredPart
+  }
+
+  private def calculateChiSquaredPart(expectedFrequency: Double, observedFrequency: Double, normalizer: Double) = {
+    pow(((observedFrequency * normalizer - expectedFrequency * normalizer).abs - 0.5), 2) / (normalizer * expectedFrequency)
   }
 
 }

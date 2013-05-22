@@ -10,6 +10,7 @@ case class MorphemesRedisTracker(morphemeList: List[Morpheme], redis: RedisClien
 
   private def storeInRedis(morpheme: Morpheme) = {
     redis.zincrby(redisKey, 1, morpheme.surface)
+    redis.zincrby(redisKey, 1, f"$redisKey%s__akanori_score_counter__")
   }
 
 }
