@@ -1,5 +1,11 @@
 import org.chasen.mecab.{ Tagger, Node, MeCab }
 import org.beachape.analyze.{ Morpheme, MorphemesRedisRetriever, FileMorphemesToRedis }
+import org.beachape.actors.{ FileToRedisActor }
+import akka.actor.Actor
+import akka.actor.ActorSystem
+import akka.routing.RoundRobinRouter
+import akka.actor.Props
+
 import com.redis._
 import java.io._
 
@@ -110,60 +116,68 @@ object TrendApp {
     val redisPort = options.getOrElse('redisPort, 6379).asInstanceOf[Int]
     val redisDb = options.getOrElse('redisPort, 7).asInstanceOf[Int]
 
-    val redis = new RedisClient(redisHost, redisPort)
-    redis.select(redisDb)
-    redis.flushdb
-
-    val oldExpectedSetRedisKey = "trends:old:expected"
-    val oldObservedSetRedisKey = "trends:old:observed"
-    val newExpectedSetRedisKey = "trends:new:expected"
-    val newObservedSetRedisKey = "trends:new:observed"
-
-    val oldExpectedFileOrchestrator = FileMorphemesToRedis(oldExpectedFilePath, redis, oldExpectedSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
-    val oldObservedFileOrchestrator = FileMorphemesToRedis(oldObservedFilePath, redis, oldObservedSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
-    val newExpectedFileOrchestrator = FileMorphemesToRedis(newExpectedFilePath, redis, newExpectedSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
-    val newObservedFileOrchestrator = FileMorphemesToRedis(newObservedFilePath, redis, newObservedSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
-
-    println("Dumping old expected set to Redis...")
-    oldExpectedFileOrchestrator.dumpToRedis
-    println("Dumping old observed set to Redis...")
-    oldObservedFileOrchestrator.dumpToRedis
-    println("Dumping new expected set to Redis...")
-    newExpectedFileOrchestrator.dumpToRedis
-    println("Dumping new observed set to Redis...")
-    newObservedFileOrchestrator.dumpToRedis
-
-    val oldChiSquaredRetriever = MorphemesRedisRetriever(redis, oldExpectedSetRedisKey, oldObservedSetRedisKey, minOccurence)
-    val newChiSquaredRetriever = MorphemesRedisRetriever(redis, newExpectedSetRedisKey, newObservedSetRedisKey, minOccurence)
-
-    println("Generating ChiSquare for Old expected vs observed and dumping to Redis")
-    val oldChiSquaredKey = oldChiSquaredRetriever.storeChiSquared
-
-    println("Generating ChiSquare for New expected vs observed and dumping to Redis")
-    val newChiSquaredKey = newChiSquaredRetriever.storeChiSquared
-
-    val chiSquaredRetreiver = MorphemesRedisRetriever(redis, oldChiSquaredKey, newChiSquaredKey, minScore = Double.NegativeInfinity)
-
-    if (reportOlderChiSquared) {
-      println("\nChiSquared for Old Set")
-      println("**********************")
-      for ((term, chiScore) <- oldChiSquaredRetriever.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
-        println(s"Term: [$term], χ² score $chiScore")
-      println("**********************\n")
+    val redisPool = new RedisClientPool(redisHost, redisPort, database= redisDb)
+    redisPool.withClient {
+      _.flushdb
     }
 
-    if (reportNewerChiSquared) {
-      println("\nChiSquared for New Set")
-      println("**********************")
-      for ((term, chiScore) <- newChiSquaredRetriever.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
-        println(s"Term: [$term], χ² score $chiScore")
-      println("**********************\n")
+//    val oldExpectedSetRedisKey = "trends:old:expected"
+//    val oldObservedSetRedisKey = "trends:old:observed"
+//    val newExpectedSetRedisKey = "trends:new:expected"
+//    val newObservedSetRedisKey = "trends:new:observed"
+
+//    val oldExpectedFileOrchestrator = FileMorphemesToRedis(oldExpectedFilePath, redisPool, oldExpectedSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
+//    val oldObservedFileOrchestrator = FileMorphemesToRedis(oldObservedFilePath, redisPool, oldObservedSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
+//    val newExpectedFileOrchestrator = FileMorphemesToRedis(newExpectedFilePath, redisPool, newExpectedSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
+//    val newObservedFileOrchestrator = FileMorphemesToRedis(newObservedFilePath, redisPool, newObservedSetRedisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
+
+//    println("Dumping old expected set to Redis...")
+//    oldExpectedFileOrchestrator.dumpToRedis
+//    println("Dumping old observed set to Redis...")
+//    oldObservedFileOrchestrator.dumpToRedis
+//    println("Dumping new expected set to Redis...")
+//    newExpectedFileOrchestrator.dumpToRedis
+//    println("Dumping new observed set to Redis...")
+//    newObservedFileOrchestrator.dumpToRedis
+
+    val system = ActorSystem("akanoriSystem")
+    val fileToRedisRoundRobin = system.actorOf(Props(new FileToRedisActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(RoundRobinRouter(4)), "fileRouter")
+
+    for (filePath <- List(oldExpectedFilePath, oldObservedFilePath, newExpectedFilePath, newObservedFilePath)) {
+      fileToRedisRoundRobin ! filePath
     }
 
-    println("ChiSquared")
-    println("**********")
-    for ((term, chiScore) <- chiSquaredRetreiver.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
-      println(s"Term: [$term], χ² of χ² score $chiScore")
+//    val oldChiSquaredRetriever = MorphemesRedisRetriever(redis, oldExpectedSetRedisKey, oldObservedSetRedisKey, minOccurence)
+//    val newChiSquaredRetriever = MorphemesRedisRetriever(redis, newExpectedSetRedisKey, newObservedSetRedisKey, minOccurence)
+//
+//    println("Generating ChiSquare for Old expected vs observed and dumping to Redis")
+//    val oldChiSquaredKey = oldChiSquaredRetriever.storeChiSquared
+//
+//    println("Generating ChiSquare for New expected vs observed and dumping to Redis")
+//    val newChiSquaredKey = newChiSquaredRetriever.storeChiSquared
+//
+//    val chiSquaredRetreiver = MorphemesRedisRetriever(redis, oldChiSquaredKey, newChiSquaredKey, minScore = Double.NegativeInfinity)
+//
+//    if (reportOlderChiSquared) {
+//      println("\nChiSquared for Old Set")
+//      println("**********************")
+//      for ((term, chiScore) <- oldChiSquaredRetriever.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
+//        println(s"Term: [$term], χ² score $chiScore")
+//      println("**********************\n")
+//    }
+//
+//    if (reportNewerChiSquared) {
+//      println("\nChiSquared for New Set")
+//      println("**********************")
+//      for ((term, chiScore) <- newChiSquaredRetriever.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
+//        println(s"Term: [$term], χ² score $chiScore")
+//      println("**********************\n")
+//    }
+//
+//    println("ChiSquared")
+//    println("**********")
+//    for ((term, chiScore) <- chiSquaredRetreiver.byChiSquaredReversed.filter(x => x._1.length >= minLength && x._1.length <= maxLength).take(top))
+//      println(s"Term: [$term], χ² of χ² score $chiScore")
 
   }
 }
