@@ -1,15 +1,14 @@
 import org.chasen.mecab.{ Tagger, Node, MeCab }
 import org.beachape.analyze.{ Morpheme, MorphemesRedisRetriever, FileMorphemesToRedis }
-import org.beachape.actors.{ FileToRedisActor }
 import akka.actor.Actor
 import akka.actor.ActorSystem
-import akka.routing.RoundRobinRouter
 import akka.actor.Props
-
 import com.redis._
 import java.io._
+import org.beachape.actors._
 
 object TrendApp {
+
 
   val usage = """
       Usage: TrendApp
@@ -19,7 +18,7 @@ object TrendApp {
           --file-newer-observed path
           [--report-older-chisquared Boolean, defaults to false]
           [--report-newer-chisquared Boolean, defaults to false]
-          [--min-occurence Int, defaults to 10]
+          [--min-occurrence Int, defaults to 10]
           [--min-length Int, defaults to 1]
           [--max-length Int, defaults to 50]
           [--top Int, defaults to 50]
@@ -58,8 +57,8 @@ object TrendApp {
           nextOption(map ++ Map('reportNewerChiSquared -> value.toBoolean), tail)
         case "--report-older-chisquared" :: value :: tail =>
           nextOption(map ++ Map('reportOlderChiSquared -> value.toBoolean), tail)
-        case "--min-occurence" :: value :: tail =>
-          nextOption(map ++ Map('minOccurence -> value.toDouble), tail)
+        case "--min-occurrence" :: value :: tail =>
+          nextOption(map ++ Map('minOccurrence -> value.toDouble), tail)
         case "--min-length" :: value :: tail =>
           nextOption(map ++ Map('minLength -> value.toInt), tail)
         case "--max-length" :: value :: tail =>
@@ -111,15 +110,13 @@ object TrendApp {
     val dropBlacklisted = options.getOrElse('dropBlacklisted, true).asInstanceOf[Boolean]
     val reportNewerChiSquared = options.getOrElse('reportNewerChiSquared, true).asInstanceOf[Boolean]
     val reportOlderChiSquared = options.getOrElse('reportOlderChiSquared, true).asInstanceOf[Boolean]
-    val minOccurence = options.getOrElse('minOccurence, 10.0).asInstanceOf[Double]
+    val minOccurrence = options.getOrElse('minOccurrence, 10.0).asInstanceOf[Double]
     val redisHost = options.getOrElse('redisHost, "localhost").toString
     val redisPort = options.getOrElse('redisPort, 6379).asInstanceOf[Int]
     val redisDb = options.getOrElse('redisPort, 7).asInstanceOf[Int]
 
     val redisPool = new RedisClientPool(redisHost, redisPort, database= redisDb)
-    redisPool.withClient {
-      _.flushdb
-    }
+    redisPool.withClient {_.flushdb}
 
 //    val oldExpectedSetRedisKey = "trends:old:expected"
 //    val oldObservedSetRedisKey = "trends:old:observed"
@@ -141,11 +138,10 @@ object TrendApp {
 //    newObservedFileOrchestrator.dumpToRedis
 
     val system = ActorSystem("akanoriSystem")
-    val fileToRedisRoundRobin = system.actorOf(Props(new FileToRedisActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(RoundRobinRouter(4)), "fileRouter")
 
-    for (filePath <- List(oldExpectedFilePath, oldObservedFilePath, newExpectedFilePath, newObservedFilePath)) {
-      fileToRedisRoundRobin ! filePath
-    }
+    val mainOrchestrator = system.actorOf(MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, minOccurrence, minLength, maxLength, top), "mainOrchestrator")
+
+    mainOrchestrator ! FullFilePathSet(FilePathSet(FilePath(oldExpectedFilePath), FilePath(oldObservedFilePath)), FilePathSet(FilePath(newExpectedFilePath), FilePath(newObservedFilePath)))
 
 //    val oldChiSquaredRetriever = MorphemesRedisRetriever(redis, oldExpectedSetRedisKey, oldObservedSetRedisKey, minOccurence)
 //    val newChiSquaredRetriever = MorphemesRedisRetriever(redis, newExpectedSetRedisKey, newObservedSetRedisKey, minOccurence)
