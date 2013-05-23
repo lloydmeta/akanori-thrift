@@ -26,7 +26,7 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
     case FullFilePathSet(oldSet: FilePathSet, newSet: FilePathSet) => {
 
       println("Lets get cracking")
-      println("******************\n")
+      println("*****************\n")
 
       val listOfRedisKeySetFutures = List(
           ask(fileToRedisRoundRobin, oldSet).mapTo[RedisKeySet],
