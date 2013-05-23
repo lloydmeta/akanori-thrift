@@ -18,25 +18,32 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
   import context.dispatcher
 
   implicit val timeout = Timeout(600 seconds)
-  val fileToRedisRoundRobin = context.actorOf(Props(new FileToRedisActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(RoundRobinRouter(2)), "fileRouter")
+  val fileToRedisRoundRobin = context.actorOf(Props(new FileToRedisActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(RoundRobinRouter(4)), "fileRouter")
   val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
 
   def receive = {
 
-    case FullFilePathSet(oldSet: FilePathSet, newSet: FilePathSet) => {
+    case FullFilePathSet(FilePathSet(oldExpectedPath: FilePath, oldObservedSet: FilePath), FilePathSet(newExpectedPath: FilePath, newObservedPath: FilePath)) => {
 
       println("Lets get cracking")
       println("*****************\n")
 
-      val listOfRedisKeySetFutures = List(
-          ask(fileToRedisRoundRobin, oldSet).mapTo[RedisKeySet],
-          ask(fileToRedisRoundRobin, newSet).mapTo[RedisKeySet]
+      val listOfRedisKeyFutures = List(
+          ask(fileToRedisRoundRobin, oldExpectedPath).mapTo[RedisKey],
+          ask(fileToRedisRoundRobin, oldObservedSet).mapTo[RedisKey],
+          ask(fileToRedisRoundRobin, newExpectedPath).mapTo[RedisKey],
+          ask(fileToRedisRoundRobin, newObservedPath).mapTo[RedisKey]
       )
-      val futureListOfRedisKeySets = Future.sequence(listOfRedisKeySetFutures)
+      val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
 
-      futureListOfRedisKeySets map { redisKeySetlist =>
-        val listOfStoredRankedTrendsKeysFutures = redisKeySetlist map { redisKeySet =>
-          ask(morphemeRetrieveRoundRobin, (redisKeySet, minOccurrence)).mapTo[RedisKey]
+      futureListOfRedisKeys map { redisKeysList =>
+
+        val listOfStoredRankedTrendsKeysFutures = redisKeysList.grouped(2).toList map { redisKeysList =>
+          redisKeysList match {
+            case List(expectedRedisKey: RedisKey, observedRedisKey: RedisKey) =>
+              ask(morphemeRetrieveRoundRobin, (RedisKeySet(expectedRedisKey, observedRedisKey), minOccurrence)).mapTo[RedisKey]
+            case _ => exit(1)
+          }
         }
 
         val futureListOfStoredRankedTrendsKeys = Future.sequence(listOfStoredRankedTrendsKeysFutures)

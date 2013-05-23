@@ -13,28 +13,20 @@ class FileToRedisActor(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
   import context.dispatcher
 
   def receive = {
-    case FilePathSet(FilePath(expectedFilePath), FilePath(observedFilePath)) => {
 
-      val expectedRedisKeyForPath = redisKeyForPath(expectedFilePath)
-      val observedRedisKeyForPath = redisKeyForPath(observedFilePath)
-
-      val expectedFileDumpFuture = Future{
-        val expectedFileToMorphemes = FileMorphemesToRedis(expectedFilePath, redisPool, expectedRedisKeyForPath, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
-        expectedFileToMorphemes.dumpToRedis
-      }
-      val observedFileDumpFuture = Future{
-        val observedFileToMorphemes = FileMorphemesToRedis(observedFilePath, redisPool, observedRedisKeyForPath, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
-        observedFileToMorphemes.dumpToRedis
-      }
-
-      Await.result(expectedFileDumpFuture, Timeout(600 seconds).duration)
-      Await.result(observedFileDumpFuture, Timeout(600 seconds).duration)
-
-      sender ! RedisKeySet(RedisKey(expectedRedisKeyForPath), RedisKey(observedRedisKeyForPath))
+    case FilePath(filePath) => {
+      sender ! RedisKey(dumpFileToRedis(filePath))
     }
 
     case _ => println("huh?")
   }
 
   def redisKeyForPath(path: String) = f"trends:$path%s"
+
+  def dumpFileToRedis(filePath: String) = {
+    val redisKey = redisKeyForPath(filePath)
+    val fileToMorphemes = FileMorphemesToRedis(filePath, redisPool, redisKey, dropBlacklisted = dropBlacklisted, onlyWhitelisted = onlyWhitelisted)
+    fileToMorphemes.dumpToRedis
+    redisKey
+  }
 }
