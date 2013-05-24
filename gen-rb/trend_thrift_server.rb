@@ -28,6 +28,21 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'time failed: unknown result')
         end
 
+        def currentTrends()
+          send_currentTrends()
+          return recv_currentTrends()
+        end
+
+        def send_currentTrends()
+          send_message('currentTrends', CurrentTrends_args)
+        end
+
+        def recv_currentTrends()
+          result = receive_message(CurrentTrends_result)
+          return result.success unless result.success.nil?
+          raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'currentTrends failed: unknown result')
+        end
+
       end
 
       class Processor
@@ -38,6 +53,13 @@ module TrendServer
           result = Time_result.new()
           result.success = @handler.time()
           write_result(result, oprot, 'time', seqid)
+        end
+
+        def process_currentTrends(seqid, iprot, oprot)
+          args = read_args(iprot, CurrentTrends_args)
+          result = CurrentTrends_result.new()
+          result.success = @handler.currentTrends()
+          write_result(result, oprot, 'currentTrends', seqid)
         end
 
       end
@@ -65,6 +87,37 @@ module TrendServer
 
         FIELDS = {
           SUCCESS => {:type => ::Thrift::Types::I64, :name => 'success'}
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class CurrentTrends_args
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+
+        FIELDS = {
+
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class CurrentTrends_result
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+        SUCCESS = 0
+
+        FIELDS = {
+          SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TrendServer::Gen::TrendResult}}
         }
 
         def struct_fields; FIELDS; end

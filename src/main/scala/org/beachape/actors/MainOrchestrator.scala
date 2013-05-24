@@ -1,7 +1,6 @@
 package org.beachape.actors
-import akka.actor.Actor
-import akka.actor.Props
-import scala.concurrent.Future
+import akka.actor.{Actor, Props}
+import scala.concurrent.{Future, Await}
 import akka.pattern.ask
 import akka.event.Logging
 import akka.routing.RoundRobinRouter
@@ -29,11 +28,10 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
       println("*****************\n")
 
       val listOfRedisKeyFutures = List(
-          ask(fileToRedisRoundRobin, oldExpectedPath).mapTo[RedisKey],
-          ask(fileToRedisRoundRobin, oldObservedSet).mapTo[RedisKey],
-          ask(fileToRedisRoundRobin, newExpectedPath).mapTo[RedisKey],
-          ask(fileToRedisRoundRobin, newObservedPath).mapTo[RedisKey]
-      )
+        ask(fileToRedisRoundRobin, oldExpectedPath).mapTo[RedisKey],
+        ask(fileToRedisRoundRobin, oldObservedSet).mapTo[RedisKey],
+        ask(fileToRedisRoundRobin, newExpectedPath).mapTo[RedisKey],
+        ask(fileToRedisRoundRobin, newObservedPath).mapTo[RedisKey])
       val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
       futureListOfRedisKeys map { redisKeysList =>
         redisKeysList match {
@@ -48,15 +46,14 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
     case List('detectTrends, oldSet: RedisKeySet, newSet: RedisKeySet) => {
       val listOfStoredRankedTrendsKeysFutures = List(
         ask(morphemeRetrieveRoundRobin, (oldSet, minOccurrence)).mapTo[RedisKey],
-        ask(morphemeRetrieveRoundRobin, (newSet, minOccurrence)).mapTo[RedisKey]
-      )
+        ask(morphemeRetrieveRoundRobin, (newSet, minOccurrence)).mapTo[RedisKey])
 
       val futureListOfStoredRankedTrendsKeys = Future.sequence(listOfStoredRankedTrendsKeysFutures)
 
       futureListOfStoredRankedTrendsKeys map { storedRankKeyList =>
         storedRankKeyList match {
           case List(olderMorphemesKey: RedisKey, newerMorphemesKey: RedisKey) => {
-            self ! List('retrieveChiChi,RedisKeySet(olderMorphemesKey, newerMorphemesKey))
+            self ! List('retrieveChiChi, RedisKeySet(olderMorphemesKey, newerMorphemesKey))
           }
           case _ => exit(1)
         }
@@ -64,14 +61,43 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
     }
 
     case List('retrieveChiChi, redisKeySet: RedisKeySet) => {
-      morphemeRetrieveRoundRobin ! List('retrieveChiChi, redisKeySet, minOccurrence, minLength, maxLength, top)
+      redisKeySet match {
+        case RedisKeySet(expectedKey, observedKey) => {
+          redisPool.withClient { redis =>
+            redis.hmset(hashOfLatestTrendKeysKey, Map("expected" -> expectedKey.redisKey, "observed" -> observedKey.redisKey))
+          }
+        }
+        case _ =>
+      }
+
+      morphemeRetrieveRoundRobin ! List('printChiChi, redisKeySet, minOccurrence, minLength, maxLength, top)
     }
 
     case 'allDone => {
       println("That's all folks!")
-      context.system.shutdown()
+//      context.system.shutdown()
+    }
+
+    case 'getLatest => {
+      val zender = sender
+      val listOfReverseSortedTermsAndScoresFuture = morphemeRetrieveRoundRobin ? List('retrieveChiChi, latestTrendsRedisKeySet, minOccurrence, minLength, maxLength, top)
+      listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
+        zender ! listOfReverseSortedTermsAndScores
+      }
     }
 
     case _ => System.exit(1)
+  }
+
+  def hashOfLatestTrendKeysKey = "trends:latest_keys"
+
+  def latestTrendsRedisKeySet: RedisKeySet = {
+    redisPool.withClient { redis =>
+      redis.hmget(hashOfLatestTrendKeysKey,"expected", "observed")
+    } match {
+      case Some(x: Map[String,String]) if ( x.contains("expected") && x.contains("observed")) =>
+        RedisKeySet(RedisKey(x.getOrElse("expected", "")), RedisKey(x.getOrElse("observed", "")))
+      case _ => RedisKeySet(RedisKey(""), RedisKey(""))
+    }
   }
 }
