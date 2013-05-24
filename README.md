@@ -1,7 +1,7 @@
-akanori
+akanori-thrift
 ------------------
 
-Scala tool for extracting Japanese phrases out of two files (one containing phrases from T2 and one containing phrases from T1, where T2 is later than T1, T2 and T1 being the same amount of time difference), analyse them using MeCab, store them in Redis, and rank them via Chi-Squared fitness test.
+Scala Thrift project/tool for extracting Japanese phrases out of two files (one containing phrases from T2 and one containing phrases from T1, where T2 is later than T1, T2 and T1 being the same amount of time difference), analyse them using MeCab, store them in Redis, and rank them via Chi-Squared fitness test.
 
 Compiling
 =======
