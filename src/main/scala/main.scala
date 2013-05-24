@@ -6,6 +6,12 @@ import akka.actor.Props
 import com.redis._
 import java.io._
 import org.beachape.actors._
+import org.beachape.server.ThriftServer
+import trendServer.gen.TrendThriftServer
+import org.apache.thrift._
+import org.apache.thrift.protocol._
+import org.apache.thrift.server._
+import org.apache.thrift.transport._
 
 object TrendApp {
 
@@ -114,7 +120,16 @@ object TrendApp {
 
     val mainOrchestrator = system.actorOf(MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, minOccurrence, minLength, maxLength, top), "mainOrchestrator")
 
-    mainOrchestrator ! FullFilePathSet(FilePathSet(FilePath(oldExpectedFilePath), FilePath(oldObservedFilePath)), FilePathSet(FilePath(newExpectedFilePath), FilePath(newObservedFilePath)))
+//    mainOrchestrator ! FullFilePathSet(FilePathSet(FilePath(oldExpectedFilePath), FilePath(oldObservedFilePath)), FilePathSet(FilePath(newExpectedFilePath), FilePath(newObservedFilePath)))
+
+    val st = new TServerSocket(9090)
+    val processor = new TrendThriftServer.Processor(new ThriftServer())
+    val arg = new TThreadPoolServer.Args(st)
+    arg.processor(processor)
+
+    val server = new TThreadPoolServer(arg)
+
+    server.serve()
 
   }
 }
