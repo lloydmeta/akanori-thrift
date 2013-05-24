@@ -36,7 +36,9 @@ public class TrendThriftServer {
 
     public long time() throws org.apache.thrift.TException;
 
-    public List<TrendResult> currentTrends() throws org.apache.thrift.TException;
+    public List<TrendResult> currentTrendsDefault() throws org.apache.thrift.TException;
+
+    public List<TrendResult> currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
 
   }
 
@@ -44,7 +46,9 @@ public class TrendThriftServer {
 
     public void time(org.apache.thrift.async.AsyncMethodCallback<AsyncClient.time_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void currentTrends(org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
+    public void currentTrendsDefault(org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrendsDefault_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void currentTrends(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -90,15 +94,41 @@ public class TrendThriftServer {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "time failed: unknown result");
     }
 
-    public List<TrendResult> currentTrends() throws org.apache.thrift.TException
+    public List<TrendResult> currentTrendsDefault() throws org.apache.thrift.TException
     {
-      send_currentTrends();
+      send_currentTrendsDefault();
+      return recv_currentTrendsDefault();
+    }
+
+    public void send_currentTrendsDefault() throws org.apache.thrift.TException
+    {
+      currentTrendsDefault_args args = new currentTrendsDefault_args();
+      sendBase("currentTrendsDefault", args);
+    }
+
+    public List<TrendResult> recv_currentTrendsDefault() throws org.apache.thrift.TException
+    {
+      currentTrendsDefault_result result = new currentTrendsDefault_result();
+      receiveBase(result, "currentTrendsDefault");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "currentTrendsDefault failed: unknown result");
+    }
+
+    public List<TrendResult> currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    {
+      send_currentTrends(minOccurrence, minLength, maxLength, top);
       return recv_currentTrends();
     }
 
-    public void send_currentTrends() throws org.apache.thrift.TException
+    public void send_currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
     {
       currentTrends_args args = new currentTrends_args();
+      args.setMinOccurrence(minOccurrence);
+      args.setMinLength(minLength);
+      args.setMaxLength(maxLength);
+      args.setTop(top);
       sendBase("currentTrends", args);
     }
 
@@ -159,21 +189,62 @@ public class TrendThriftServer {
       }
     }
 
-    public void currentTrends(org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler) throws org.apache.thrift.TException {
+    public void currentTrendsDefault(org.apache.thrift.async.AsyncMethodCallback<currentTrendsDefault_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      currentTrends_call method_call = new currentTrends_call(resultHandler, this, ___protocolFactory, ___transport);
+      currentTrendsDefault_call method_call = new currentTrendsDefault_call(resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class currentTrendsDefault_call extends org.apache.thrift.async.TAsyncMethodCall {
+      public currentTrendsDefault_call(org.apache.thrift.async.AsyncMethodCallback<currentTrendsDefault_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("currentTrendsDefault", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        currentTrendsDefault_args args = new currentTrendsDefault_args();
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<TrendResult> getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_currentTrendsDefault();
+      }
+    }
+
+    public void currentTrends(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      currentTrends_call method_call = new currentTrends_call(minOccurrence, minLength, maxLength, top, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
     public static class currentTrends_call extends org.apache.thrift.async.TAsyncMethodCall {
-      public currentTrends_call(org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private double minOccurrence;
+      private int minLength;
+      private int maxLength;
+      private int top;
+      public currentTrends_call(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
+        this.minOccurrence = minOccurrence;
+        this.minLength = minLength;
+        this.maxLength = maxLength;
+        this.top = top;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("currentTrends", org.apache.thrift.protocol.TMessageType.CALL, 0));
         currentTrends_args args = new currentTrends_args();
+        args.setMinOccurrence(minOccurrence);
+        args.setMinLength(minLength);
+        args.setMaxLength(maxLength);
+        args.setTop(top);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -202,6 +273,7 @@ public class TrendThriftServer {
 
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
       processMap.put("time", new time());
+      processMap.put("currentTrendsDefault", new currentTrendsDefault());
       processMap.put("currentTrends", new currentTrends());
       return processMap;
     }
@@ -227,6 +299,26 @@ public class TrendThriftServer {
       }
     }
 
+    public static class currentTrendsDefault<I extends Iface> extends org.apache.thrift.ProcessFunction<I, currentTrendsDefault_args> {
+      public currentTrendsDefault() {
+        super("currentTrendsDefault");
+      }
+
+      public currentTrendsDefault_args getEmptyArgsInstance() {
+        return new currentTrendsDefault_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public currentTrendsDefault_result getResult(I iface, currentTrendsDefault_args args) throws org.apache.thrift.TException {
+        currentTrendsDefault_result result = new currentTrendsDefault_result();
+        result.success = iface.currentTrendsDefault();
+        return result;
+      }
+    }
+
     public static class currentTrends<I extends Iface> extends org.apache.thrift.ProcessFunction<I, currentTrends_args> {
       public currentTrends() {
         super("currentTrends");
@@ -242,7 +334,7 @@ public class TrendThriftServer {
 
       public currentTrends_result getResult(I iface, currentTrends_args args) throws org.apache.thrift.TException {
         currentTrends_result result = new currentTrends_result();
-        result.success = iface.currentTrends();
+        result.success = iface.currentTrends(args.minOccurrence, args.minLength, args.maxLength, args.top);
         return result;
       }
     }
@@ -849,14 +941,14 @@ public class TrendThriftServer {
 
   }
 
-  public static class currentTrends_args implements org.apache.thrift.TBase<currentTrends_args, currentTrends_args._Fields>, java.io.Serializable, Cloneable   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("currentTrends_args");
+  public static class currentTrendsDefault_args implements org.apache.thrift.TBase<currentTrendsDefault_args, currentTrendsDefault_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("currentTrendsDefault_args");
 
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new currentTrends_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new currentTrends_argsTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new currentTrendsDefault_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new currentTrendsDefault_argsTupleSchemeFactory());
     }
 
 
@@ -919,20 +1011,20 @@ public class TrendThriftServer {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(currentTrends_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(currentTrendsDefault_args.class, metaDataMap);
     }
 
-    public currentTrends_args() {
+    public currentTrendsDefault_args() {
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public currentTrends_args(currentTrends_args other) {
+    public currentTrendsDefault_args(currentTrendsDefault_args other) {
     }
 
-    public currentTrends_args deepCopy() {
-      return new currentTrends_args(this);
+    public currentTrendsDefault_args deepCopy() {
+      return new currentTrendsDefault_args(this);
     }
 
     @Override
@@ -965,12 +1057,12 @@ public class TrendThriftServer {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof currentTrends_args)
-        return this.equals((currentTrends_args)that);
+      if (that instanceof currentTrendsDefault_args)
+        return this.equals((currentTrendsDefault_args)that);
       return false;
     }
 
-    public boolean equals(currentTrends_args that) {
+    public boolean equals(currentTrendsDefault_args that) {
       if (that == null)
         return false;
 
@@ -982,13 +1074,13 @@ public class TrendThriftServer {
       return 0;
     }
 
-    public int compareTo(currentTrends_args other) {
+    public int compareTo(currentTrendsDefault_args other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
 
       int lastComparison = 0;
-      currentTrends_args typedOther = (currentTrends_args)other;
+      currentTrendsDefault_args typedOther = (currentTrendsDefault_args)other;
 
       return 0;
     }
@@ -1007,7 +1099,7 @@ public class TrendThriftServer {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("currentTrends_args(");
+      StringBuilder sb = new StringBuilder("currentTrendsDefault_args(");
       boolean first = true;
 
       sb.append(")");
@@ -1035,15 +1127,15 @@ public class TrendThriftServer {
       }
     }
 
-    private static class currentTrends_argsStandardSchemeFactory implements SchemeFactory {
-      public currentTrends_argsStandardScheme getScheme() {
-        return new currentTrends_argsStandardScheme();
+    private static class currentTrendsDefault_argsStandardSchemeFactory implements SchemeFactory {
+      public currentTrendsDefault_argsStandardScheme getScheme() {
+        return new currentTrendsDefault_argsStandardScheme();
       }
     }
 
-    private static class currentTrends_argsStandardScheme extends StandardScheme<currentTrends_args> {
+    private static class currentTrendsDefault_argsStandardScheme extends StandardScheme<currentTrendsDefault_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, currentTrends_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, currentTrendsDefault_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -1064,10 +1156,1009 @@ public class TrendThriftServer {
         struct.validate();
       }
 
+      public void write(org.apache.thrift.protocol.TProtocol oprot, currentTrendsDefault_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class currentTrendsDefault_argsTupleSchemeFactory implements SchemeFactory {
+      public currentTrendsDefault_argsTupleScheme getScheme() {
+        return new currentTrendsDefault_argsTupleScheme();
+      }
+    }
+
+    private static class currentTrendsDefault_argsTupleScheme extends TupleScheme<currentTrendsDefault_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, currentTrendsDefault_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, currentTrendsDefault_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+      }
+    }
+
+  }
+
+  public static class currentTrendsDefault_result implements org.apache.thrift.TBase<currentTrendsDefault_result, currentTrendsDefault_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("currentTrendsDefault_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.LIST, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new currentTrendsDefault_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new currentTrendsDefault_resultTupleSchemeFactory());
+    }
+
+    public List<TrendResult> success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+              new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TrendResult.class))));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(currentTrendsDefault_result.class, metaDataMap);
+    }
+
+    public currentTrendsDefault_result() {
+    }
+
+    public currentTrendsDefault_result(
+      List<TrendResult> success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public currentTrendsDefault_result(currentTrendsDefault_result other) {
+      if (other.isSetSuccess()) {
+        List<TrendResult> __this__success = new ArrayList<TrendResult>();
+        for (TrendResult other_element : other.success) {
+          __this__success.add(new TrendResult(other_element));
+        }
+        this.success = __this__success;
+      }
+    }
+
+    public currentTrendsDefault_result deepCopy() {
+      return new currentTrendsDefault_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public int getSuccessSize() {
+      return (this.success == null) ? 0 : this.success.size();
+    }
+
+    public java.util.Iterator<TrendResult> getSuccessIterator() {
+      return (this.success == null) ? null : this.success.iterator();
+    }
+
+    public void addToSuccess(TrendResult elem) {
+      if (this.success == null) {
+        this.success = new ArrayList<TrendResult>();
+      }
+      this.success.add(elem);
+    }
+
+    public List<TrendResult> getSuccess() {
+      return this.success;
+    }
+
+    public currentTrendsDefault_result setSuccess(List<TrendResult> success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((List<TrendResult>)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof currentTrendsDefault_result)
+        return this.equals((currentTrendsDefault_result)that);
+      return false;
+    }
+
+    public boolean equals(currentTrendsDefault_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(currentTrendsDefault_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      currentTrendsDefault_result typedOther = (currentTrendsDefault_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("currentTrendsDefault_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class currentTrendsDefault_resultStandardSchemeFactory implements SchemeFactory {
+      public currentTrendsDefault_resultStandardScheme getScheme() {
+        return new currentTrendsDefault_resultStandardScheme();
+      }
+    }
+
+    private static class currentTrendsDefault_resultStandardScheme extends StandardScheme<currentTrendsDefault_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, currentTrendsDefault_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+                {
+                  org.apache.thrift.protocol.TList _list0 = iprot.readListBegin();
+                  struct.success = new ArrayList<TrendResult>(_list0.size);
+                  for (int _i1 = 0; _i1 < _list0.size; ++_i1)
+                  {
+                    TrendResult _elem2; // required
+                    _elem2 = new TrendResult();
+                    _elem2.read(iprot);
+                    struct.success.add(_elem2);
+                  }
+                  iprot.readListEnd();
+                }
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, currentTrendsDefault_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.success.size()));
+            for (TrendResult _iter3 : struct.success)
+            {
+              _iter3.write(oprot);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class currentTrendsDefault_resultTupleSchemeFactory implements SchemeFactory {
+      public currentTrendsDefault_resultTupleScheme getScheme() {
+        return new currentTrendsDefault_resultTupleScheme();
+      }
+    }
+
+    private static class currentTrendsDefault_resultTupleScheme extends TupleScheme<currentTrendsDefault_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, currentTrendsDefault_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          {
+            oprot.writeI32(struct.success.size());
+            for (TrendResult _iter4 : struct.success)
+            {
+              _iter4.write(oprot);
+            }
+          }
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, currentTrendsDefault_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          {
+            org.apache.thrift.protocol.TList _list5 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+            struct.success = new ArrayList<TrendResult>(_list5.size);
+            for (int _i6 = 0; _i6 < _list5.size; ++_i6)
+            {
+              TrendResult _elem7; // required
+              _elem7 = new TrendResult();
+              _elem7.read(iprot);
+              struct.success.add(_elem7);
+            }
+          }
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class currentTrends_args implements org.apache.thrift.TBase<currentTrends_args, currentTrends_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("currentTrends_args");
+
+    private static final org.apache.thrift.protocol.TField MIN_OCCURRENCE_FIELD_DESC = new org.apache.thrift.protocol.TField("minOccurrence", org.apache.thrift.protocol.TType.DOUBLE, (short)1);
+    private static final org.apache.thrift.protocol.TField MIN_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("minLength", org.apache.thrift.protocol.TType.I32, (short)2);
+    private static final org.apache.thrift.protocol.TField MAX_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("maxLength", org.apache.thrift.protocol.TType.I32, (short)3);
+    private static final org.apache.thrift.protocol.TField TOP_FIELD_DESC = new org.apache.thrift.protocol.TField("top", org.apache.thrift.protocol.TType.I32, (short)4);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new currentTrends_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new currentTrends_argsTupleSchemeFactory());
+    }
+
+    public double minOccurrence; // required
+    public int minLength; // required
+    public int maxLength; // required
+    public int top; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      MIN_OCCURRENCE((short)1, "minOccurrence"),
+      MIN_LENGTH((short)2, "minLength"),
+      MAX_LENGTH((short)3, "maxLength"),
+      TOP((short)4, "top");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // MIN_OCCURRENCE
+            return MIN_OCCURRENCE;
+          case 2: // MIN_LENGTH
+            return MIN_LENGTH;
+          case 3: // MAX_LENGTH
+            return MAX_LENGTH;
+          case 4: // TOP
+            return TOP;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __MINOCCURRENCE_ISSET_ID = 0;
+    private static final int __MINLENGTH_ISSET_ID = 1;
+    private static final int __MAXLENGTH_ISSET_ID = 2;
+    private static final int __TOP_ISSET_ID = 3;
+    private byte __isset_bitfield = 0;
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.MIN_OCCURRENCE, new org.apache.thrift.meta_data.FieldMetaData("minOccurrence", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
+      tmpMap.put(_Fields.MIN_LENGTH, new org.apache.thrift.meta_data.FieldMetaData("minLength", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.MAX_LENGTH, new org.apache.thrift.meta_data.FieldMetaData("maxLength", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.TOP, new org.apache.thrift.meta_data.FieldMetaData("top", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(currentTrends_args.class, metaDataMap);
+    }
+
+    public currentTrends_args() {
+    }
+
+    public currentTrends_args(
+      double minOccurrence,
+      int minLength,
+      int maxLength,
+      int top)
+    {
+      this();
+      this.minOccurrence = minOccurrence;
+      setMinOccurrenceIsSet(true);
+      this.minLength = minLength;
+      setMinLengthIsSet(true);
+      this.maxLength = maxLength;
+      setMaxLengthIsSet(true);
+      this.top = top;
+      setTopIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public currentTrends_args(currentTrends_args other) {
+      __isset_bitfield = other.__isset_bitfield;
+      this.minOccurrence = other.minOccurrence;
+      this.minLength = other.minLength;
+      this.maxLength = other.maxLength;
+      this.top = other.top;
+    }
+
+    public currentTrends_args deepCopy() {
+      return new currentTrends_args(this);
+    }
+
+    @Override
+    public void clear() {
+      setMinOccurrenceIsSet(false);
+      this.minOccurrence = 0.0;
+      setMinLengthIsSet(false);
+      this.minLength = 0;
+      setMaxLengthIsSet(false);
+      this.maxLength = 0;
+      setTopIsSet(false);
+      this.top = 0;
+    }
+
+    public double getMinOccurrence() {
+      return this.minOccurrence;
+    }
+
+    public currentTrends_args setMinOccurrence(double minOccurrence) {
+      this.minOccurrence = minOccurrence;
+      setMinOccurrenceIsSet(true);
+      return this;
+    }
+
+    public void unsetMinOccurrence() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __MINOCCURRENCE_ISSET_ID);
+    }
+
+    /** Returns true if field minOccurrence is set (has been assigned a value) and false otherwise */
+    public boolean isSetMinOccurrence() {
+      return EncodingUtils.testBit(__isset_bitfield, __MINOCCURRENCE_ISSET_ID);
+    }
+
+    public void setMinOccurrenceIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __MINOCCURRENCE_ISSET_ID, value);
+    }
+
+    public int getMinLength() {
+      return this.minLength;
+    }
+
+    public currentTrends_args setMinLength(int minLength) {
+      this.minLength = minLength;
+      setMinLengthIsSet(true);
+      return this;
+    }
+
+    public void unsetMinLength() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __MINLENGTH_ISSET_ID);
+    }
+
+    /** Returns true if field minLength is set (has been assigned a value) and false otherwise */
+    public boolean isSetMinLength() {
+      return EncodingUtils.testBit(__isset_bitfield, __MINLENGTH_ISSET_ID);
+    }
+
+    public void setMinLengthIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __MINLENGTH_ISSET_ID, value);
+    }
+
+    public int getMaxLength() {
+      return this.maxLength;
+    }
+
+    public currentTrends_args setMaxLength(int maxLength) {
+      this.maxLength = maxLength;
+      setMaxLengthIsSet(true);
+      return this;
+    }
+
+    public void unsetMaxLength() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __MAXLENGTH_ISSET_ID);
+    }
+
+    /** Returns true if field maxLength is set (has been assigned a value) and false otherwise */
+    public boolean isSetMaxLength() {
+      return EncodingUtils.testBit(__isset_bitfield, __MAXLENGTH_ISSET_ID);
+    }
+
+    public void setMaxLengthIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __MAXLENGTH_ISSET_ID, value);
+    }
+
+    public int getTop() {
+      return this.top;
+    }
+
+    public currentTrends_args setTop(int top) {
+      this.top = top;
+      setTopIsSet(true);
+      return this;
+    }
+
+    public void unsetTop() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __TOP_ISSET_ID);
+    }
+
+    /** Returns true if field top is set (has been assigned a value) and false otherwise */
+    public boolean isSetTop() {
+      return EncodingUtils.testBit(__isset_bitfield, __TOP_ISSET_ID);
+    }
+
+    public void setTopIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __TOP_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case MIN_OCCURRENCE:
+        if (value == null) {
+          unsetMinOccurrence();
+        } else {
+          setMinOccurrence((Double)value);
+        }
+        break;
+
+      case MIN_LENGTH:
+        if (value == null) {
+          unsetMinLength();
+        } else {
+          setMinLength((Integer)value);
+        }
+        break;
+
+      case MAX_LENGTH:
+        if (value == null) {
+          unsetMaxLength();
+        } else {
+          setMaxLength((Integer)value);
+        }
+        break;
+
+      case TOP:
+        if (value == null) {
+          unsetTop();
+        } else {
+          setTop((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case MIN_OCCURRENCE:
+        return Double.valueOf(getMinOccurrence());
+
+      case MIN_LENGTH:
+        return Integer.valueOf(getMinLength());
+
+      case MAX_LENGTH:
+        return Integer.valueOf(getMaxLength());
+
+      case TOP:
+        return Integer.valueOf(getTop());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case MIN_OCCURRENCE:
+        return isSetMinOccurrence();
+      case MIN_LENGTH:
+        return isSetMinLength();
+      case MAX_LENGTH:
+        return isSetMaxLength();
+      case TOP:
+        return isSetTop();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof currentTrends_args)
+        return this.equals((currentTrends_args)that);
+      return false;
+    }
+
+    public boolean equals(currentTrends_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_minOccurrence = true;
+      boolean that_present_minOccurrence = true;
+      if (this_present_minOccurrence || that_present_minOccurrence) {
+        if (!(this_present_minOccurrence && that_present_minOccurrence))
+          return false;
+        if (this.minOccurrence != that.minOccurrence)
+          return false;
+      }
+
+      boolean this_present_minLength = true;
+      boolean that_present_minLength = true;
+      if (this_present_minLength || that_present_minLength) {
+        if (!(this_present_minLength && that_present_minLength))
+          return false;
+        if (this.minLength != that.minLength)
+          return false;
+      }
+
+      boolean this_present_maxLength = true;
+      boolean that_present_maxLength = true;
+      if (this_present_maxLength || that_present_maxLength) {
+        if (!(this_present_maxLength && that_present_maxLength))
+          return false;
+        if (this.maxLength != that.maxLength)
+          return false;
+      }
+
+      boolean this_present_top = true;
+      boolean that_present_top = true;
+      if (this_present_top || that_present_top) {
+        if (!(this_present_top && that_present_top))
+          return false;
+        if (this.top != that.top)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(currentTrends_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      currentTrends_args typedOther = (currentTrends_args)other;
+
+      lastComparison = Boolean.valueOf(isSetMinOccurrence()).compareTo(typedOther.isSetMinOccurrence());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMinOccurrence()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.minOccurrence, typedOther.minOccurrence);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetMinLength()).compareTo(typedOther.isSetMinLength());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMinLength()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.minLength, typedOther.minLength);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetMaxLength()).compareTo(typedOther.isSetMaxLength());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMaxLength()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.maxLength, typedOther.maxLength);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTop()).compareTo(typedOther.isSetTop());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTop()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.top, typedOther.top);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("currentTrends_args(");
+      boolean first = true;
+
+      sb.append("minOccurrence:");
+      sb.append(this.minOccurrence);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("minLength:");
+      sb.append(this.minLength);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("maxLength:");
+      sb.append(this.maxLength);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("top:");
+      sb.append(this.top);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bitfield = 0;
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class currentTrends_argsStandardSchemeFactory implements SchemeFactory {
+      public currentTrends_argsStandardScheme getScheme() {
+        return new currentTrends_argsStandardScheme();
+      }
+    }
+
+    private static class currentTrends_argsStandardScheme extends StandardScheme<currentTrends_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, currentTrends_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // MIN_OCCURRENCE
+              if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
+                struct.minOccurrence = iprot.readDouble();
+                struct.setMinOccurrenceIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // MIN_LENGTH
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.minLength = iprot.readI32();
+                struct.setMinLengthIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // MAX_LENGTH
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.maxLength = iprot.readI32();
+                struct.setMaxLengthIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 4: // TOP
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.top = iprot.readI32();
+                struct.setTopIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
       public void write(org.apache.thrift.protocol.TProtocol oprot, currentTrends_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldBegin(MIN_OCCURRENCE_FIELD_DESC);
+        oprot.writeDouble(struct.minOccurrence);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(MIN_LENGTH_FIELD_DESC);
+        oprot.writeI32(struct.minLength);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(MAX_LENGTH_FIELD_DESC);
+        oprot.writeI32(struct.maxLength);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(TOP_FIELD_DESC);
+        oprot.writeI32(struct.top);
+        oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -1085,11 +2176,54 @@ public class TrendThriftServer {
       @Override
       public void write(org.apache.thrift.protocol.TProtocol prot, currentTrends_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetMinOccurrence()) {
+          optionals.set(0);
+        }
+        if (struct.isSetMinLength()) {
+          optionals.set(1);
+        }
+        if (struct.isSetMaxLength()) {
+          optionals.set(2);
+        }
+        if (struct.isSetTop()) {
+          optionals.set(3);
+        }
+        oprot.writeBitSet(optionals, 4);
+        if (struct.isSetMinOccurrence()) {
+          oprot.writeDouble(struct.minOccurrence);
+        }
+        if (struct.isSetMinLength()) {
+          oprot.writeI32(struct.minLength);
+        }
+        if (struct.isSetMaxLength()) {
+          oprot.writeI32(struct.maxLength);
+        }
+        if (struct.isSetTop()) {
+          oprot.writeI32(struct.top);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, currentTrends_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(4);
+        if (incoming.get(0)) {
+          struct.minOccurrence = iprot.readDouble();
+          struct.setMinOccurrenceIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.minLength = iprot.readI32();
+          struct.setMinLengthIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.maxLength = iprot.readI32();
+          struct.setMaxLengthIsSet(true);
+        }
+        if (incoming.get(3)) {
+          struct.top = iprot.readI32();
+          struct.setTopIsSet(true);
+        }
       }
     }
 
@@ -1404,14 +2538,14 @@ public class TrendThriftServer {
             case 0: // SUCCESS
               if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
                 {
-                  org.apache.thrift.protocol.TList _list0 = iprot.readListBegin();
-                  struct.success = new ArrayList<TrendResult>(_list0.size);
-                  for (int _i1 = 0; _i1 < _list0.size; ++_i1)
+                  org.apache.thrift.protocol.TList _list8 = iprot.readListBegin();
+                  struct.success = new ArrayList<TrendResult>(_list8.size);
+                  for (int _i9 = 0; _i9 < _list8.size; ++_i9)
                   {
-                    TrendResult _elem2; // required
-                    _elem2 = new TrendResult();
-                    _elem2.read(iprot);
-                    struct.success.add(_elem2);
+                    TrendResult _elem10; // required
+                    _elem10 = new TrendResult();
+                    _elem10.read(iprot);
+                    struct.success.add(_elem10);
                   }
                   iprot.readListEnd();
                 }
@@ -1439,9 +2573,9 @@ public class TrendThriftServer {
           oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.success.size()));
-            for (TrendResult _iter3 : struct.success)
+            for (TrendResult _iter11 : struct.success)
             {
-              _iter3.write(oprot);
+              _iter11.write(oprot);
             }
             oprot.writeListEnd();
           }
@@ -1472,9 +2606,9 @@ public class TrendThriftServer {
         if (struct.isSetSuccess()) {
           {
             oprot.writeI32(struct.success.size());
-            for (TrendResult _iter4 : struct.success)
+            for (TrendResult _iter12 : struct.success)
             {
-              _iter4.write(oprot);
+              _iter12.write(oprot);
             }
           }
         }
@@ -1486,14 +2620,14 @@ public class TrendThriftServer {
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
           {
-            org.apache.thrift.protocol.TList _list5 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-            struct.success = new ArrayList<TrendResult>(_list5.size);
-            for (int _i6 = 0; _i6 < _list5.size; ++_i6)
+            org.apache.thrift.protocol.TList _list13 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+            struct.success = new ArrayList<TrendResult>(_list13.size);
+            for (int _i14 = 0; _i14 < _list13.size; ++_i14)
             {
-              TrendResult _elem7; // required
-              _elem7 = new TrendResult();
-              _elem7.read(iprot);
-              struct.success.add(_elem7);
+              TrendResult _elem15; // required
+              _elem15 = new TrendResult();
+              _elem15.read(iprot);
+              struct.success.add(_elem15);
             }
           }
           struct.setSuccessIsSet(true);

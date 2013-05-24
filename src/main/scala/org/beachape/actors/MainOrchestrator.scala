@@ -1,6 +1,6 @@
 package org.beachape.actors
-import akka.actor.{Actor, Props}
-import scala.concurrent.{Future, Await}
+import akka.actor.{ Actor, Props }
+import scala.concurrent.{ Future, Await }
 import akka.pattern.ask
 import akka.event.Logging
 import akka.routing.RoundRobinRouter
@@ -75,12 +75,20 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
 
     case 'allDone => {
       println("That's all folks!")
-//      context.system.shutdown()
+      //      context.system.shutdown()
     }
 
-    case 'getLatest => {
+    case 'getTrendsDefault => {
       val zender = sender
       val listOfReverseSortedTermsAndScoresFuture = morphemeRetrieveRoundRobin ? List('retrieveChiChi, latestTrendsRedisKeySet, minOccurrence, minLength, maxLength, top)
+      listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
+        zender ! listOfReverseSortedTermsAndScores
+      }
+    }
+
+    case List('getTrends, (callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
+      val zender = sender
+      val listOfReverseSortedTermsAndScoresFuture = morphemeRetrieveRoundRobin ? List('retrieveChiChi, latestTrendsRedisKeySet, callMinOccurrence, callMinLength, callMaxLength, callTop)
       listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
         zender ! listOfReverseSortedTermsAndScores
       }
@@ -93,9 +101,9 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
 
   def latestTrendsRedisKeySet: RedisKeySet = {
     redisPool.withClient { redis =>
-      redis.hmget(hashOfLatestTrendKeysKey,"expected", "observed")
+      redis.hmget(hashOfLatestTrendKeysKey, "expected", "observed")
     } match {
-      case Some(x: Map[String,String]) if ( x.contains("expected") && x.contains("observed")) =>
+      case Some(x: Map[String, String]) if (x.contains("expected") && x.contains("observed")) =>
         RedisKeySet(RedisKey(x.getOrElse("expected", "")), RedisKey(x.getOrElse("observed", "")))
       case _ => RedisKeySet(RedisKey(""), RedisKey(""))
     }

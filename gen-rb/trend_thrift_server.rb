@@ -28,13 +28,28 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'time failed: unknown result')
         end
 
-        def currentTrends()
-          send_currentTrends()
+        def currentTrendsDefault()
+          send_currentTrendsDefault()
+          return recv_currentTrendsDefault()
+        end
+
+        def send_currentTrendsDefault()
+          send_message('currentTrendsDefault', CurrentTrendsDefault_args)
+        end
+
+        def recv_currentTrendsDefault()
+          result = receive_message(CurrentTrendsDefault_result)
+          return result.success unless result.success.nil?
+          raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'currentTrendsDefault failed: unknown result')
+        end
+
+        def currentTrends(minOccurrence, minLength, maxLength, top)
+          send_currentTrends(minOccurrence, minLength, maxLength, top)
           return recv_currentTrends()
         end
 
-        def send_currentTrends()
-          send_message('currentTrends', CurrentTrends_args)
+        def send_currentTrends(minOccurrence, minLength, maxLength, top)
+          send_message('currentTrends', CurrentTrends_args, :minOccurrence => minOccurrence, :minLength => minLength, :maxLength => maxLength, :top => top)
         end
 
         def recv_currentTrends()
@@ -55,10 +70,17 @@ module TrendServer
           write_result(result, oprot, 'time', seqid)
         end
 
+        def process_currentTrendsDefault(seqid, iprot, oprot)
+          args = read_args(iprot, CurrentTrendsDefault_args)
+          result = CurrentTrendsDefault_result.new()
+          result.success = @handler.currentTrendsDefault()
+          write_result(result, oprot, 'currentTrendsDefault', seqid)
+        end
+
         def process_currentTrends(seqid, iprot, oprot)
           args = read_args(iprot, CurrentTrends_args)
           result = CurrentTrends_result.new()
-          result.success = @handler.currentTrends()
+          result.success = @handler.currentTrends(args.minOccurrence, args.minLength, args.maxLength, args.top)
           write_result(result, oprot, 'currentTrends', seqid)
         end
 
@@ -97,11 +119,49 @@ module TrendServer
         ::Thrift::Struct.generate_accessors self
       end
 
-      class CurrentTrends_args
+      class CurrentTrendsDefault_args
         include ::Thrift::Struct, ::Thrift::Struct_Union
 
         FIELDS = {
 
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class CurrentTrendsDefault_result
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+        SUCCESS = 0
+
+        FIELDS = {
+          SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TrendServer::Gen::TrendResult}}
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class CurrentTrends_args
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+        MINOCCURRENCE = 1
+        MINLENGTH = 2
+        MAXLENGTH = 3
+        TOP = 4
+
+        FIELDS = {
+          MINOCCURRENCE => {:type => ::Thrift::Types::DOUBLE, :name => 'minOccurrence'},
+          MINLENGTH => {:type => ::Thrift::Types::I32, :name => 'minLength'},
+          MAXLENGTH => {:type => ::Thrift::Types::I32, :name => 'maxLength'},
+          TOP => {:type => ::Thrift::Types::I32, :name => 'top'}
         }
 
         def struct_fields; FIELDS; end

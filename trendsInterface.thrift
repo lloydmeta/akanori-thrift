@@ -11,8 +11,9 @@ struct TrendResult {
 service TrendThriftServer {
 
     // Simply returns the current time.
-	Timestamp time()
+	Timestamp time(),
 	
-	// Get list of trends
-	list<TrendResult> currentTrends()
+	// Methods for retrieving Trends
+	list<TrendResult> currentTrendsDefault(),
+	list<TrendResult> currentTrends(1:double minOccurrence, 2:i32 minLength, 3:i32 maxLength, 4:i32 top)
 }
