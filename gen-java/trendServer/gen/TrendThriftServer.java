@@ -40,6 +40,8 @@ public class TrendThriftServer {
 
     public List<TrendResult> currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
 
+    public void analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException;
+
   }
 
   public interface AsyncIface {
@@ -49,6 +51,8 @@ public class TrendThriftServer {
     public void currentTrendsDefault(org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrendsDefault_call> resultHandler) throws org.apache.thrift.TException;
 
     public void currentTrends(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.analyzeAndStoreMorphemes_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -140,6 +144,20 @@ public class TrendThriftServer {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "currentTrends failed: unknown result");
+    }
+
+    public void analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException
+    {
+      send_analyzeAndStoreMorphemes(stringToParse, dropBlacklisted, onlyWhitelisted);
+    }
+
+    public void send_analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException
+    {
+      analyzeAndStoreMorphemes_args args = new analyzeAndStoreMorphemes_args();
+      args.setStringToParse(stringToParse);
+      args.setDropBlacklisted(dropBlacklisted);
+      args.setOnlyWhitelisted(onlyWhitelisted);
+      sendBase("analyzeAndStoreMorphemes", args);
     }
 
   }
@@ -259,6 +277,43 @@ public class TrendThriftServer {
       }
     }
 
+    public void analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<analyzeAndStoreMorphemes_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      analyzeAndStoreMorphemes_call method_call = new analyzeAndStoreMorphemes_call(stringToParse, dropBlacklisted, onlyWhitelisted, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class analyzeAndStoreMorphemes_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String stringToParse;
+      private boolean dropBlacklisted;
+      private boolean onlyWhitelisted;
+      public analyzeAndStoreMorphemes_call(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<analyzeAndStoreMorphemes_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, true);
+        this.stringToParse = stringToParse;
+        this.dropBlacklisted = dropBlacklisted;
+        this.onlyWhitelisted = onlyWhitelisted;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("analyzeAndStoreMorphemes", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        analyzeAndStoreMorphemes_args args = new analyzeAndStoreMorphemes_args();
+        args.setStringToParse(stringToParse);
+        args.setDropBlacklisted(dropBlacklisted);
+        args.setOnlyWhitelisted(onlyWhitelisted);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+      }
+    }
+
   }
 
   public static class Processor<I extends Iface> extends org.apache.thrift.TBaseProcessor<I> implements org.apache.thrift.TProcessor {
@@ -275,6 +330,7 @@ public class TrendThriftServer {
       processMap.put("time", new time());
       processMap.put("currentTrendsDefault", new currentTrendsDefault());
       processMap.put("currentTrends", new currentTrends());
+      processMap.put("analyzeAndStoreMorphemes", new analyzeAndStoreMorphemes());
       return processMap;
     }
 
@@ -336,6 +392,25 @@ public class TrendThriftServer {
         currentTrends_result result = new currentTrends_result();
         result.success = iface.currentTrends(args.minOccurrence, args.minLength, args.maxLength, args.top);
         return result;
+      }
+    }
+
+    public static class analyzeAndStoreMorphemes<I extends Iface> extends org.apache.thrift.ProcessFunction<I, analyzeAndStoreMorphemes_args> {
+      public analyzeAndStoreMorphemes() {
+        super("analyzeAndStoreMorphemes");
+      }
+
+      public analyzeAndStoreMorphemes_args getEmptyArgsInstance() {
+        return new analyzeAndStoreMorphemes_args();
+      }
+
+      protected boolean isOneway() {
+        return true;
+      }
+
+      public org.apache.thrift.TBase getResult(I iface, analyzeAndStoreMorphemes_args args) throws org.apache.thrift.TException {
+        iface.analyzeAndStoreMorphemes(args.stringToParse, args.dropBlacklisted, args.onlyWhitelisted);
+        return null;
       }
     }
 
@@ -2631,6 +2706,552 @@ public class TrendThriftServer {
             }
           }
           struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class analyzeAndStoreMorphemes_args implements org.apache.thrift.TBase<analyzeAndStoreMorphemes_args, analyzeAndStoreMorphemes_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("analyzeAndStoreMorphemes_args");
+
+    private static final org.apache.thrift.protocol.TField STRING_TO_PARSE_FIELD_DESC = new org.apache.thrift.protocol.TField("stringToParse", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField DROP_BLACKLISTED_FIELD_DESC = new org.apache.thrift.protocol.TField("dropBlacklisted", org.apache.thrift.protocol.TType.BOOL, (short)2);
+    private static final org.apache.thrift.protocol.TField ONLY_WHITELISTED_FIELD_DESC = new org.apache.thrift.protocol.TField("onlyWhitelisted", org.apache.thrift.protocol.TType.BOOL, (short)3);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new analyzeAndStoreMorphemes_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new analyzeAndStoreMorphemes_argsTupleSchemeFactory());
+    }
+
+    public String stringToParse; // required
+    public boolean dropBlacklisted; // required
+    public boolean onlyWhitelisted; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      STRING_TO_PARSE((short)1, "stringToParse"),
+      DROP_BLACKLISTED((short)2, "dropBlacklisted"),
+      ONLY_WHITELISTED((short)3, "onlyWhitelisted");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // STRING_TO_PARSE
+            return STRING_TO_PARSE;
+          case 2: // DROP_BLACKLISTED
+            return DROP_BLACKLISTED;
+          case 3: // ONLY_WHITELISTED
+            return ONLY_WHITELISTED;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __DROPBLACKLISTED_ISSET_ID = 0;
+    private static final int __ONLYWHITELISTED_ISSET_ID = 1;
+    private byte __isset_bitfield = 0;
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.STRING_TO_PARSE, new org.apache.thrift.meta_data.FieldMetaData("stringToParse", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.DROP_BLACKLISTED, new org.apache.thrift.meta_data.FieldMetaData("dropBlacklisted", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+      tmpMap.put(_Fields.ONLY_WHITELISTED, new org.apache.thrift.meta_data.FieldMetaData("onlyWhitelisted", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(analyzeAndStoreMorphemes_args.class, metaDataMap);
+    }
+
+    public analyzeAndStoreMorphemes_args() {
+    }
+
+    public analyzeAndStoreMorphemes_args(
+      String stringToParse,
+      boolean dropBlacklisted,
+      boolean onlyWhitelisted)
+    {
+      this();
+      this.stringToParse = stringToParse;
+      this.dropBlacklisted = dropBlacklisted;
+      setDropBlacklistedIsSet(true);
+      this.onlyWhitelisted = onlyWhitelisted;
+      setOnlyWhitelistedIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public analyzeAndStoreMorphemes_args(analyzeAndStoreMorphemes_args other) {
+      __isset_bitfield = other.__isset_bitfield;
+      if (other.isSetStringToParse()) {
+        this.stringToParse = other.stringToParse;
+      }
+      this.dropBlacklisted = other.dropBlacklisted;
+      this.onlyWhitelisted = other.onlyWhitelisted;
+    }
+
+    public analyzeAndStoreMorphemes_args deepCopy() {
+      return new analyzeAndStoreMorphemes_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.stringToParse = null;
+      setDropBlacklistedIsSet(false);
+      this.dropBlacklisted = false;
+      setOnlyWhitelistedIsSet(false);
+      this.onlyWhitelisted = false;
+    }
+
+    public String getStringToParse() {
+      return this.stringToParse;
+    }
+
+    public analyzeAndStoreMorphemes_args setStringToParse(String stringToParse) {
+      this.stringToParse = stringToParse;
+      return this;
+    }
+
+    public void unsetStringToParse() {
+      this.stringToParse = null;
+    }
+
+    /** Returns true if field stringToParse is set (has been assigned a value) and false otherwise */
+    public boolean isSetStringToParse() {
+      return this.stringToParse != null;
+    }
+
+    public void setStringToParseIsSet(boolean value) {
+      if (!value) {
+        this.stringToParse = null;
+      }
+    }
+
+    public boolean isDropBlacklisted() {
+      return this.dropBlacklisted;
+    }
+
+    public analyzeAndStoreMorphemes_args setDropBlacklisted(boolean dropBlacklisted) {
+      this.dropBlacklisted = dropBlacklisted;
+      setDropBlacklistedIsSet(true);
+      return this;
+    }
+
+    public void unsetDropBlacklisted() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID);
+    }
+
+    /** Returns true if field dropBlacklisted is set (has been assigned a value) and false otherwise */
+    public boolean isSetDropBlacklisted() {
+      return EncodingUtils.testBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID);
+    }
+
+    public void setDropBlacklistedIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID, value);
+    }
+
+    public boolean isOnlyWhitelisted() {
+      return this.onlyWhitelisted;
+    }
+
+    public analyzeAndStoreMorphemes_args setOnlyWhitelisted(boolean onlyWhitelisted) {
+      this.onlyWhitelisted = onlyWhitelisted;
+      setOnlyWhitelistedIsSet(true);
+      return this;
+    }
+
+    public void unsetOnlyWhitelisted() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID);
+    }
+
+    /** Returns true if field onlyWhitelisted is set (has been assigned a value) and false otherwise */
+    public boolean isSetOnlyWhitelisted() {
+      return EncodingUtils.testBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID);
+    }
+
+    public void setOnlyWhitelistedIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case STRING_TO_PARSE:
+        if (value == null) {
+          unsetStringToParse();
+        } else {
+          setStringToParse((String)value);
+        }
+        break;
+
+      case DROP_BLACKLISTED:
+        if (value == null) {
+          unsetDropBlacklisted();
+        } else {
+          setDropBlacklisted((Boolean)value);
+        }
+        break;
+
+      case ONLY_WHITELISTED:
+        if (value == null) {
+          unsetOnlyWhitelisted();
+        } else {
+          setOnlyWhitelisted((Boolean)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case STRING_TO_PARSE:
+        return getStringToParse();
+
+      case DROP_BLACKLISTED:
+        return Boolean.valueOf(isDropBlacklisted());
+
+      case ONLY_WHITELISTED:
+        return Boolean.valueOf(isOnlyWhitelisted());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case STRING_TO_PARSE:
+        return isSetStringToParse();
+      case DROP_BLACKLISTED:
+        return isSetDropBlacklisted();
+      case ONLY_WHITELISTED:
+        return isSetOnlyWhitelisted();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof analyzeAndStoreMorphemes_args)
+        return this.equals((analyzeAndStoreMorphemes_args)that);
+      return false;
+    }
+
+    public boolean equals(analyzeAndStoreMorphemes_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_stringToParse = true && this.isSetStringToParse();
+      boolean that_present_stringToParse = true && that.isSetStringToParse();
+      if (this_present_stringToParse || that_present_stringToParse) {
+        if (!(this_present_stringToParse && that_present_stringToParse))
+          return false;
+        if (!this.stringToParse.equals(that.stringToParse))
+          return false;
+      }
+
+      boolean this_present_dropBlacklisted = true;
+      boolean that_present_dropBlacklisted = true;
+      if (this_present_dropBlacklisted || that_present_dropBlacklisted) {
+        if (!(this_present_dropBlacklisted && that_present_dropBlacklisted))
+          return false;
+        if (this.dropBlacklisted != that.dropBlacklisted)
+          return false;
+      }
+
+      boolean this_present_onlyWhitelisted = true;
+      boolean that_present_onlyWhitelisted = true;
+      if (this_present_onlyWhitelisted || that_present_onlyWhitelisted) {
+        if (!(this_present_onlyWhitelisted && that_present_onlyWhitelisted))
+          return false;
+        if (this.onlyWhitelisted != that.onlyWhitelisted)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(analyzeAndStoreMorphemes_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      analyzeAndStoreMorphemes_args typedOther = (analyzeAndStoreMorphemes_args)other;
+
+      lastComparison = Boolean.valueOf(isSetStringToParse()).compareTo(typedOther.isSetStringToParse());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetStringToParse()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.stringToParse, typedOther.stringToParse);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetDropBlacklisted()).compareTo(typedOther.isSetDropBlacklisted());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetDropBlacklisted()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.dropBlacklisted, typedOther.dropBlacklisted);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetOnlyWhitelisted()).compareTo(typedOther.isSetOnlyWhitelisted());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetOnlyWhitelisted()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.onlyWhitelisted, typedOther.onlyWhitelisted);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("analyzeAndStoreMorphemes_args(");
+      boolean first = true;
+
+      sb.append("stringToParse:");
+      if (this.stringToParse == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.stringToParse);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("dropBlacklisted:");
+      sb.append(this.dropBlacklisted);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("onlyWhitelisted:");
+      sb.append(this.onlyWhitelisted);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bitfield = 0;
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class analyzeAndStoreMorphemes_argsStandardSchemeFactory implements SchemeFactory {
+      public analyzeAndStoreMorphemes_argsStandardScheme getScheme() {
+        return new analyzeAndStoreMorphemes_argsStandardScheme();
+      }
+    }
+
+    private static class analyzeAndStoreMorphemes_argsStandardScheme extends StandardScheme<analyzeAndStoreMorphemes_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, analyzeAndStoreMorphemes_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // STRING_TO_PARSE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.stringToParse = iprot.readString();
+                struct.setStringToParseIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // DROP_BLACKLISTED
+              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+                struct.dropBlacklisted = iprot.readBool();
+                struct.setDropBlacklistedIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // ONLY_WHITELISTED
+              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+                struct.onlyWhitelisted = iprot.readBool();
+                struct.setOnlyWhitelistedIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, analyzeAndStoreMorphemes_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.stringToParse != null) {
+          oprot.writeFieldBegin(STRING_TO_PARSE_FIELD_DESC);
+          oprot.writeString(struct.stringToParse);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldBegin(DROP_BLACKLISTED_FIELD_DESC);
+        oprot.writeBool(struct.dropBlacklisted);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(ONLY_WHITELISTED_FIELD_DESC);
+        oprot.writeBool(struct.onlyWhitelisted);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class analyzeAndStoreMorphemes_argsTupleSchemeFactory implements SchemeFactory {
+      public analyzeAndStoreMorphemes_argsTupleScheme getScheme() {
+        return new analyzeAndStoreMorphemes_argsTupleScheme();
+      }
+    }
+
+    private static class analyzeAndStoreMorphemes_argsTupleScheme extends TupleScheme<analyzeAndStoreMorphemes_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, analyzeAndStoreMorphemes_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetStringToParse()) {
+          optionals.set(0);
+        }
+        if (struct.isSetDropBlacklisted()) {
+          optionals.set(1);
+        }
+        if (struct.isSetOnlyWhitelisted()) {
+          optionals.set(2);
+        }
+        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetStringToParse()) {
+          oprot.writeString(struct.stringToParse);
+        }
+        if (struct.isSetDropBlacklisted()) {
+          oprot.writeBool(struct.dropBlacklisted);
+        }
+        if (struct.isSetOnlyWhitelisted()) {
+          oprot.writeBool(struct.onlyWhitelisted);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, analyzeAndStoreMorphemes_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(3);
+        if (incoming.get(0)) {
+          struct.stringToParse = iprot.readString();
+          struct.setStringToParseIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.dropBlacklisted = iprot.readBool();
+          struct.setDropBlacklistedIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.onlyWhitelisted = iprot.readBool();
+          struct.setOnlyWhitelistedIsSet(true);
         }
       }
     }

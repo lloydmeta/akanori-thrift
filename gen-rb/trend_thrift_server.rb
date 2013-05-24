@@ -58,6 +58,13 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'currentTrends failed: unknown result')
         end
 
+        def analyzeAndStoreMorphemes(stringToParse, dropBlacklisted, onlyWhitelisted)
+          send_analyzeAndStoreMorphemes(stringToParse, dropBlacklisted, onlyWhitelisted)
+        end
+
+        def send_analyzeAndStoreMorphemes(stringToParse, dropBlacklisted, onlyWhitelisted)
+          send_message('analyzeAndStoreMorphemes', AnalyzeAndStoreMorphemes_args, :stringToParse => stringToParse, :dropBlacklisted => dropBlacklisted, :onlyWhitelisted => onlyWhitelisted)
+        end
       end
 
       class Processor
@@ -82,6 +89,12 @@ module TrendServer
           result = CurrentTrends_result.new()
           result.success = @handler.currentTrends(args.minOccurrence, args.minLength, args.maxLength, args.top)
           write_result(result, oprot, 'currentTrends', seqid)
+        end
+
+        def process_analyzeAndStoreMorphemes(seqid, iprot, oprot)
+          args = read_args(iprot, AnalyzeAndStoreMorphemes_args)
+          @handler.analyzeAndStoreMorphemes(args.stringToParse, args.dropBlacklisted, args.onlyWhitelisted)
+          return
         end
 
       end
@@ -178,6 +191,41 @@ module TrendServer
 
         FIELDS = {
           SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TrendServer::Gen::TrendResult}}
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class AnalyzeAndStoreMorphemes_args
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+        STRINGTOPARSE = 1
+        DROPBLACKLISTED = 2
+        ONLYWHITELISTED = 3
+
+        FIELDS = {
+          STRINGTOPARSE => {:type => ::Thrift::Types::STRING, :name => 'stringToParse'},
+          DROPBLACKLISTED => {:type => ::Thrift::Types::BOOL, :name => 'dropBlacklisted'},
+          ONLYWHITELISTED => {:type => ::Thrift::Types::BOOL, :name => 'onlyWhitelisted'}
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class AnalyzeAndStoreMorphemes_result
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+
+        FIELDS = {
+
         }
 
         def struct_fields; FIELDS; end

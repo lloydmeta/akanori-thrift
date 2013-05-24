@@ -47,4 +47,8 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
     listOfTrendResults
   }
 
+  override def analyzeAndStoreMorphemes(stringToParse: String, dropBlacklisted: Boolean, onlyWhitelisted: Boolean): Unit = {
+    mainOrchestrator ! List('analyzeAndStoreMorphemes, (stringToParse, dropBlacklisted, onlyWhitelisted))
+  }
+
 }

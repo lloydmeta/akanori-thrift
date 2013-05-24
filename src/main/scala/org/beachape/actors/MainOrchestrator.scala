@@ -17,8 +17,10 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
   import context.dispatcher
 
   implicit val timeout = Timeout(600 seconds)
+
   val fileToRedisRoundRobin = context.actorOf(Props(new FileToRedisActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(RoundRobinRouter(4)), "fileRouter")
   val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
+  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorMorphemesAnalyzerRoundRobin")
 
   def receive = {
 
@@ -92,6 +94,10 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
       listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
         zender ! listOfReverseSortedTermsAndScores
       }
+    }
+
+    case List('analyzeAndStoreMorphemes, (stringToParse: String, callDropBlacklisted: Boolean, callWhitelisted: Boolean)) => {
+        morphemeAnalyzerRoundRobin ! List('analyzeAndStoreMorphemes, (stringToParse, callDropBlacklisted, callWhitelisted))
     }
 
     case _ => System.exit(1)
