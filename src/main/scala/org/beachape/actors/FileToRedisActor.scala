@@ -11,7 +11,6 @@ import scala.concurrent.{Await, Future}
 import akka.util.Timeout
 import scala.concurrent.duration._
 
-
 class FileToRedisActor(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) extends Actor {
 
   import context.dispatcher
