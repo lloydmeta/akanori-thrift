@@ -1,6 +1,6 @@
 seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
 
-name := "akanori"
+name := "akanori-thrift"
 
 version := "1.0"
 
