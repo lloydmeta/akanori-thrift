@@ -13,9 +13,10 @@ class MorphemesAnalyzerActor(redisPool: RedisClientPool) extends Actor with Redi
     case List('dumpMorphemesToRedis, redisKey: RedisKey, line: String, dropBlacklisted:Boolean, onlyWhitelisted: Boolean) => {
       val morphemes = Morpheme.stringToMorphemes(line, dropBlacklisted, onlyWhitelisted)
       storeAllInRedis(morphemes, redisKey)
+      sender ! true
     }
 
-    case _ => println("huh?")
+    case _ => println("MorphemesAnalyzerActor says 'huh? '")
   }
 
   private def storeAllInRedis(morphemeList: List[Morpheme], redisKey: RedisKey) = {

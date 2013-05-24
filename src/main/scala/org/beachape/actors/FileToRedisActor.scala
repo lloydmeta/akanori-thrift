@@ -17,28 +17,33 @@ class FileToRedisActor(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
   import context.dispatcher
   implicit val timeout = Timeout(600 seconds)
 
-  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(4)), "morphemesAnalyzerRoundRobin")
+  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "morphemesAnalyzerRoundRobin")
 
   def receive = {
 
-    case FilePath(filePath) => {
+    case FilePath(filePath: String) => {
       val redisKey = redisKeyForPath(filePath)
+      val zender = sender
 
-      val listOfAnalyzeAndDumpFutures = Source.fromFile(filePath).getLines().flatMap(line =>
-        ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, line, dropBlacklisted, onlyWhitelisted))
-      ).toList
+      //Not sure if theres a better way, but for now, store everything in memory...
+      val linesInFile = Source.fromFile(filePath).getLines.toList
+      val listOfAnalyzeAndDumpFutures = for (line <- linesInFile) yield {
+        ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, RedisKey(redisKey), line, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
+      }
 
       val futureListOfAnalyzeAndDumpResults = Future.sequence(listOfAnalyzeAndDumpFutures)
 
       futureListOfAnalyzeAndDumpResults map {analyzeAndDumpResultsList =>
         analyzeAndDumpResultsList match {
-          case x:List[Boolean] if x.forall(_ == true) => sender ! RedisKey(redisKey)
-          case _ => exit(0)
+          case x:List[Boolean] if x.forall(_ == true) => {
+            zender ! RedisKey(redisKey)
+          }
+          case _ => exit(1)
         }
       }
     }
 
-    case _ => println("huh?")
+    case _ => println("FiletoRedisActor says 'huh?'")
   }
 
   def redisKeyForPath(path: String) = f"trends:$path%s"

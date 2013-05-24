@@ -35,9 +35,7 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
           ask(fileToRedisRoundRobin, newObservedPath).mapTo[RedisKey]
       )
       val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
-
       futureListOfRedisKeys map { redisKeysList =>
-
         redisKeysList match {
           case List(oldExpectedKey: RedisKey, oldObservedKey: RedisKey, newExpectedKey: RedisKey, newObservedKey: RedisKey) => {
             self ! List('detectTrends, RedisKeySet(oldExpectedKey, oldObservedKey), RedisKeySet(newExpectedKey, newObservedKey))
