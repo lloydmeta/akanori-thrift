@@ -51,4 +51,9 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
     mainOrchestrator ! List('storeString, (stringToStore, unixCreatedAtTime, weeksAgoDataToExpire))
   }
 
+  override def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) = {
+   mainOrchestrator ! List('getTrendsEndingAt, (unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top))
+   List(new TrendResult("test", 1.0)) //stub
+  }
+
 }

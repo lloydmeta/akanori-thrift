@@ -1,4 +1,5 @@
 package org.beachape.actors
+
 import akka.actor.{ Actor, Props }
 import scala.concurrent.{ Future, Await }
 import akka.pattern.ask
@@ -22,6 +23,8 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
   val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
   val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorMorphemesAnalyzerRoundRobin")
   val stringToRedisRoundRobin = context.actorOf(Props(new StringToRedisActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorStringToRedisRoundRobin")
+  val redisStringSetToMorphemesOrchestrator = context.actorOf(Props(new RedisStringSetToMorphemesOrchestrator(redisPool)))
+  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
 
   def receive = {
 
@@ -98,7 +101,33 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
     }
 
     case message @ List('storeString, (stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)) => {
-        stringToRedisRoundRobin ! message
+      stringToRedisRoundRobin ! message
+    }
+
+    case message @ List('getTrendsEndingAt, (unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
+      val zender = sender
+      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateTrendsFor, (unixEndAtTime: Int, spanInSeconds: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)))
+
+      listOfRedisKeysFuture map { listOfRedisKeys =>
+        listOfRedisKeys match {
+          case List(oldSet: RedisKeySet, newSet: RedisKeySet) => {
+            val oldNewMorphemesSetKeys = ask(morphemesTrendDetectRoundRobin, List('detectTrends, oldSet, newSet, callMinOccurrence))
+            oldNewMorphemesSetKeys map { keySet =>
+              keySet match {
+                case newlyGeneratedSet:RedisKeySet => {
+                  val listOfReverseSortedTermsAndScoresFuture = morphemeRetrieveRoundRobin ? List('retrieveChiChi, newlyGeneratedSet, callMinOccurrence, callMinLength, callMaxLength, callTop)
+                  listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
+                    zender ! listOfReverseSortedTermsAndScores
+                  }
+                }
+                case _ => print("daaamn")
+              }
+            }
+          }
+          case _ =>
+        }
+      }
+
     }
 
     case _ => System.exit(1)

@@ -40,6 +40,8 @@ public class TrendThriftServer {
 
     public List<TrendResult> currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
 
+    public List<TrendResult> trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
+
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException;
 
   }
@@ -51,6 +53,8 @@ public class TrendThriftServer {
     public void currentTrendsDefault(org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrendsDefault_call> resultHandler) throws org.apache.thrift.TException;
 
     public void currentTrends(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.trendsEndingAt_call> resultHandler) throws org.apache.thrift.TException;
 
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.storeString_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -144,6 +148,34 @@ public class TrendThriftServer {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "currentTrends failed: unknown result");
+    }
+
+    public List<TrendResult> trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    {
+      send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top);
+      return recv_trendsEndingAt();
+    }
+
+    public void send_trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    {
+      trendsEndingAt_args args = new trendsEndingAt_args();
+      args.setUnixEndAtTime(unixEndAtTime);
+      args.setSpanInSeconds(spanInSeconds);
+      args.setMinOccurrence(minOccurrence);
+      args.setMinLength(minLength);
+      args.setMaxLength(maxLength);
+      args.setTop(top);
+      sendBase("trendsEndingAt", args);
+    }
+
+    public List<TrendResult> recv_trendsEndingAt() throws org.apache.thrift.TException
+    {
+      trendsEndingAt_result result = new trendsEndingAt_result();
+      receiveBase(result, "trendsEndingAt");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "trendsEndingAt failed: unknown result");
     }
 
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException
@@ -277,6 +309,53 @@ public class TrendThriftServer {
       }
     }
 
+    public void trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<trendsEndingAt_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      trendsEndingAt_call method_call = new trendsEndingAt_call(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class trendsEndingAt_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private int unixEndAtTime;
+      private int spanInSeconds;
+      private double minOccurrence;
+      private int minLength;
+      private int maxLength;
+      private int top;
+      public trendsEndingAt_call(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<trendsEndingAt_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.unixEndAtTime = unixEndAtTime;
+        this.spanInSeconds = spanInSeconds;
+        this.minOccurrence = minOccurrence;
+        this.minLength = minLength;
+        this.maxLength = maxLength;
+        this.top = top;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("trendsEndingAt", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        trendsEndingAt_args args = new trendsEndingAt_args();
+        args.setUnixEndAtTime(unixEndAtTime);
+        args.setSpanInSeconds(spanInSeconds);
+        args.setMinOccurrence(minOccurrence);
+        args.setMinLength(minLength);
+        args.setMaxLength(maxLength);
+        args.setTop(top);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<TrendResult> getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_trendsEndingAt();
+      }
+    }
+
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<storeString_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       storeString_call method_call = new storeString_call(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire, resultHandler, this, ___protocolFactory, ___transport);
@@ -330,6 +409,7 @@ public class TrendThriftServer {
       processMap.put("time", new time());
       processMap.put("currentTrendsDefault", new currentTrendsDefault());
       processMap.put("currentTrends", new currentTrends());
+      processMap.put("trendsEndingAt", new trendsEndingAt());
       processMap.put("storeString", new storeString());
       return processMap;
     }
@@ -391,6 +471,26 @@ public class TrendThriftServer {
       public currentTrends_result getResult(I iface, currentTrends_args args) throws org.apache.thrift.TException {
         currentTrends_result result = new currentTrends_result();
         result.success = iface.currentTrends(args.minOccurrence, args.minLength, args.maxLength, args.top);
+        return result;
+      }
+    }
+
+    public static class trendsEndingAt<I extends Iface> extends org.apache.thrift.ProcessFunction<I, trendsEndingAt_args> {
+      public trendsEndingAt() {
+        super("trendsEndingAt");
+      }
+
+      public trendsEndingAt_args getEmptyArgsInstance() {
+        return new trendsEndingAt_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public trendsEndingAt_result getResult(I iface, trendsEndingAt_args args) throws org.apache.thrift.TException {
+        trendsEndingAt_result result = new trendsEndingAt_result();
+        result.success = iface.trendsEndingAt(args.unixEndAtTime, args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top);
         return result;
       }
     }
@@ -2703,6 +2803,1236 @@ public class TrendThriftServer {
               _elem15 = new TrendResult();
               _elem15.read(iprot);
               struct.success.add(_elem15);
+            }
+          }
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class trendsEndingAt_args implements org.apache.thrift.TBase<trendsEndingAt_args, trendsEndingAt_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("trendsEndingAt_args");
+
+    private static final org.apache.thrift.protocol.TField UNIX_END_AT_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("unixEndAtTime", org.apache.thrift.protocol.TType.I32, (short)1);
+    private static final org.apache.thrift.protocol.TField SPAN_IN_SECONDS_FIELD_DESC = new org.apache.thrift.protocol.TField("spanInSeconds", org.apache.thrift.protocol.TType.I32, (short)2);
+    private static final org.apache.thrift.protocol.TField MIN_OCCURRENCE_FIELD_DESC = new org.apache.thrift.protocol.TField("minOccurrence", org.apache.thrift.protocol.TType.DOUBLE, (short)3);
+    private static final org.apache.thrift.protocol.TField MIN_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("minLength", org.apache.thrift.protocol.TType.I32, (short)4);
+    private static final org.apache.thrift.protocol.TField MAX_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("maxLength", org.apache.thrift.protocol.TType.I32, (short)5);
+    private static final org.apache.thrift.protocol.TField TOP_FIELD_DESC = new org.apache.thrift.protocol.TField("top", org.apache.thrift.protocol.TType.I32, (short)6);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new trendsEndingAt_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new trendsEndingAt_argsTupleSchemeFactory());
+    }
+
+    public int unixEndAtTime; // required
+    public int spanInSeconds; // required
+    public double minOccurrence; // required
+    public int minLength; // required
+    public int maxLength; // required
+    public int top; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      UNIX_END_AT_TIME((short)1, "unixEndAtTime"),
+      SPAN_IN_SECONDS((short)2, "spanInSeconds"),
+      MIN_OCCURRENCE((short)3, "minOccurrence"),
+      MIN_LENGTH((short)4, "minLength"),
+      MAX_LENGTH((short)5, "maxLength"),
+      TOP((short)6, "top");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // UNIX_END_AT_TIME
+            return UNIX_END_AT_TIME;
+          case 2: // SPAN_IN_SECONDS
+            return SPAN_IN_SECONDS;
+          case 3: // MIN_OCCURRENCE
+            return MIN_OCCURRENCE;
+          case 4: // MIN_LENGTH
+            return MIN_LENGTH;
+          case 5: // MAX_LENGTH
+            return MAX_LENGTH;
+          case 6: // TOP
+            return TOP;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __UNIXENDATTIME_ISSET_ID = 0;
+    private static final int __SPANINSECONDS_ISSET_ID = 1;
+    private static final int __MINOCCURRENCE_ISSET_ID = 2;
+    private static final int __MINLENGTH_ISSET_ID = 3;
+    private static final int __MAXLENGTH_ISSET_ID = 4;
+    private static final int __TOP_ISSET_ID = 5;
+    private byte __isset_bitfield = 0;
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.UNIX_END_AT_TIME, new org.apache.thrift.meta_data.FieldMetaData("unixEndAtTime", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.SPAN_IN_SECONDS, new org.apache.thrift.meta_data.FieldMetaData("spanInSeconds", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.MIN_OCCURRENCE, new org.apache.thrift.meta_data.FieldMetaData("minOccurrence", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
+      tmpMap.put(_Fields.MIN_LENGTH, new org.apache.thrift.meta_data.FieldMetaData("minLength", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.MAX_LENGTH, new org.apache.thrift.meta_data.FieldMetaData("maxLength", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.TOP, new org.apache.thrift.meta_data.FieldMetaData("top", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(trendsEndingAt_args.class, metaDataMap);
+    }
+
+    public trendsEndingAt_args() {
+    }
+
+    public trendsEndingAt_args(
+      int unixEndAtTime,
+      int spanInSeconds,
+      double minOccurrence,
+      int minLength,
+      int maxLength,
+      int top)
+    {
+      this();
+      this.unixEndAtTime = unixEndAtTime;
+      setUnixEndAtTimeIsSet(true);
+      this.spanInSeconds = spanInSeconds;
+      setSpanInSecondsIsSet(true);
+      this.minOccurrence = minOccurrence;
+      setMinOccurrenceIsSet(true);
+      this.minLength = minLength;
+      setMinLengthIsSet(true);
+      this.maxLength = maxLength;
+      setMaxLengthIsSet(true);
+      this.top = top;
+      setTopIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public trendsEndingAt_args(trendsEndingAt_args other) {
+      __isset_bitfield = other.__isset_bitfield;
+      this.unixEndAtTime = other.unixEndAtTime;
+      this.spanInSeconds = other.spanInSeconds;
+      this.minOccurrence = other.minOccurrence;
+      this.minLength = other.minLength;
+      this.maxLength = other.maxLength;
+      this.top = other.top;
+    }
+
+    public trendsEndingAt_args deepCopy() {
+      return new trendsEndingAt_args(this);
+    }
+
+    @Override
+    public void clear() {
+      setUnixEndAtTimeIsSet(false);
+      this.unixEndAtTime = 0;
+      setSpanInSecondsIsSet(false);
+      this.spanInSeconds = 0;
+      setMinOccurrenceIsSet(false);
+      this.minOccurrence = 0.0;
+      setMinLengthIsSet(false);
+      this.minLength = 0;
+      setMaxLengthIsSet(false);
+      this.maxLength = 0;
+      setTopIsSet(false);
+      this.top = 0;
+    }
+
+    public int getUnixEndAtTime() {
+      return this.unixEndAtTime;
+    }
+
+    public trendsEndingAt_args setUnixEndAtTime(int unixEndAtTime) {
+      this.unixEndAtTime = unixEndAtTime;
+      setUnixEndAtTimeIsSet(true);
+      return this;
+    }
+
+    public void unsetUnixEndAtTime() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __UNIXENDATTIME_ISSET_ID);
+    }
+
+    /** Returns true if field unixEndAtTime is set (has been assigned a value) and false otherwise */
+    public boolean isSetUnixEndAtTime() {
+      return EncodingUtils.testBit(__isset_bitfield, __UNIXENDATTIME_ISSET_ID);
+    }
+
+    public void setUnixEndAtTimeIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __UNIXENDATTIME_ISSET_ID, value);
+    }
+
+    public int getSpanInSeconds() {
+      return this.spanInSeconds;
+    }
+
+    public trendsEndingAt_args setSpanInSeconds(int spanInSeconds) {
+      this.spanInSeconds = spanInSeconds;
+      setSpanInSecondsIsSet(true);
+      return this;
+    }
+
+    public void unsetSpanInSeconds() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __SPANINSECONDS_ISSET_ID);
+    }
+
+    /** Returns true if field spanInSeconds is set (has been assigned a value) and false otherwise */
+    public boolean isSetSpanInSeconds() {
+      return EncodingUtils.testBit(__isset_bitfield, __SPANINSECONDS_ISSET_ID);
+    }
+
+    public void setSpanInSecondsIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __SPANINSECONDS_ISSET_ID, value);
+    }
+
+    public double getMinOccurrence() {
+      return this.minOccurrence;
+    }
+
+    public trendsEndingAt_args setMinOccurrence(double minOccurrence) {
+      this.minOccurrence = minOccurrence;
+      setMinOccurrenceIsSet(true);
+      return this;
+    }
+
+    public void unsetMinOccurrence() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __MINOCCURRENCE_ISSET_ID);
+    }
+
+    /** Returns true if field minOccurrence is set (has been assigned a value) and false otherwise */
+    public boolean isSetMinOccurrence() {
+      return EncodingUtils.testBit(__isset_bitfield, __MINOCCURRENCE_ISSET_ID);
+    }
+
+    public void setMinOccurrenceIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __MINOCCURRENCE_ISSET_ID, value);
+    }
+
+    public int getMinLength() {
+      return this.minLength;
+    }
+
+    public trendsEndingAt_args setMinLength(int minLength) {
+      this.minLength = minLength;
+      setMinLengthIsSet(true);
+      return this;
+    }
+
+    public void unsetMinLength() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __MINLENGTH_ISSET_ID);
+    }
+
+    /** Returns true if field minLength is set (has been assigned a value) and false otherwise */
+    public boolean isSetMinLength() {
+      return EncodingUtils.testBit(__isset_bitfield, __MINLENGTH_ISSET_ID);
+    }
+
+    public void setMinLengthIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __MINLENGTH_ISSET_ID, value);
+    }
+
+    public int getMaxLength() {
+      return this.maxLength;
+    }
+
+    public trendsEndingAt_args setMaxLength(int maxLength) {
+      this.maxLength = maxLength;
+      setMaxLengthIsSet(true);
+      return this;
+    }
+
+    public void unsetMaxLength() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __MAXLENGTH_ISSET_ID);
+    }
+
+    /** Returns true if field maxLength is set (has been assigned a value) and false otherwise */
+    public boolean isSetMaxLength() {
+      return EncodingUtils.testBit(__isset_bitfield, __MAXLENGTH_ISSET_ID);
+    }
+
+    public void setMaxLengthIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __MAXLENGTH_ISSET_ID, value);
+    }
+
+    public int getTop() {
+      return this.top;
+    }
+
+    public trendsEndingAt_args setTop(int top) {
+      this.top = top;
+      setTopIsSet(true);
+      return this;
+    }
+
+    public void unsetTop() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __TOP_ISSET_ID);
+    }
+
+    /** Returns true if field top is set (has been assigned a value) and false otherwise */
+    public boolean isSetTop() {
+      return EncodingUtils.testBit(__isset_bitfield, __TOP_ISSET_ID);
+    }
+
+    public void setTopIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __TOP_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case UNIX_END_AT_TIME:
+        if (value == null) {
+          unsetUnixEndAtTime();
+        } else {
+          setUnixEndAtTime((Integer)value);
+        }
+        break;
+
+      case SPAN_IN_SECONDS:
+        if (value == null) {
+          unsetSpanInSeconds();
+        } else {
+          setSpanInSeconds((Integer)value);
+        }
+        break;
+
+      case MIN_OCCURRENCE:
+        if (value == null) {
+          unsetMinOccurrence();
+        } else {
+          setMinOccurrence((Double)value);
+        }
+        break;
+
+      case MIN_LENGTH:
+        if (value == null) {
+          unsetMinLength();
+        } else {
+          setMinLength((Integer)value);
+        }
+        break;
+
+      case MAX_LENGTH:
+        if (value == null) {
+          unsetMaxLength();
+        } else {
+          setMaxLength((Integer)value);
+        }
+        break;
+
+      case TOP:
+        if (value == null) {
+          unsetTop();
+        } else {
+          setTop((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case UNIX_END_AT_TIME:
+        return Integer.valueOf(getUnixEndAtTime());
+
+      case SPAN_IN_SECONDS:
+        return Integer.valueOf(getSpanInSeconds());
+
+      case MIN_OCCURRENCE:
+        return Double.valueOf(getMinOccurrence());
+
+      case MIN_LENGTH:
+        return Integer.valueOf(getMinLength());
+
+      case MAX_LENGTH:
+        return Integer.valueOf(getMaxLength());
+
+      case TOP:
+        return Integer.valueOf(getTop());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case UNIX_END_AT_TIME:
+        return isSetUnixEndAtTime();
+      case SPAN_IN_SECONDS:
+        return isSetSpanInSeconds();
+      case MIN_OCCURRENCE:
+        return isSetMinOccurrence();
+      case MIN_LENGTH:
+        return isSetMinLength();
+      case MAX_LENGTH:
+        return isSetMaxLength();
+      case TOP:
+        return isSetTop();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof trendsEndingAt_args)
+        return this.equals((trendsEndingAt_args)that);
+      return false;
+    }
+
+    public boolean equals(trendsEndingAt_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_unixEndAtTime = true;
+      boolean that_present_unixEndAtTime = true;
+      if (this_present_unixEndAtTime || that_present_unixEndAtTime) {
+        if (!(this_present_unixEndAtTime && that_present_unixEndAtTime))
+          return false;
+        if (this.unixEndAtTime != that.unixEndAtTime)
+          return false;
+      }
+
+      boolean this_present_spanInSeconds = true;
+      boolean that_present_spanInSeconds = true;
+      if (this_present_spanInSeconds || that_present_spanInSeconds) {
+        if (!(this_present_spanInSeconds && that_present_spanInSeconds))
+          return false;
+        if (this.spanInSeconds != that.spanInSeconds)
+          return false;
+      }
+
+      boolean this_present_minOccurrence = true;
+      boolean that_present_minOccurrence = true;
+      if (this_present_minOccurrence || that_present_minOccurrence) {
+        if (!(this_present_minOccurrence && that_present_minOccurrence))
+          return false;
+        if (this.minOccurrence != that.minOccurrence)
+          return false;
+      }
+
+      boolean this_present_minLength = true;
+      boolean that_present_minLength = true;
+      if (this_present_minLength || that_present_minLength) {
+        if (!(this_present_minLength && that_present_minLength))
+          return false;
+        if (this.minLength != that.minLength)
+          return false;
+      }
+
+      boolean this_present_maxLength = true;
+      boolean that_present_maxLength = true;
+      if (this_present_maxLength || that_present_maxLength) {
+        if (!(this_present_maxLength && that_present_maxLength))
+          return false;
+        if (this.maxLength != that.maxLength)
+          return false;
+      }
+
+      boolean this_present_top = true;
+      boolean that_present_top = true;
+      if (this_present_top || that_present_top) {
+        if (!(this_present_top && that_present_top))
+          return false;
+        if (this.top != that.top)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(trendsEndingAt_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      trendsEndingAt_args typedOther = (trendsEndingAt_args)other;
+
+      lastComparison = Boolean.valueOf(isSetUnixEndAtTime()).compareTo(typedOther.isSetUnixEndAtTime());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUnixEndAtTime()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.unixEndAtTime, typedOther.unixEndAtTime);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetSpanInSeconds()).compareTo(typedOther.isSetSpanInSeconds());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSpanInSeconds()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.spanInSeconds, typedOther.spanInSeconds);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetMinOccurrence()).compareTo(typedOther.isSetMinOccurrence());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMinOccurrence()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.minOccurrence, typedOther.minOccurrence);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetMinLength()).compareTo(typedOther.isSetMinLength());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMinLength()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.minLength, typedOther.minLength);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetMaxLength()).compareTo(typedOther.isSetMaxLength());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMaxLength()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.maxLength, typedOther.maxLength);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTop()).compareTo(typedOther.isSetTop());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTop()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.top, typedOther.top);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("trendsEndingAt_args(");
+      boolean first = true;
+
+      sb.append("unixEndAtTime:");
+      sb.append(this.unixEndAtTime);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("spanInSeconds:");
+      sb.append(this.spanInSeconds);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("minOccurrence:");
+      sb.append(this.minOccurrence);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("minLength:");
+      sb.append(this.minLength);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("maxLength:");
+      sb.append(this.maxLength);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("top:");
+      sb.append(this.top);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bitfield = 0;
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class trendsEndingAt_argsStandardSchemeFactory implements SchemeFactory {
+      public trendsEndingAt_argsStandardScheme getScheme() {
+        return new trendsEndingAt_argsStandardScheme();
+      }
+    }
+
+    private static class trendsEndingAt_argsStandardScheme extends StandardScheme<trendsEndingAt_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, trendsEndingAt_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // UNIX_END_AT_TIME
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.unixEndAtTime = iprot.readI32();
+                struct.setUnixEndAtTimeIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // SPAN_IN_SECONDS
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.spanInSeconds = iprot.readI32();
+                struct.setSpanInSecondsIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // MIN_OCCURRENCE
+              if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
+                struct.minOccurrence = iprot.readDouble();
+                struct.setMinOccurrenceIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 4: // MIN_LENGTH
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.minLength = iprot.readI32();
+                struct.setMinLengthIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 5: // MAX_LENGTH
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.maxLength = iprot.readI32();
+                struct.setMaxLengthIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 6: // TOP
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.top = iprot.readI32();
+                struct.setTopIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, trendsEndingAt_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldBegin(UNIX_END_AT_TIME_FIELD_DESC);
+        oprot.writeI32(struct.unixEndAtTime);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(SPAN_IN_SECONDS_FIELD_DESC);
+        oprot.writeI32(struct.spanInSeconds);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(MIN_OCCURRENCE_FIELD_DESC);
+        oprot.writeDouble(struct.minOccurrence);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(MIN_LENGTH_FIELD_DESC);
+        oprot.writeI32(struct.minLength);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(MAX_LENGTH_FIELD_DESC);
+        oprot.writeI32(struct.maxLength);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(TOP_FIELD_DESC);
+        oprot.writeI32(struct.top);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class trendsEndingAt_argsTupleSchemeFactory implements SchemeFactory {
+      public trendsEndingAt_argsTupleScheme getScheme() {
+        return new trendsEndingAt_argsTupleScheme();
+      }
+    }
+
+    private static class trendsEndingAt_argsTupleScheme extends TupleScheme<trendsEndingAt_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, trendsEndingAt_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetUnixEndAtTime()) {
+          optionals.set(0);
+        }
+        if (struct.isSetSpanInSeconds()) {
+          optionals.set(1);
+        }
+        if (struct.isSetMinOccurrence()) {
+          optionals.set(2);
+        }
+        if (struct.isSetMinLength()) {
+          optionals.set(3);
+        }
+        if (struct.isSetMaxLength()) {
+          optionals.set(4);
+        }
+        if (struct.isSetTop()) {
+          optionals.set(5);
+        }
+        oprot.writeBitSet(optionals, 6);
+        if (struct.isSetUnixEndAtTime()) {
+          oprot.writeI32(struct.unixEndAtTime);
+        }
+        if (struct.isSetSpanInSeconds()) {
+          oprot.writeI32(struct.spanInSeconds);
+        }
+        if (struct.isSetMinOccurrence()) {
+          oprot.writeDouble(struct.minOccurrence);
+        }
+        if (struct.isSetMinLength()) {
+          oprot.writeI32(struct.minLength);
+        }
+        if (struct.isSetMaxLength()) {
+          oprot.writeI32(struct.maxLength);
+        }
+        if (struct.isSetTop()) {
+          oprot.writeI32(struct.top);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, trendsEndingAt_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(6);
+        if (incoming.get(0)) {
+          struct.unixEndAtTime = iprot.readI32();
+          struct.setUnixEndAtTimeIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.spanInSeconds = iprot.readI32();
+          struct.setSpanInSecondsIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.minOccurrence = iprot.readDouble();
+          struct.setMinOccurrenceIsSet(true);
+        }
+        if (incoming.get(3)) {
+          struct.minLength = iprot.readI32();
+          struct.setMinLengthIsSet(true);
+        }
+        if (incoming.get(4)) {
+          struct.maxLength = iprot.readI32();
+          struct.setMaxLengthIsSet(true);
+        }
+        if (incoming.get(5)) {
+          struct.top = iprot.readI32();
+          struct.setTopIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class trendsEndingAt_result implements org.apache.thrift.TBase<trendsEndingAt_result, trendsEndingAt_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("trendsEndingAt_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.LIST, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new trendsEndingAt_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new trendsEndingAt_resultTupleSchemeFactory());
+    }
+
+    public List<TrendResult> success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+              new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TrendResult.class))));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(trendsEndingAt_result.class, metaDataMap);
+    }
+
+    public trendsEndingAt_result() {
+    }
+
+    public trendsEndingAt_result(
+      List<TrendResult> success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public trendsEndingAt_result(trendsEndingAt_result other) {
+      if (other.isSetSuccess()) {
+        List<TrendResult> __this__success = new ArrayList<TrendResult>();
+        for (TrendResult other_element : other.success) {
+          __this__success.add(new TrendResult(other_element));
+        }
+        this.success = __this__success;
+      }
+    }
+
+    public trendsEndingAt_result deepCopy() {
+      return new trendsEndingAt_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public int getSuccessSize() {
+      return (this.success == null) ? 0 : this.success.size();
+    }
+
+    public java.util.Iterator<TrendResult> getSuccessIterator() {
+      return (this.success == null) ? null : this.success.iterator();
+    }
+
+    public void addToSuccess(TrendResult elem) {
+      if (this.success == null) {
+        this.success = new ArrayList<TrendResult>();
+      }
+      this.success.add(elem);
+    }
+
+    public List<TrendResult> getSuccess() {
+      return this.success;
+    }
+
+    public trendsEndingAt_result setSuccess(List<TrendResult> success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((List<TrendResult>)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof trendsEndingAt_result)
+        return this.equals((trendsEndingAt_result)that);
+      return false;
+    }
+
+    public boolean equals(trendsEndingAt_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(trendsEndingAt_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      trendsEndingAt_result typedOther = (trendsEndingAt_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("trendsEndingAt_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class trendsEndingAt_resultStandardSchemeFactory implements SchemeFactory {
+      public trendsEndingAt_resultStandardScheme getScheme() {
+        return new trendsEndingAt_resultStandardScheme();
+      }
+    }
+
+    private static class trendsEndingAt_resultStandardScheme extends StandardScheme<trendsEndingAt_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, trendsEndingAt_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+                {
+                  org.apache.thrift.protocol.TList _list16 = iprot.readListBegin();
+                  struct.success = new ArrayList<TrendResult>(_list16.size);
+                  for (int _i17 = 0; _i17 < _list16.size; ++_i17)
+                  {
+                    TrendResult _elem18; // required
+                    _elem18 = new TrendResult();
+                    _elem18.read(iprot);
+                    struct.success.add(_elem18);
+                  }
+                  iprot.readListEnd();
+                }
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, trendsEndingAt_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.success.size()));
+            for (TrendResult _iter19 : struct.success)
+            {
+              _iter19.write(oprot);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class trendsEndingAt_resultTupleSchemeFactory implements SchemeFactory {
+      public trendsEndingAt_resultTupleScheme getScheme() {
+        return new trendsEndingAt_resultTupleScheme();
+      }
+    }
+
+    private static class trendsEndingAt_resultTupleScheme extends TupleScheme<trendsEndingAt_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, trendsEndingAt_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          {
+            oprot.writeI32(struct.success.size());
+            for (TrendResult _iter20 : struct.success)
+            {
+              _iter20.write(oprot);
+            }
+          }
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, trendsEndingAt_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          {
+            org.apache.thrift.protocol.TList _list21 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+            struct.success = new ArrayList<TrendResult>(_list21.size);
+            for (int _i22 = 0; _i22 < _list21.size; ++_i22)
+            {
+              TrendResult _elem23; // required
+              _elem23 = new TrendResult();
+              _elem23.read(iprot);
+              struct.success.add(_elem23);
             }
           }
           struct.setSuccessIsSet(true);

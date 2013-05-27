@@ -7,10 +7,12 @@ import org.beachape.analyze.MorphemesRedisRetriever
 class MorphemeRedisRetrieverActor(redisPool: RedisClientPool) extends Actor {
 
   def receive = {
+
     case (RedisKeySet(RedisKey(expectedKey), RedisKey(observedKey)), minOccurence: Double) => {
       val morphemesRetriever = MorphemesRedisRetriever(redisPool, expectedKey, observedKey, minOccurence)
       sender ! RedisKey(morphemesRetriever.storeChiSquared)
     }
+
     case List('printChiChi, RedisKeySet(RedisKey(expectedKey), RedisKey(observedKey)), minOccurence: Double, minLength: Int, maxLength: Int, top: Int) => {
       println("ChiSquared")
       println("**********")

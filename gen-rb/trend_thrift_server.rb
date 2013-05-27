@@ -58,6 +58,21 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'currentTrends failed: unknown result')
         end
 
+        def trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)
+          send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)
+          return recv_trendsEndingAt()
+        end
+
+        def send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)
+          send_message('trendsEndingAt', TrendsEndingAt_args, :unixEndAtTime => unixEndAtTime, :spanInSeconds => spanInSeconds, :minOccurrence => minOccurrence, :minLength => minLength, :maxLength => maxLength, :top => top)
+        end
+
+        def recv_trendsEndingAt()
+          result = receive_message(TrendsEndingAt_result)
+          return result.success unless result.success.nil?
+          raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'trendsEndingAt failed: unknown result')
+        end
+
         def storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
           send_storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
         end
@@ -89,6 +104,13 @@ module TrendServer
           result = CurrentTrends_result.new()
           result.success = @handler.currentTrends(args.minOccurrence, args.minLength, args.maxLength, args.top)
           write_result(result, oprot, 'currentTrends', seqid)
+        end
+
+        def process_trendsEndingAt(seqid, iprot, oprot)
+          args = read_args(iprot, TrendsEndingAt_args)
+          result = TrendsEndingAt_result.new()
+          result.success = @handler.trendsEndingAt(args.unixEndAtTime, args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top)
+          write_result(result, oprot, 'trendsEndingAt', seqid)
         end
 
         def process_storeString(seqid, iprot, oprot)
@@ -186,6 +208,48 @@ module TrendServer
       end
 
       class CurrentTrends_result
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+        SUCCESS = 0
+
+        FIELDS = {
+          SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TrendServer::Gen::TrendResult}}
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class TrendsEndingAt_args
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+        UNIXENDATTIME = 1
+        SPANINSECONDS = 2
+        MINOCCURRENCE = 3
+        MINLENGTH = 4
+        MAXLENGTH = 5
+        TOP = 6
+
+        FIELDS = {
+          UNIXENDATTIME => {:type => ::Thrift::Types::I32, :name => 'unixEndAtTime'},
+          SPANINSECONDS => {:type => ::Thrift::Types::I32, :name => 'spanInSeconds'},
+          MINOCCURRENCE => {:type => ::Thrift::Types::DOUBLE, :name => 'minOccurrence'},
+          MINLENGTH => {:type => ::Thrift::Types::I32, :name => 'minLength'},
+          MAXLENGTH => {:type => ::Thrift::Types::I32, :name => 'maxLength'},
+          TOP => {:type => ::Thrift::Types::I32, :name => 'top'}
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class TrendsEndingAt_result
         include ::Thrift::Struct, ::Thrift::Struct_Union
         SUCCESS = 0
 

@@ -25,8 +25,8 @@ class StringToRedisActor(redisPool: RedisClientPool) extends Actor with RedisSto
     redisPool.withClient {
       redis =>
         {
-          redis.zremrangebyscore(storedStringsSetKey, Double.NegativeInfinity, oldestScoreToKeep(weeksAgoDataToExpire))
           redis.zadd(storedStringsSetKey, unixCreatedAtTime, storableString)
+          redis.zremrangebyscore(storedStringsSetKey, Double.NegativeInfinity, oldestScoreToKeep(weeksAgoDataToExpire))
         }
     }
   }
