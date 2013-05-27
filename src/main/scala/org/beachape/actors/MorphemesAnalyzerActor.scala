@@ -5,7 +5,7 @@ import akka.event.Logging
 import com.redis._
 import org.beachape.analyze.{ Morpheme, RedisHelper }
 
-class MorphemesAnalyzerActor(redisPool: RedisClientPool) extends Actor with RedisHelper with RedisKeys {
+class MorphemesAnalyzerActor(redisPool: RedisClientPool) extends Actor with RedisHelper with RedisStorageHelper {
 
   def receive = {
 
@@ -15,10 +15,10 @@ class MorphemesAnalyzerActor(redisPool: RedisClientPool) extends Actor with Redi
       sender ! true
     }
 
-    case List('analyzeAndStoreMorphemes, (stringToParse: String, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)) => {
-      val morphemes = Morpheme.stringToMorphemes(stringToParse, dropBlacklisted, onlyWhitelisted)
-      storeAllInRedis(morphemes, RedisKey(currentRedisInsertKey))
-    }
+//    case List('analyzeAndStoreMorphemes, (stringToParse: String, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)) => {
+//      val morphemes = Morpheme.stringToMorphemes(stringToParse, dropBlacklisted, onlyWhitelisted)
+//      storeAllInRedis(morphemes, RedisKey(currentRedisInsertKey))
+//    }
 
     case _ => println("MorphemesAnalyzerActor says 'huh? '")
   }

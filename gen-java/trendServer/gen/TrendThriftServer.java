@@ -40,7 +40,7 @@ public class TrendThriftServer {
 
     public List<TrendResult> currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
 
-    public void analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException;
+    public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException;
 
   }
 
@@ -52,7 +52,7 @@ public class TrendThriftServer {
 
     public void currentTrends(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.analyzeAndStoreMorphemes_call> resultHandler) throws org.apache.thrift.TException;
+    public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.storeString_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -146,18 +146,18 @@ public class TrendThriftServer {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "currentTrends failed: unknown result");
     }
 
-    public void analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException
+    public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException
     {
-      send_analyzeAndStoreMorphemes(stringToParse, dropBlacklisted, onlyWhitelisted);
+      send_storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire);
     }
 
-    public void send_analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException
+    public void send_storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException
     {
-      analyzeAndStoreMorphemes_args args = new analyzeAndStoreMorphemes_args();
-      args.setStringToParse(stringToParse);
-      args.setDropBlacklisted(dropBlacklisted);
-      args.setOnlyWhitelisted(onlyWhitelisted);
-      sendBase("analyzeAndStoreMorphemes", args);
+      storeString_args args = new storeString_args();
+      args.setStringToStore(stringToStore);
+      args.setUnixCreatedAtTime(unixCreatedAtTime);
+      args.setWeeksAgoDataToExpire(weeksAgoDataToExpire);
+      sendBase("storeString", args);
     }
 
   }
@@ -277,30 +277,30 @@ public class TrendThriftServer {
       }
     }
 
-    public void analyzeAndStoreMorphemes(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<analyzeAndStoreMorphemes_call> resultHandler) throws org.apache.thrift.TException {
+    public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<storeString_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      analyzeAndStoreMorphemes_call method_call = new analyzeAndStoreMorphemes_call(stringToParse, dropBlacklisted, onlyWhitelisted, resultHandler, this, ___protocolFactory, ___transport);
+      storeString_call method_call = new storeString_call(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
-    public static class analyzeAndStoreMorphemes_call extends org.apache.thrift.async.TAsyncMethodCall {
-      private String stringToParse;
-      private boolean dropBlacklisted;
-      private boolean onlyWhitelisted;
-      public analyzeAndStoreMorphemes_call(String stringToParse, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<analyzeAndStoreMorphemes_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+    public static class storeString_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String stringToStore;
+      private int unixCreatedAtTime;
+      private int weeksAgoDataToExpire;
+      public storeString_call(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<storeString_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, true);
-        this.stringToParse = stringToParse;
-        this.dropBlacklisted = dropBlacklisted;
-        this.onlyWhitelisted = onlyWhitelisted;
+        this.stringToStore = stringToStore;
+        this.unixCreatedAtTime = unixCreatedAtTime;
+        this.weeksAgoDataToExpire = weeksAgoDataToExpire;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
-        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("analyzeAndStoreMorphemes", org.apache.thrift.protocol.TMessageType.CALL, 0));
-        analyzeAndStoreMorphemes_args args = new analyzeAndStoreMorphemes_args();
-        args.setStringToParse(stringToParse);
-        args.setDropBlacklisted(dropBlacklisted);
-        args.setOnlyWhitelisted(onlyWhitelisted);
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("storeString", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        storeString_args args = new storeString_args();
+        args.setStringToStore(stringToStore);
+        args.setUnixCreatedAtTime(unixCreatedAtTime);
+        args.setWeeksAgoDataToExpire(weeksAgoDataToExpire);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -330,7 +330,7 @@ public class TrendThriftServer {
       processMap.put("time", new time());
       processMap.put("currentTrendsDefault", new currentTrendsDefault());
       processMap.put("currentTrends", new currentTrends());
-      processMap.put("analyzeAndStoreMorphemes", new analyzeAndStoreMorphemes());
+      processMap.put("storeString", new storeString());
       return processMap;
     }
 
@@ -395,21 +395,21 @@ public class TrendThriftServer {
       }
     }
 
-    public static class analyzeAndStoreMorphemes<I extends Iface> extends org.apache.thrift.ProcessFunction<I, analyzeAndStoreMorphemes_args> {
-      public analyzeAndStoreMorphemes() {
-        super("analyzeAndStoreMorphemes");
+    public static class storeString<I extends Iface> extends org.apache.thrift.ProcessFunction<I, storeString_args> {
+      public storeString() {
+        super("storeString");
       }
 
-      public analyzeAndStoreMorphemes_args getEmptyArgsInstance() {
-        return new analyzeAndStoreMorphemes_args();
+      public storeString_args getEmptyArgsInstance() {
+        return new storeString_args();
       }
 
       protected boolean isOneway() {
         return true;
       }
 
-      public org.apache.thrift.TBase getResult(I iface, analyzeAndStoreMorphemes_args args) throws org.apache.thrift.TException {
-        iface.analyzeAndStoreMorphemes(args.stringToParse, args.dropBlacklisted, args.onlyWhitelisted);
+      public org.apache.thrift.TBase getResult(I iface, storeString_args args) throws org.apache.thrift.TException {
+        iface.storeString(args.stringToStore, args.unixCreatedAtTime, args.weeksAgoDataToExpire);
         return null;
       }
     }
@@ -2712,28 +2712,28 @@ public class TrendThriftServer {
 
   }
 
-  public static class analyzeAndStoreMorphemes_args implements org.apache.thrift.TBase<analyzeAndStoreMorphemes_args, analyzeAndStoreMorphemes_args._Fields>, java.io.Serializable, Cloneable   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("analyzeAndStoreMorphemes_args");
+  public static class storeString_args implements org.apache.thrift.TBase<storeString_args, storeString_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("storeString_args");
 
-    private static final org.apache.thrift.protocol.TField STRING_TO_PARSE_FIELD_DESC = new org.apache.thrift.protocol.TField("stringToParse", org.apache.thrift.protocol.TType.STRING, (short)1);
-    private static final org.apache.thrift.protocol.TField DROP_BLACKLISTED_FIELD_DESC = new org.apache.thrift.protocol.TField("dropBlacklisted", org.apache.thrift.protocol.TType.BOOL, (short)2);
-    private static final org.apache.thrift.protocol.TField ONLY_WHITELISTED_FIELD_DESC = new org.apache.thrift.protocol.TField("onlyWhitelisted", org.apache.thrift.protocol.TType.BOOL, (short)3);
+    private static final org.apache.thrift.protocol.TField STRING_TO_STORE_FIELD_DESC = new org.apache.thrift.protocol.TField("stringToStore", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField UNIX_CREATED_AT_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("unixCreatedAtTime", org.apache.thrift.protocol.TType.I32, (short)2);
+    private static final org.apache.thrift.protocol.TField WEEKS_AGO_DATA_TO_EXPIRE_FIELD_DESC = new org.apache.thrift.protocol.TField("weeksAgoDataToExpire", org.apache.thrift.protocol.TType.I32, (short)3);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new analyzeAndStoreMorphemes_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new analyzeAndStoreMorphemes_argsTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new storeString_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new storeString_argsTupleSchemeFactory());
     }
 
-    public String stringToParse; // required
-    public boolean dropBlacklisted; // required
-    public boolean onlyWhitelisted; // required
+    public String stringToStore; // required
+    public int unixCreatedAtTime; // required
+    public int weeksAgoDataToExpire; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      STRING_TO_PARSE((short)1, "stringToParse"),
-      DROP_BLACKLISTED((short)2, "dropBlacklisted"),
-      ONLY_WHITELISTED((short)3, "onlyWhitelisted");
+      STRING_TO_STORE((short)1, "stringToStore"),
+      UNIX_CREATED_AT_TIME((short)2, "unixCreatedAtTime"),
+      WEEKS_AGO_DATA_TO_EXPIRE((short)3, "weeksAgoDataToExpire");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -2748,12 +2748,12 @@ public class TrendThriftServer {
        */
       public static _Fields findByThriftId(int fieldId) {
         switch(fieldId) {
-          case 1: // STRING_TO_PARSE
-            return STRING_TO_PARSE;
-          case 2: // DROP_BLACKLISTED
-            return DROP_BLACKLISTED;
-          case 3: // ONLY_WHITELISTED
-            return ONLY_WHITELISTED;
+          case 1: // STRING_TO_STORE
+            return STRING_TO_STORE;
+          case 2: // UNIX_CREATED_AT_TIME
+            return UNIX_CREATED_AT_TIME;
+          case 3: // WEEKS_AGO_DATA_TO_EXPIRE
+            return WEEKS_AGO_DATA_TO_EXPIRE;
           default:
             return null;
         }
@@ -2794,156 +2794,156 @@ public class TrendThriftServer {
     }
 
     // isset id assignments
-    private static final int __DROPBLACKLISTED_ISSET_ID = 0;
-    private static final int __ONLYWHITELISTED_ISSET_ID = 1;
+    private static final int __UNIXCREATEDATTIME_ISSET_ID = 0;
+    private static final int __WEEKSAGODATATOEXPIRE_ISSET_ID = 1;
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.STRING_TO_PARSE, new org.apache.thrift.meta_data.FieldMetaData("stringToParse", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.STRING_TO_STORE, new org.apache.thrift.meta_data.FieldMetaData("stringToStore", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-      tmpMap.put(_Fields.DROP_BLACKLISTED, new org.apache.thrift.meta_data.FieldMetaData("dropBlacklisted", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
-      tmpMap.put(_Fields.ONLY_WHITELISTED, new org.apache.thrift.meta_data.FieldMetaData("onlyWhitelisted", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+      tmpMap.put(_Fields.UNIX_CREATED_AT_TIME, new org.apache.thrift.meta_data.FieldMetaData("unixCreatedAtTime", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.WEEKS_AGO_DATA_TO_EXPIRE, new org.apache.thrift.meta_data.FieldMetaData("weeksAgoDataToExpire", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(analyzeAndStoreMorphemes_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(storeString_args.class, metaDataMap);
     }
 
-    public analyzeAndStoreMorphemes_args() {
+    public storeString_args() {
     }
 
-    public analyzeAndStoreMorphemes_args(
-      String stringToParse,
-      boolean dropBlacklisted,
-      boolean onlyWhitelisted)
+    public storeString_args(
+      String stringToStore,
+      int unixCreatedAtTime,
+      int weeksAgoDataToExpire)
     {
       this();
-      this.stringToParse = stringToParse;
-      this.dropBlacklisted = dropBlacklisted;
-      setDropBlacklistedIsSet(true);
-      this.onlyWhitelisted = onlyWhitelisted;
-      setOnlyWhitelistedIsSet(true);
+      this.stringToStore = stringToStore;
+      this.unixCreatedAtTime = unixCreatedAtTime;
+      setUnixCreatedAtTimeIsSet(true);
+      this.weeksAgoDataToExpire = weeksAgoDataToExpire;
+      setWeeksAgoDataToExpireIsSet(true);
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public analyzeAndStoreMorphemes_args(analyzeAndStoreMorphemes_args other) {
+    public storeString_args(storeString_args other) {
       __isset_bitfield = other.__isset_bitfield;
-      if (other.isSetStringToParse()) {
-        this.stringToParse = other.stringToParse;
+      if (other.isSetStringToStore()) {
+        this.stringToStore = other.stringToStore;
       }
-      this.dropBlacklisted = other.dropBlacklisted;
-      this.onlyWhitelisted = other.onlyWhitelisted;
+      this.unixCreatedAtTime = other.unixCreatedAtTime;
+      this.weeksAgoDataToExpire = other.weeksAgoDataToExpire;
     }
 
-    public analyzeAndStoreMorphemes_args deepCopy() {
-      return new analyzeAndStoreMorphemes_args(this);
+    public storeString_args deepCopy() {
+      return new storeString_args(this);
     }
 
     @Override
     public void clear() {
-      this.stringToParse = null;
-      setDropBlacklistedIsSet(false);
-      this.dropBlacklisted = false;
-      setOnlyWhitelistedIsSet(false);
-      this.onlyWhitelisted = false;
+      this.stringToStore = null;
+      setUnixCreatedAtTimeIsSet(false);
+      this.unixCreatedAtTime = 0;
+      setWeeksAgoDataToExpireIsSet(false);
+      this.weeksAgoDataToExpire = 0;
     }
 
-    public String getStringToParse() {
-      return this.stringToParse;
+    public String getStringToStore() {
+      return this.stringToStore;
     }
 
-    public analyzeAndStoreMorphemes_args setStringToParse(String stringToParse) {
-      this.stringToParse = stringToParse;
+    public storeString_args setStringToStore(String stringToStore) {
+      this.stringToStore = stringToStore;
       return this;
     }
 
-    public void unsetStringToParse() {
-      this.stringToParse = null;
+    public void unsetStringToStore() {
+      this.stringToStore = null;
     }
 
-    /** Returns true if field stringToParse is set (has been assigned a value) and false otherwise */
-    public boolean isSetStringToParse() {
-      return this.stringToParse != null;
+    /** Returns true if field stringToStore is set (has been assigned a value) and false otherwise */
+    public boolean isSetStringToStore() {
+      return this.stringToStore != null;
     }
 
-    public void setStringToParseIsSet(boolean value) {
+    public void setStringToStoreIsSet(boolean value) {
       if (!value) {
-        this.stringToParse = null;
+        this.stringToStore = null;
       }
     }
 
-    public boolean isDropBlacklisted() {
-      return this.dropBlacklisted;
+    public int getUnixCreatedAtTime() {
+      return this.unixCreatedAtTime;
     }
 
-    public analyzeAndStoreMorphemes_args setDropBlacklisted(boolean dropBlacklisted) {
-      this.dropBlacklisted = dropBlacklisted;
-      setDropBlacklistedIsSet(true);
+    public storeString_args setUnixCreatedAtTime(int unixCreatedAtTime) {
+      this.unixCreatedAtTime = unixCreatedAtTime;
+      setUnixCreatedAtTimeIsSet(true);
       return this;
     }
 
-    public void unsetDropBlacklisted() {
-      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID);
+    public void unsetUnixCreatedAtTime() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __UNIXCREATEDATTIME_ISSET_ID);
     }
 
-    /** Returns true if field dropBlacklisted is set (has been assigned a value) and false otherwise */
-    public boolean isSetDropBlacklisted() {
-      return EncodingUtils.testBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID);
+    /** Returns true if field unixCreatedAtTime is set (has been assigned a value) and false otherwise */
+    public boolean isSetUnixCreatedAtTime() {
+      return EncodingUtils.testBit(__isset_bitfield, __UNIXCREATEDATTIME_ISSET_ID);
     }
 
-    public void setDropBlacklistedIsSet(boolean value) {
-      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID, value);
+    public void setUnixCreatedAtTimeIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __UNIXCREATEDATTIME_ISSET_ID, value);
     }
 
-    public boolean isOnlyWhitelisted() {
-      return this.onlyWhitelisted;
+    public int getWeeksAgoDataToExpire() {
+      return this.weeksAgoDataToExpire;
     }
 
-    public analyzeAndStoreMorphemes_args setOnlyWhitelisted(boolean onlyWhitelisted) {
-      this.onlyWhitelisted = onlyWhitelisted;
-      setOnlyWhitelistedIsSet(true);
+    public storeString_args setWeeksAgoDataToExpire(int weeksAgoDataToExpire) {
+      this.weeksAgoDataToExpire = weeksAgoDataToExpire;
+      setWeeksAgoDataToExpireIsSet(true);
       return this;
     }
 
-    public void unsetOnlyWhitelisted() {
-      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID);
+    public void unsetWeeksAgoDataToExpire() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __WEEKSAGODATATOEXPIRE_ISSET_ID);
     }
 
-    /** Returns true if field onlyWhitelisted is set (has been assigned a value) and false otherwise */
-    public boolean isSetOnlyWhitelisted() {
-      return EncodingUtils.testBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID);
+    /** Returns true if field weeksAgoDataToExpire is set (has been assigned a value) and false otherwise */
+    public boolean isSetWeeksAgoDataToExpire() {
+      return EncodingUtils.testBit(__isset_bitfield, __WEEKSAGODATATOEXPIRE_ISSET_ID);
     }
 
-    public void setOnlyWhitelistedIsSet(boolean value) {
-      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID, value);
+    public void setWeeksAgoDataToExpireIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __WEEKSAGODATATOEXPIRE_ISSET_ID, value);
     }
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case STRING_TO_PARSE:
+      case STRING_TO_STORE:
         if (value == null) {
-          unsetStringToParse();
+          unsetStringToStore();
         } else {
-          setStringToParse((String)value);
+          setStringToStore((String)value);
         }
         break;
 
-      case DROP_BLACKLISTED:
+      case UNIX_CREATED_AT_TIME:
         if (value == null) {
-          unsetDropBlacklisted();
+          unsetUnixCreatedAtTime();
         } else {
-          setDropBlacklisted((Boolean)value);
+          setUnixCreatedAtTime((Integer)value);
         }
         break;
 
-      case ONLY_WHITELISTED:
+      case WEEKS_AGO_DATA_TO_EXPIRE:
         if (value == null) {
-          unsetOnlyWhitelisted();
+          unsetWeeksAgoDataToExpire();
         } else {
-          setOnlyWhitelisted((Boolean)value);
+          setWeeksAgoDataToExpire((Integer)value);
         }
         break;
 
@@ -2952,14 +2952,14 @@ public class TrendThriftServer {
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case STRING_TO_PARSE:
-        return getStringToParse();
+      case STRING_TO_STORE:
+        return getStringToStore();
 
-      case DROP_BLACKLISTED:
-        return Boolean.valueOf(isDropBlacklisted());
+      case UNIX_CREATED_AT_TIME:
+        return Integer.valueOf(getUnixCreatedAtTime());
 
-      case ONLY_WHITELISTED:
-        return Boolean.valueOf(isOnlyWhitelisted());
+      case WEEKS_AGO_DATA_TO_EXPIRE:
+        return Integer.valueOf(getWeeksAgoDataToExpire());
 
       }
       throw new IllegalStateException();
@@ -2972,12 +2972,12 @@ public class TrendThriftServer {
       }
 
       switch (field) {
-      case STRING_TO_PARSE:
-        return isSetStringToParse();
-      case DROP_BLACKLISTED:
-        return isSetDropBlacklisted();
-      case ONLY_WHITELISTED:
-        return isSetOnlyWhitelisted();
+      case STRING_TO_STORE:
+        return isSetStringToStore();
+      case UNIX_CREATED_AT_TIME:
+        return isSetUnixCreatedAtTime();
+      case WEEKS_AGO_DATA_TO_EXPIRE:
+        return isSetWeeksAgoDataToExpire();
       }
       throw new IllegalStateException();
     }
@@ -2986,39 +2986,39 @@ public class TrendThriftServer {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof analyzeAndStoreMorphemes_args)
-        return this.equals((analyzeAndStoreMorphemes_args)that);
+      if (that instanceof storeString_args)
+        return this.equals((storeString_args)that);
       return false;
     }
 
-    public boolean equals(analyzeAndStoreMorphemes_args that) {
+    public boolean equals(storeString_args that) {
       if (that == null)
         return false;
 
-      boolean this_present_stringToParse = true && this.isSetStringToParse();
-      boolean that_present_stringToParse = true && that.isSetStringToParse();
-      if (this_present_stringToParse || that_present_stringToParse) {
-        if (!(this_present_stringToParse && that_present_stringToParse))
+      boolean this_present_stringToStore = true && this.isSetStringToStore();
+      boolean that_present_stringToStore = true && that.isSetStringToStore();
+      if (this_present_stringToStore || that_present_stringToStore) {
+        if (!(this_present_stringToStore && that_present_stringToStore))
           return false;
-        if (!this.stringToParse.equals(that.stringToParse))
-          return false;
-      }
-
-      boolean this_present_dropBlacklisted = true;
-      boolean that_present_dropBlacklisted = true;
-      if (this_present_dropBlacklisted || that_present_dropBlacklisted) {
-        if (!(this_present_dropBlacklisted && that_present_dropBlacklisted))
-          return false;
-        if (this.dropBlacklisted != that.dropBlacklisted)
+        if (!this.stringToStore.equals(that.stringToStore))
           return false;
       }
 
-      boolean this_present_onlyWhitelisted = true;
-      boolean that_present_onlyWhitelisted = true;
-      if (this_present_onlyWhitelisted || that_present_onlyWhitelisted) {
-        if (!(this_present_onlyWhitelisted && that_present_onlyWhitelisted))
+      boolean this_present_unixCreatedAtTime = true;
+      boolean that_present_unixCreatedAtTime = true;
+      if (this_present_unixCreatedAtTime || that_present_unixCreatedAtTime) {
+        if (!(this_present_unixCreatedAtTime && that_present_unixCreatedAtTime))
           return false;
-        if (this.onlyWhitelisted != that.onlyWhitelisted)
+        if (this.unixCreatedAtTime != that.unixCreatedAtTime)
+          return false;
+      }
+
+      boolean this_present_weeksAgoDataToExpire = true;
+      boolean that_present_weeksAgoDataToExpire = true;
+      if (this_present_weeksAgoDataToExpire || that_present_weeksAgoDataToExpire) {
+        if (!(this_present_weeksAgoDataToExpire && that_present_weeksAgoDataToExpire))
+          return false;
+        if (this.weeksAgoDataToExpire != that.weeksAgoDataToExpire)
           return false;
       }
 
@@ -3030,40 +3030,40 @@ public class TrendThriftServer {
       return 0;
     }
 
-    public int compareTo(analyzeAndStoreMorphemes_args other) {
+    public int compareTo(storeString_args other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
 
       int lastComparison = 0;
-      analyzeAndStoreMorphemes_args typedOther = (analyzeAndStoreMorphemes_args)other;
+      storeString_args typedOther = (storeString_args)other;
 
-      lastComparison = Boolean.valueOf(isSetStringToParse()).compareTo(typedOther.isSetStringToParse());
+      lastComparison = Boolean.valueOf(isSetStringToStore()).compareTo(typedOther.isSetStringToStore());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      if (isSetStringToParse()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.stringToParse, typedOther.stringToParse);
+      if (isSetStringToStore()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.stringToStore, typedOther.stringToStore);
         if (lastComparison != 0) {
           return lastComparison;
         }
       }
-      lastComparison = Boolean.valueOf(isSetDropBlacklisted()).compareTo(typedOther.isSetDropBlacklisted());
+      lastComparison = Boolean.valueOf(isSetUnixCreatedAtTime()).compareTo(typedOther.isSetUnixCreatedAtTime());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      if (isSetDropBlacklisted()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.dropBlacklisted, typedOther.dropBlacklisted);
+      if (isSetUnixCreatedAtTime()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.unixCreatedAtTime, typedOther.unixCreatedAtTime);
         if (lastComparison != 0) {
           return lastComparison;
         }
       }
-      lastComparison = Boolean.valueOf(isSetOnlyWhitelisted()).compareTo(typedOther.isSetOnlyWhitelisted());
+      lastComparison = Boolean.valueOf(isSetWeeksAgoDataToExpire()).compareTo(typedOther.isSetWeeksAgoDataToExpire());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      if (isSetOnlyWhitelisted()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.onlyWhitelisted, typedOther.onlyWhitelisted);
+      if (isSetWeeksAgoDataToExpire()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.weeksAgoDataToExpire, typedOther.weeksAgoDataToExpire);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -3085,23 +3085,23 @@ public class TrendThriftServer {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("analyzeAndStoreMorphemes_args(");
+      StringBuilder sb = new StringBuilder("storeString_args(");
       boolean first = true;
 
-      sb.append("stringToParse:");
-      if (this.stringToParse == null) {
+      sb.append("stringToStore:");
+      if (this.stringToStore == null) {
         sb.append("null");
       } else {
-        sb.append(this.stringToParse);
+        sb.append(this.stringToStore);
       }
       first = false;
       if (!first) sb.append(", ");
-      sb.append("dropBlacklisted:");
-      sb.append(this.dropBlacklisted);
+      sb.append("unixCreatedAtTime:");
+      sb.append(this.unixCreatedAtTime);
       first = false;
       if (!first) sb.append(", ");
-      sb.append("onlyWhitelisted:");
-      sb.append(this.onlyWhitelisted);
+      sb.append("weeksAgoDataToExpire:");
+      sb.append(this.weeksAgoDataToExpire);
       first = false;
       sb.append(")");
       return sb.toString();
@@ -3130,15 +3130,15 @@ public class TrendThriftServer {
       }
     }
 
-    private static class analyzeAndStoreMorphemes_argsStandardSchemeFactory implements SchemeFactory {
-      public analyzeAndStoreMorphemes_argsStandardScheme getScheme() {
-        return new analyzeAndStoreMorphemes_argsStandardScheme();
+    private static class storeString_argsStandardSchemeFactory implements SchemeFactory {
+      public storeString_argsStandardScheme getScheme() {
+        return new storeString_argsStandardScheme();
       }
     }
 
-    private static class analyzeAndStoreMorphemes_argsStandardScheme extends StandardScheme<analyzeAndStoreMorphemes_args> {
+    private static class storeString_argsStandardScheme extends StandardScheme<storeString_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, analyzeAndStoreMorphemes_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, storeString_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -3148,26 +3148,26 @@ public class TrendThriftServer {
             break;
           }
           switch (schemeField.id) {
-            case 1: // STRING_TO_PARSE
+            case 1: // STRING_TO_STORE
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
-                struct.stringToParse = iprot.readString();
-                struct.setStringToParseIsSet(true);
+                struct.stringToStore = iprot.readString();
+                struct.setStringToStoreIsSet(true);
               } else { 
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 2: // DROP_BLACKLISTED
-              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
-                struct.dropBlacklisted = iprot.readBool();
-                struct.setDropBlacklistedIsSet(true);
+            case 2: // UNIX_CREATED_AT_TIME
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.unixCreatedAtTime = iprot.readI32();
+                struct.setUnixCreatedAtTimeIsSet(true);
               } else { 
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 3: // ONLY_WHITELISTED
-              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
-                struct.onlyWhitelisted = iprot.readBool();
-                struct.setOnlyWhitelistedIsSet(true);
+            case 3: // WEEKS_AGO_DATA_TO_EXPIRE
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.weeksAgoDataToExpire = iprot.readI32();
+                struct.setWeeksAgoDataToExpireIsSet(true);
               } else { 
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
@@ -3183,20 +3183,20 @@ public class TrendThriftServer {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, analyzeAndStoreMorphemes_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, storeString_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
-        if (struct.stringToParse != null) {
-          oprot.writeFieldBegin(STRING_TO_PARSE_FIELD_DESC);
-          oprot.writeString(struct.stringToParse);
+        if (struct.stringToStore != null) {
+          oprot.writeFieldBegin(STRING_TO_STORE_FIELD_DESC);
+          oprot.writeString(struct.stringToStore);
           oprot.writeFieldEnd();
         }
-        oprot.writeFieldBegin(DROP_BLACKLISTED_FIELD_DESC);
-        oprot.writeBool(struct.dropBlacklisted);
+        oprot.writeFieldBegin(UNIX_CREATED_AT_TIME_FIELD_DESC);
+        oprot.writeI32(struct.unixCreatedAtTime);
         oprot.writeFieldEnd();
-        oprot.writeFieldBegin(ONLY_WHITELISTED_FIELD_DESC);
-        oprot.writeBool(struct.onlyWhitelisted);
+        oprot.writeFieldBegin(WEEKS_AGO_DATA_TO_EXPIRE_FIELD_DESC);
+        oprot.writeI32(struct.weeksAgoDataToExpire);
         oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
@@ -3204,54 +3204,54 @@ public class TrendThriftServer {
 
     }
 
-    private static class analyzeAndStoreMorphemes_argsTupleSchemeFactory implements SchemeFactory {
-      public analyzeAndStoreMorphemes_argsTupleScheme getScheme() {
-        return new analyzeAndStoreMorphemes_argsTupleScheme();
+    private static class storeString_argsTupleSchemeFactory implements SchemeFactory {
+      public storeString_argsTupleScheme getScheme() {
+        return new storeString_argsTupleScheme();
       }
     }
 
-    private static class analyzeAndStoreMorphemes_argsTupleScheme extends TupleScheme<analyzeAndStoreMorphemes_args> {
+    private static class storeString_argsTupleScheme extends TupleScheme<storeString_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, analyzeAndStoreMorphemes_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, storeString_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
-        if (struct.isSetStringToParse()) {
+        if (struct.isSetStringToStore()) {
           optionals.set(0);
         }
-        if (struct.isSetDropBlacklisted()) {
+        if (struct.isSetUnixCreatedAtTime()) {
           optionals.set(1);
         }
-        if (struct.isSetOnlyWhitelisted()) {
+        if (struct.isSetWeeksAgoDataToExpire()) {
           optionals.set(2);
         }
         oprot.writeBitSet(optionals, 3);
-        if (struct.isSetStringToParse()) {
-          oprot.writeString(struct.stringToParse);
+        if (struct.isSetStringToStore()) {
+          oprot.writeString(struct.stringToStore);
         }
-        if (struct.isSetDropBlacklisted()) {
-          oprot.writeBool(struct.dropBlacklisted);
+        if (struct.isSetUnixCreatedAtTime()) {
+          oprot.writeI32(struct.unixCreatedAtTime);
         }
-        if (struct.isSetOnlyWhitelisted()) {
-          oprot.writeBool(struct.onlyWhitelisted);
+        if (struct.isSetWeeksAgoDataToExpire()) {
+          oprot.writeI32(struct.weeksAgoDataToExpire);
         }
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, analyzeAndStoreMorphemes_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, storeString_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(3);
         if (incoming.get(0)) {
-          struct.stringToParse = iprot.readString();
-          struct.setStringToParseIsSet(true);
+          struct.stringToStore = iprot.readString();
+          struct.setStringToStoreIsSet(true);
         }
         if (incoming.get(1)) {
-          struct.dropBlacklisted = iprot.readBool();
-          struct.setDropBlacklistedIsSet(true);
+          struct.unixCreatedAtTime = iprot.readI32();
+          struct.setUnixCreatedAtTimeIsSet(true);
         }
         if (incoming.get(2)) {
-          struct.onlyWhitelisted = iprot.readBool();
-          struct.setOnlyWhitelistedIsSet(true);
+          struct.weeksAgoDataToExpire = iprot.readI32();
+          struct.setWeeksAgoDataToExpireIsSet(true);
         }
       }
     }

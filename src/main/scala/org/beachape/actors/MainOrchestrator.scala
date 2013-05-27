@@ -21,6 +21,7 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
   val fileToRedisRoundRobin = context.actorOf(Props(new FileToRedisActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(RoundRobinRouter(4)), "fileRouter")
   val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
   val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorMorphemesAnalyzerRoundRobin")
+  val stringToRedisRoundRobin = context.actorOf(Props(new StringToRedisActor(redisPool)).withRouter(RoundRobinRouter(10)), "mainOrchestartorStringToRedisRoundRobin")
 
   def receive = {
 
@@ -96,8 +97,8 @@ class MainOrchestrator(redisPool: RedisClientPool, dropBlacklisted: Boolean, onl
       }
     }
 
-    case List('analyzeAndStoreMorphemes, (stringToParse: String, callDropBlacklisted: Boolean, callWhitelisted: Boolean)) => {
-        morphemeAnalyzerRoundRobin ! List('analyzeAndStoreMorphemes, (stringToParse, callDropBlacklisted, callWhitelisted))
+    case message @ List('storeString, (stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)) => {
+        stringToRedisRoundRobin ! message
     }
 
     case _ => System.exit(1)
