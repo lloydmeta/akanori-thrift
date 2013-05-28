@@ -11,5 +11,6 @@ libraryDependencies ++= Seq(
   "org.chasen.mecab" % "mecab-java" % "0.993",
   "net.debasishg" % "redisclient_2.10" % "2.10",
   "org.apache.thrift" % "libthrift" % "0.9.0",
-  "com.github.nscala-time" % "nscala-time_2.9.2" % "0.4.0"
+  "com.github.nscala-time" % "nscala-time_2.9.2" % "0.4.0",
+  "com.typesafe.akka" % "akka-testkit_2.10" % "2.1.4"
 )
