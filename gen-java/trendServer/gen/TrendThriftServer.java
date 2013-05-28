@@ -38,7 +38,7 @@ public class TrendThriftServer {
 
     public List<TrendResult> currentTrendsDefault() throws org.apache.thrift.TException;
 
-    public List<TrendResult> currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
+    public List<TrendResult> currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
 
     public List<TrendResult> trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
 
@@ -52,7 +52,7 @@ public class TrendThriftServer {
 
     public void currentTrendsDefault(org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrendsDefault_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void currentTrends(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
+    public void currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
 
     public void trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.trendsEndingAt_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -124,15 +124,16 @@ public class TrendThriftServer {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "currentTrendsDefault failed: unknown result");
     }
 
-    public List<TrendResult> currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    public List<TrendResult> currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
     {
-      send_currentTrends(minOccurrence, minLength, maxLength, top);
+      send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top);
       return recv_currentTrends();
     }
 
-    public void send_currentTrends(double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    public void send_currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
     {
       currentTrends_args args = new currentTrends_args();
+      args.setSpanInSeconds(spanInSeconds);
       args.setMinOccurrence(minOccurrence);
       args.setMinLength(minLength);
       args.setMaxLength(maxLength);
@@ -268,20 +269,22 @@ public class TrendThriftServer {
       }
     }
 
-    public void currentTrends(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler) throws org.apache.thrift.TException {
+    public void currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      currentTrends_call method_call = new currentTrends_call(minOccurrence, minLength, maxLength, top, resultHandler, this, ___protocolFactory, ___transport);
+      currentTrends_call method_call = new currentTrends_call(spanInSeconds, minOccurrence, minLength, maxLength, top, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
     public static class currentTrends_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private int spanInSeconds;
       private double minOccurrence;
       private int minLength;
       private int maxLength;
       private int top;
-      public currentTrends_call(double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public currentTrends_call(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
+        this.spanInSeconds = spanInSeconds;
         this.minOccurrence = minOccurrence;
         this.minLength = minLength;
         this.maxLength = maxLength;
@@ -291,6 +294,7 @@ public class TrendThriftServer {
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("currentTrends", org.apache.thrift.protocol.TMessageType.CALL, 0));
         currentTrends_args args = new currentTrends_args();
+        args.setSpanInSeconds(spanInSeconds);
         args.setMinOccurrence(minOccurrence);
         args.setMinLength(minLength);
         args.setMaxLength(maxLength);
@@ -470,7 +474,7 @@ public class TrendThriftServer {
 
       public currentTrends_result getResult(I iface, currentTrends_args args) throws org.apache.thrift.TException {
         currentTrends_result result = new currentTrends_result();
-        result.success = iface.currentTrends(args.minOccurrence, args.minLength, args.maxLength, args.top);
+        result.success = iface.currentTrends(args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top);
         return result;
       }
     }
@@ -1773,10 +1777,11 @@ public class TrendThriftServer {
   public static class currentTrends_args implements org.apache.thrift.TBase<currentTrends_args, currentTrends_args._Fields>, java.io.Serializable, Cloneable   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("currentTrends_args");
 
-    private static final org.apache.thrift.protocol.TField MIN_OCCURRENCE_FIELD_DESC = new org.apache.thrift.protocol.TField("minOccurrence", org.apache.thrift.protocol.TType.DOUBLE, (short)1);
-    private static final org.apache.thrift.protocol.TField MIN_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("minLength", org.apache.thrift.protocol.TType.I32, (short)2);
-    private static final org.apache.thrift.protocol.TField MAX_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("maxLength", org.apache.thrift.protocol.TType.I32, (short)3);
-    private static final org.apache.thrift.protocol.TField TOP_FIELD_DESC = new org.apache.thrift.protocol.TField("top", org.apache.thrift.protocol.TType.I32, (short)4);
+    private static final org.apache.thrift.protocol.TField SPAN_IN_SECONDS_FIELD_DESC = new org.apache.thrift.protocol.TField("spanInSeconds", org.apache.thrift.protocol.TType.I32, (short)1);
+    private static final org.apache.thrift.protocol.TField MIN_OCCURRENCE_FIELD_DESC = new org.apache.thrift.protocol.TField("minOccurrence", org.apache.thrift.protocol.TType.DOUBLE, (short)2);
+    private static final org.apache.thrift.protocol.TField MIN_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("minLength", org.apache.thrift.protocol.TType.I32, (short)3);
+    private static final org.apache.thrift.protocol.TField MAX_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("maxLength", org.apache.thrift.protocol.TType.I32, (short)4);
+    private static final org.apache.thrift.protocol.TField TOP_FIELD_DESC = new org.apache.thrift.protocol.TField("top", org.apache.thrift.protocol.TType.I32, (short)5);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -1784,6 +1789,7 @@ public class TrendThriftServer {
       schemes.put(TupleScheme.class, new currentTrends_argsTupleSchemeFactory());
     }
 
+    public int spanInSeconds; // required
     public double minOccurrence; // required
     public int minLength; // required
     public int maxLength; // required
@@ -1791,10 +1797,11 @@ public class TrendThriftServer {
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      MIN_OCCURRENCE((short)1, "minOccurrence"),
-      MIN_LENGTH((short)2, "minLength"),
-      MAX_LENGTH((short)3, "maxLength"),
-      TOP((short)4, "top");
+      SPAN_IN_SECONDS((short)1, "spanInSeconds"),
+      MIN_OCCURRENCE((short)2, "minOccurrence"),
+      MIN_LENGTH((short)3, "minLength"),
+      MAX_LENGTH((short)4, "maxLength"),
+      TOP((short)5, "top");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -1809,13 +1816,15 @@ public class TrendThriftServer {
        */
       public static _Fields findByThriftId(int fieldId) {
         switch(fieldId) {
-          case 1: // MIN_OCCURRENCE
+          case 1: // SPAN_IN_SECONDS
+            return SPAN_IN_SECONDS;
+          case 2: // MIN_OCCURRENCE
             return MIN_OCCURRENCE;
-          case 2: // MIN_LENGTH
+          case 3: // MIN_LENGTH
             return MIN_LENGTH;
-          case 3: // MAX_LENGTH
+          case 4: // MAX_LENGTH
             return MAX_LENGTH;
-          case 4: // TOP
+          case 5: // TOP
             return TOP;
           default:
             return null;
@@ -1857,14 +1866,17 @@ public class TrendThriftServer {
     }
 
     // isset id assignments
-    private static final int __MINOCCURRENCE_ISSET_ID = 0;
-    private static final int __MINLENGTH_ISSET_ID = 1;
-    private static final int __MAXLENGTH_ISSET_ID = 2;
-    private static final int __TOP_ISSET_ID = 3;
+    private static final int __SPANINSECONDS_ISSET_ID = 0;
+    private static final int __MINOCCURRENCE_ISSET_ID = 1;
+    private static final int __MINLENGTH_ISSET_ID = 2;
+    private static final int __MAXLENGTH_ISSET_ID = 3;
+    private static final int __TOP_ISSET_ID = 4;
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SPAN_IN_SECONDS, new org.apache.thrift.meta_data.FieldMetaData("spanInSeconds", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.MIN_OCCURRENCE, new org.apache.thrift.meta_data.FieldMetaData("minOccurrence", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
       tmpMap.put(_Fields.MIN_LENGTH, new org.apache.thrift.meta_data.FieldMetaData("minLength", org.apache.thrift.TFieldRequirementType.DEFAULT, 
@@ -1881,12 +1893,15 @@ public class TrendThriftServer {
     }
 
     public currentTrends_args(
+      int spanInSeconds,
       double minOccurrence,
       int minLength,
       int maxLength,
       int top)
     {
       this();
+      this.spanInSeconds = spanInSeconds;
+      setSpanInSecondsIsSet(true);
       this.minOccurrence = minOccurrence;
       setMinOccurrenceIsSet(true);
       this.minLength = minLength;
@@ -1902,6 +1917,7 @@ public class TrendThriftServer {
      */
     public currentTrends_args(currentTrends_args other) {
       __isset_bitfield = other.__isset_bitfield;
+      this.spanInSeconds = other.spanInSeconds;
       this.minOccurrence = other.minOccurrence;
       this.minLength = other.minLength;
       this.maxLength = other.maxLength;
@@ -1914,6 +1930,8 @@ public class TrendThriftServer {
 
     @Override
     public void clear() {
+      setSpanInSecondsIsSet(false);
+      this.spanInSeconds = 0;
       setMinOccurrenceIsSet(false);
       this.minOccurrence = 0.0;
       setMinLengthIsSet(false);
@@ -1922,6 +1940,29 @@ public class TrendThriftServer {
       this.maxLength = 0;
       setTopIsSet(false);
       this.top = 0;
+    }
+
+    public int getSpanInSeconds() {
+      return this.spanInSeconds;
+    }
+
+    public currentTrends_args setSpanInSeconds(int spanInSeconds) {
+      this.spanInSeconds = spanInSeconds;
+      setSpanInSecondsIsSet(true);
+      return this;
+    }
+
+    public void unsetSpanInSeconds() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __SPANINSECONDS_ISSET_ID);
+    }
+
+    /** Returns true if field spanInSeconds is set (has been assigned a value) and false otherwise */
+    public boolean isSetSpanInSeconds() {
+      return EncodingUtils.testBit(__isset_bitfield, __SPANINSECONDS_ISSET_ID);
+    }
+
+    public void setSpanInSecondsIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __SPANINSECONDS_ISSET_ID, value);
     }
 
     public double getMinOccurrence() {
@@ -2018,6 +2059,14 @@ public class TrendThriftServer {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
+      case SPAN_IN_SECONDS:
+        if (value == null) {
+          unsetSpanInSeconds();
+        } else {
+          setSpanInSeconds((Integer)value);
+        }
+        break;
+
       case MIN_OCCURRENCE:
         if (value == null) {
           unsetMinOccurrence();
@@ -2055,6 +2104,9 @@ public class TrendThriftServer {
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
+      case SPAN_IN_SECONDS:
+        return Integer.valueOf(getSpanInSeconds());
+
       case MIN_OCCURRENCE:
         return Double.valueOf(getMinOccurrence());
 
@@ -2078,6 +2130,8 @@ public class TrendThriftServer {
       }
 
       switch (field) {
+      case SPAN_IN_SECONDS:
+        return isSetSpanInSeconds();
       case MIN_OCCURRENCE:
         return isSetMinOccurrence();
       case MIN_LENGTH:
@@ -2102,6 +2156,15 @@ public class TrendThriftServer {
     public boolean equals(currentTrends_args that) {
       if (that == null)
         return false;
+
+      boolean this_present_spanInSeconds = true;
+      boolean that_present_spanInSeconds = true;
+      if (this_present_spanInSeconds || that_present_spanInSeconds) {
+        if (!(this_present_spanInSeconds && that_present_spanInSeconds))
+          return false;
+        if (this.spanInSeconds != that.spanInSeconds)
+          return false;
+      }
 
       boolean this_present_minOccurrence = true;
       boolean that_present_minOccurrence = true;
@@ -2155,6 +2218,16 @@ public class TrendThriftServer {
       int lastComparison = 0;
       currentTrends_args typedOther = (currentTrends_args)other;
 
+      lastComparison = Boolean.valueOf(isSetSpanInSeconds()).compareTo(typedOther.isSetSpanInSeconds());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSpanInSeconds()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.spanInSeconds, typedOther.spanInSeconds);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       lastComparison = Boolean.valueOf(isSetMinOccurrence()).compareTo(typedOther.isSetMinOccurrence());
       if (lastComparison != 0) {
         return lastComparison;
@@ -2215,6 +2288,10 @@ public class TrendThriftServer {
       StringBuilder sb = new StringBuilder("currentTrends_args(");
       boolean first = true;
 
+      sb.append("spanInSeconds:");
+      sb.append(this.spanInSeconds);
+      first = false;
+      if (!first) sb.append(", ");
       sb.append("minOccurrence:");
       sb.append(this.minOccurrence);
       first = false;
@@ -2275,7 +2352,15 @@ public class TrendThriftServer {
             break;
           }
           switch (schemeField.id) {
-            case 1: // MIN_OCCURRENCE
+            case 1: // SPAN_IN_SECONDS
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.spanInSeconds = iprot.readI32();
+                struct.setSpanInSecondsIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // MIN_OCCURRENCE
               if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
                 struct.minOccurrence = iprot.readDouble();
                 struct.setMinOccurrenceIsSet(true);
@@ -2283,7 +2368,7 @@ public class TrendThriftServer {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 2: // MIN_LENGTH
+            case 3: // MIN_LENGTH
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.minLength = iprot.readI32();
                 struct.setMinLengthIsSet(true);
@@ -2291,7 +2376,7 @@ public class TrendThriftServer {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 3: // MAX_LENGTH
+            case 4: // MAX_LENGTH
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.maxLength = iprot.readI32();
                 struct.setMaxLengthIsSet(true);
@@ -2299,7 +2384,7 @@ public class TrendThriftServer {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 4: // TOP
+            case 5: // TOP
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.top = iprot.readI32();
                 struct.setTopIsSet(true);
@@ -2322,6 +2407,9 @@ public class TrendThriftServer {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldBegin(SPAN_IN_SECONDS_FIELD_DESC);
+        oprot.writeI32(struct.spanInSeconds);
+        oprot.writeFieldEnd();
         oprot.writeFieldBegin(MIN_OCCURRENCE_FIELD_DESC);
         oprot.writeDouble(struct.minOccurrence);
         oprot.writeFieldEnd();
@@ -2352,19 +2440,25 @@ public class TrendThriftServer {
       public void write(org.apache.thrift.protocol.TProtocol prot, currentTrends_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
-        if (struct.isSetMinOccurrence()) {
+        if (struct.isSetSpanInSeconds()) {
           optionals.set(0);
         }
-        if (struct.isSetMinLength()) {
+        if (struct.isSetMinOccurrence()) {
           optionals.set(1);
         }
-        if (struct.isSetMaxLength()) {
+        if (struct.isSetMinLength()) {
           optionals.set(2);
         }
-        if (struct.isSetTop()) {
+        if (struct.isSetMaxLength()) {
           optionals.set(3);
         }
-        oprot.writeBitSet(optionals, 4);
+        if (struct.isSetTop()) {
+          optionals.set(4);
+        }
+        oprot.writeBitSet(optionals, 5);
+        if (struct.isSetSpanInSeconds()) {
+          oprot.writeI32(struct.spanInSeconds);
+        }
         if (struct.isSetMinOccurrence()) {
           oprot.writeDouble(struct.minOccurrence);
         }
@@ -2382,20 +2476,24 @@ public class TrendThriftServer {
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, currentTrends_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(4);
+        BitSet incoming = iprot.readBitSet(5);
         if (incoming.get(0)) {
+          struct.spanInSeconds = iprot.readI32();
+          struct.setSpanInSecondsIsSet(true);
+        }
+        if (incoming.get(1)) {
           struct.minOccurrence = iprot.readDouble();
           struct.setMinOccurrenceIsSet(true);
         }
-        if (incoming.get(1)) {
+        if (incoming.get(2)) {
           struct.minLength = iprot.readI32();
           struct.setMinLengthIsSet(true);
         }
-        if (incoming.get(2)) {
+        if (incoming.get(3)) {
           struct.maxLength = iprot.readI32();
           struct.setMaxLengthIsSet(true);
         }
-        if (incoming.get(3)) {
+        if (incoming.get(4)) {
           struct.top = iprot.readI32();
           struct.setTopIsSet(true);
         }

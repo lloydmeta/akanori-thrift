@@ -35,8 +35,8 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
     listOfTrendResults
   }
 
-  override def currentTrends(minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) = {
-    val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrends, (minOccurrence, minLength, maxLength, top)))
+  override def currentTrends(spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) = {
+    val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrends, (spanInSeconds, minOccurrence, minLength, maxLength, top)))
     val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
     val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
       result match {

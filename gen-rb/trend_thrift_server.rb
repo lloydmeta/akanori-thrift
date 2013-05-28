@@ -43,13 +43,13 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'currentTrendsDefault failed: unknown result')
         end
 
-        def currentTrends(minOccurrence, minLength, maxLength, top)
-          send_currentTrends(minOccurrence, minLength, maxLength, top)
+        def currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top)
+          send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top)
           return recv_currentTrends()
         end
 
-        def send_currentTrends(minOccurrence, minLength, maxLength, top)
-          send_message('currentTrends', CurrentTrends_args, :minOccurrence => minOccurrence, :minLength => minLength, :maxLength => maxLength, :top => top)
+        def send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top)
+          send_message('currentTrends', CurrentTrends_args, :spanInSeconds => spanInSeconds, :minOccurrence => minOccurrence, :minLength => minLength, :maxLength => maxLength, :top => top)
         end
 
         def recv_currentTrends()
@@ -102,7 +102,7 @@ module TrendServer
         def process_currentTrends(seqid, iprot, oprot)
           args = read_args(iprot, CurrentTrends_args)
           result = CurrentTrends_result.new()
-          result.success = @handler.currentTrends(args.minOccurrence, args.minLength, args.maxLength, args.top)
+          result.success = @handler.currentTrends(args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top)
           write_result(result, oprot, 'currentTrends', seqid)
         end
 
@@ -187,12 +187,14 @@ module TrendServer
 
       class CurrentTrends_args
         include ::Thrift::Struct, ::Thrift::Struct_Union
-        MINOCCURRENCE = 1
-        MINLENGTH = 2
-        MAXLENGTH = 3
-        TOP = 4
+        SPANINSECONDS = 1
+        MINOCCURRENCE = 2
+        MINLENGTH = 3
+        MAXLENGTH = 4
+        TOP = 5
 
         FIELDS = {
+          SPANINSECONDS => {:type => ::Thrift::Types::I32, :name => 'spanInSeconds'},
           MINOCCURRENCE => {:type => ::Thrift::Types::DOUBLE, :name => 'minOccurrence'},
           MINLENGTH => {:type => ::Thrift::Types::I32, :name => 'minLength'},
           MAXLENGTH => {:type => ::Thrift::Types::I32, :name => 'maxLength'},
