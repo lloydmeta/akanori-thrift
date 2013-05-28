@@ -1,7 +1,9 @@
 akanori-thrift
 ------------------
 
-Scala Thrift project/tool for extracting Japanese phrases out of two files (one containing phrases from T2 and one containing phrases from T1, where T2 is later than T1, T2 and T1 being the same amount of time difference), analyse them using MeCab, store them in Redis, and rank them via Chi-Squared fitness test.
+Scala Thrift project/tool for extracting trends from Japanese phrases. Still in development.
+
+Thrift clients send strings to the Scala server, which then stores it initially. Clients can then ask for trends at specific time slices in the past (granted the data for that timeslice), with certain parameters such as dropblacklisted, whitelisted only, etc, and the server will reply with a list of TrendResults by doing Chi-squared fitness tests and comparing results from the timeslice requested and the same timeslice 24 hours before.
 
 Compiling
 =======
