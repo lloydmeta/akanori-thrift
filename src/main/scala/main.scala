@@ -1,8 +1,7 @@
 import org.chasen.mecab.{ Tagger, Node, MeCab }
 import org.beachape.analyze.{ Morpheme, MorphemesRedisRetriever }
-import akka.actor.Actor
-import akka.actor.ActorSystem
-import akka.actor.Props
+import akka.actor.{Actor, ActorSystem, Props}
+import akka.routing.SmallestMailboxRouter
 import com.redis._
 import java.io._
 import org.beachape.actors._
@@ -12,6 +11,7 @@ import org.apache.thrift._
 import org.apache.thrift.protocol._
 import org.apache.thrift.server._
 import org.apache.thrift.transport._
+import scala.concurrent.duration._
 
 object TrendApp {
 
@@ -80,7 +80,7 @@ object TrendApp {
       case Some(x) => x.asInstanceOf[Boolean]
       case _ => printUsageAndExit(true)
     }
-    val spanInSeconds = options.getOrElse('spanInSeconds, 1).asInstanceOf[Int]
+    val spanInSeconds = options.getOrElse('spanInSeconds, 10800).asInstanceOf[Int]
     val minLength = options.getOrElse('minLength, 1).asInstanceOf[Int]
     val maxLength = options.getOrElse('maxLength, 50).asInstanceOf[Int]
     val top = options.getOrElse('top, 50).asInstanceOf[Int]
@@ -95,10 +95,13 @@ object TrendApp {
     if (clearRedis) redisPool.withClient { _.flushdb }
 
     val system = ActorSystem("akanoriSystem")
-    val mainOrchestrator = system.actorOf(MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top), "mainOrchestrator")
+    val mainOrchestratorRoundRobin = system.actorOf(MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top).withRouter(SmallestMailboxRouter(3)), "mainOrchestrator")
+
+    import system.dispatcher
+    val generateDefaultTrendsCancellableSchedule = system.scheduler.schedule(5 seconds, 1 minute, mainOrchestratorRoundRobin, List('generateDefaultTrends))
 
     val st = new TServerSocket(9090)
-    val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestrator))
+    val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestratorRoundRobin))
     val arg = new TThreadPoolServer.Args(st)
     arg.processor(processor)
     val server = new TThreadPoolServer(arg)

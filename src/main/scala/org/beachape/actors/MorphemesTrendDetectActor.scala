@@ -6,7 +6,7 @@ import com.redis._
 import org.beachape.analyze.MorphemesRedisRetriever
 import scala.concurrent.{ Future, Await }
 import akka.pattern.ask
-import akka.routing.RoundRobinRouter
+import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 import scala.concurrent.duration._
 
@@ -16,7 +16,7 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
   implicit val timeout = Timeout(600 seconds)
 
-  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
+  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "morphemeRetrievalRouter")
 
   def receive = {
 
@@ -34,7 +34,7 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
           case List(olderMorphemesKey: RedisKey, newerMorphemesKey: RedisKey) => {
             zender ! RedisKeySet(olderMorphemesKey, newerMorphemesKey)
           }
-          case _ => exit(1)
+          case _ => throw new Exception("MorphemesTrendDetectActor did not receive proper RedisKeys pointing to ranked morphemes")
         }
       }
     }

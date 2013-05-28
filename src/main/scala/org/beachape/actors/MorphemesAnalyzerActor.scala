@@ -5,7 +5,7 @@ import akka.event.Logging
 import com.redis._
 import org.beachape.analyze.{ Morpheme, RedisHelper }
 
-class MorphemesAnalyzerActor(redisPool: RedisClientPool) extends Actor with RedisHelper with RedisStorageHelper {
+class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor with RedisHelper with RedisStorageHelper {
 
   def receive = {
 

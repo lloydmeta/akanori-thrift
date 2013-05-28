@@ -5,7 +5,7 @@ import akka.event.Logging
 import com.redis._
 import com.github.nscala_time.time.Imports._
 
-class StringToRedisActor(redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
+class StringToRedisActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
   def receive = {
 
@@ -25,8 +25,8 @@ class StringToRedisActor(redisPool: RedisClientPool) extends Actor with RedisSto
     redisPool.withClient {
       redis =>
         {
-          redis.zadd(storedStringsSetKey, unixCreatedAtTime, storableString)
           redis.zremrangebyscore(storedStringsSetKey, Double.NegativeInfinity, oldestScoreToKeep(weeksAgoDataToExpire))
+          redis.zadd(storedStringsSetKey, unixCreatedAtTime, storableString)
         }
     }
   }

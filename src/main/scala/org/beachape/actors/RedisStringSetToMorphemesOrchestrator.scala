@@ -5,18 +5,18 @@ import akka.event.Logging
 import com.redis._
 import akka.actor.Props
 import akka.pattern.ask
-import akka.routing.RoundRobinRouter
+import akka.routing.SmallestMailboxRouter
 import scala.concurrent.{ Await, Future }
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.github.nscala_time.time.Imports._
 
-class RedisStringSetToMorphemesOrchestrator(redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
+class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val redisStringSetToMorphemesActorsRoundRobin = context.actorOf(Props(new RedisStringSetToMorphemesActor(redisPool)).withRouter(RoundRobinRouter(4)), "redisStringSetToMorphemesActorsRoundRobin")
+  val redisStringSetToMorphemesActorsRoundRobin = context.actorOf(Props(new RedisStringSetToMorphemesActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "redisStringSetToMorphemesActorsRoundRobin")
 
   def receive = {
 
@@ -48,11 +48,10 @@ class RedisStringSetToMorphemesOrchestrator(redisPool: RedisClientPool) extends 
       val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
       futureListOfRedisKeys map { redisKeysList =>
         redisKeysList match {
-          case thing @ List(oldExpectedKey: RedisKey, oldObservedKey: RedisKey, newExpectedKey: RedisKey, newObservedKey: RedisKey) => {
-            println(thing)
+          case List(oldExpectedKey: RedisKey, oldObservedKey: RedisKey, newExpectedKey: RedisKey, newObservedKey: RedisKey) => {
             zender ! List(RedisKeySet(oldExpectedKey, oldObservedKey), RedisKeySet(newExpectedKey, newObservedKey))
           }
-          case _ => exit(1)
+          case _ => throw new Exception("RedisStringSetToMorphemesOrchestrator did not receive proper Redis Keys pointing to morphemes")
         }
       }
     }

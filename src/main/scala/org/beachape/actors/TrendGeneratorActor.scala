@@ -4,20 +4,20 @@ import akka.actor.{ Actor, Props }
 import akka.event.Logging
 import com.redis._
 import akka.pattern.ask
-import akka.routing.RoundRobinRouter
+import akka.routing.SmallestMailboxRouter
 import scala.concurrent.{ Await, Future }
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.github.nscala_time.time.Imports._
 
-class TrendGeneratorActor(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) extends Actor with RedisStorageHelper {
+class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600) seconds)
 
-  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemeRetrievalRouter")
+  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(SmallestMailboxRouter(2)), "morphemeRetrievalRouter")
   val redisStringSetToMorphemesOrchestrator = context.actorOf(Props(new RedisStringSetToMorphemesOrchestrator(redisPool)))
-  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(RoundRobinRouter(2)), "morphemesTrendDetectRoundRobin")
+  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(SmallestMailboxRouter(2)), "morphemesTrendDetectRoundRobin")
 
   def receive = {
 
@@ -39,11 +39,11 @@ class TrendGeneratorActor(redisPool: RedisClientPool, dropBlacklisted: Boolean, 
                     zender ! listOfReverseSortedTermsAndScores
                   }
                 }
-                case _ => print("TrendGeneratorActor messed up")
+                case _ => throw new Exception("TrendGeneratorActor failed to generate trends")
               }
             }
           }
-          case x @ _ => println(x)
+          case _ => throw new Exception("TrendGeneratorActor did not receive proper Redis keys pointing to morphemes")
         }
       }
     }
@@ -58,7 +58,7 @@ class TrendGeneratorActor(redisPool: RedisClientPool, dropBlacklisted: Boolean, 
         for ((term: String, score: Double) <- listOfReverseSortedTermsAndScores) {
          redis.zincrby(cacheKey.redisKey, score, term)
         }
-        redis.pexpire(cacheKey.redisKey, RichInt(1).minute.millis.toInt)
+        redis.pexpire(cacheKey.redisKey, RichInt(15).minute.millis.toInt)
       }
     }
   }
