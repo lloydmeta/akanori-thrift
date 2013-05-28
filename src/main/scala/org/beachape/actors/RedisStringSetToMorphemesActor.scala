@@ -15,7 +15,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(SmallestMailboxRouter(5)), "redisStringSetToMorphemesMorphemesAnalyzerRoundRobin")
+  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "redisStringSetToMorphemesMorphemesAnalyzerRoundRobin")
 
   def receive = {
 
