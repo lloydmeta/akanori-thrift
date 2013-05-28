@@ -42,5 +42,4 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
     case _ => println("MorphemesTrendDetectActor says 'huh???'")
   }
 
-
 }

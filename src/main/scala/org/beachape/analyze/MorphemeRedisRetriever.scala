@@ -11,12 +11,12 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
 
   def storeChiSquared = {
     val storageKey = f"MorphemesChiSquared:$redisKeyOlder%s-$redisKeyNewer%s"
-    redisPool.withClient{redis =>
+    redisPool.withClient { redis =>
       val zcardNewer = redis.zcard(redisKeyNewer) match {
         case Some(x: Long) => x
         case _ => 1
       }
-      val zcardOlder = redis.zcard(redisKeyOlder)  match {
+      val zcardOlder = redis.zcard(redisKeyOlder) match {
         case Some(x: Long) => x
         case _ => 1
       }

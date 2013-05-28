@@ -56,7 +56,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boole
     redisPool.withClient { redis =>
       {
         for ((term: String, score: Double) <- listOfReverseSortedTermsAndScores) {
-         redis.zincrby(cacheKey.redisKey, score, term)
+          redis.zincrby(cacheKey.redisKey, score, term)
         }
         redis.pexpire(cacheKey.redisKey, RichInt(15).minute.millis.toInt)
       }

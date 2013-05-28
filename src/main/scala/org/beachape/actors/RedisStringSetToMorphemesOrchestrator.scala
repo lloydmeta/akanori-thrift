@@ -29,7 +29,7 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
       val newExpectedSetEndScore = newObservedSetStartScore
       val newExpectedSetStartScore = newExpectedSetEndScore - spanInSeconds
 
-      val oldObservedSetEndScore = newObservedSetEndScore - (RichInt(7 * 24).hours.millis / 1000) .toDouble // week
+      val oldObservedSetEndScore = newObservedSetEndScore - (RichInt(7 * 24).hours.millis / 1000).toDouble // week
       val oldObservedSetStartScore = oldObservedSetEndScore - spanInSeconds
       val oldExpectedSetEndScore = oldObservedSetStartScore
       val oldExpectedSetStartScore = oldObservedSetStartScore - spanInSeconds
