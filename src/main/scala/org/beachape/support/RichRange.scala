@@ -11,14 +11,15 @@ case class RichRange(range: Range) {
 
     def splitIntoConsecutivePairs(xs: List[Int]):List[(Int,Int)] = {
       xs match {
-        case x::y::Nil => {
+        case x :: y :: Nil => {
           if (y != range.end) {
             List((x, range.end))
           } else {
             List((x, y))
           }
         }
-        case x::y::ys => List((x,y)) ::: splitIntoConsecutivePairs(y::ys)
+        case x :: y :: ys => List((x,y)) ::: splitIntoConsecutivePairs(y::ys)
+        case x :: Nil => List((x, range.end))
         case _ => Nil
       }
     }

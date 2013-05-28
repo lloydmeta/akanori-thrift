@@ -24,6 +24,11 @@ class RichRangeSpec extends FunSpec
       )
     }
 
+    it("should return me a list with a single double with start and end as ._1 and ._2 if the range is smaller than the step"){
+      val list = range.listOfConsecutivePairsInSteps(50)
+      list.head should be ((1,30))
+    }
+
   }
 
 }
