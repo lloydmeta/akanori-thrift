@@ -9,6 +9,7 @@ import scala.concurrent.{ Await, Future }
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.github.nscala_time.time.Imports._
+import org.beachape.support.RichRange._
 
 class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
@@ -25,10 +26,11 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
       if (cachedKeyExists(redisKey)) {
         zender ! redisKey
       } else {
-        val listOfAnalyzeAndDumpFutures = listOfTermsInRedisStoredSetBetweenUnixTimeSpan(unixTimeSpan) map { phrase =>
-          ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, phrase, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
+        val listOfAnalyzeAndDumpFutures = listOfUnixTimeSpanInSteps(unixTimeSpan) flatMap {steppedUnixTimeSpan =>
+          listOfTermsInRedisStoredSetBetweenUnixTimeSpan(steppedUnixTimeSpan) map { phrase =>
+            ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, phrase, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
+          }
         }
-
         val futureListOfAnalyzeAndDumpResults = Future.sequence(listOfAnalyzeAndDumpFutures)
 
         futureListOfAnalyzeAndDumpResults map { analyzeAndDumpResultsList =>
@@ -44,6 +46,13 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
     }
 
     case _ => println("RedisStringSetToMorphemesActor says 'huh?'")
+  }
+
+  def listOfUnixTimeSpanInSteps(unixTimeSpan: UnixTimeSpan, stepInSeconds: Int = 1800) : List[UnixTimeSpan] = {
+    val originalUnixTimeRange = (unixTimeSpan.start.time to unixTimeSpan.end.time)
+    originalUnixTimeRange.listOfConsecutivePairsInSteps(stepInSeconds) map {double =>
+      UnixTimeSpan(UnixTime(double._1), UnixTime(double._2))
+    }
   }
 
   def listOfTermsInRedisStoredSetBetweenUnixTimeSpan(timeSpan: UnixTimeSpan): List[String] = {
