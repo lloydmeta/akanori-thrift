@@ -3,19 +3,20 @@ import com.redis._
 import org.scalatest.FunSpec
 import org.scalatest.BeforeAndAfter
 import org.scalatest.matchers.ShouldMatchers
-import akka.testkit.TestActorRef
+import akka.testkit.{TestActorRef, TestKit, ImplicitSender, DefaultTimeout}
 import scala.concurrent.duration._
 import scala.concurrent.Await
 import akka.pattern.ask
 import akka.actor.ActorSystem
 import akka.util.Timeout
+import scala.util.{Try, Success, Failure}
 
-class MorphemesAnalyzerActorSpec extends FunSpec
+class MorphemesAnalyzerActorSpec extends TestKit(ActorSystem("akkaTest"))
+  with FunSpec
   with ShouldMatchers
-  with BeforeAndAfter {
-
-  implicit val system = ActorSystem("testSys")
-  implicit val timeout = Timeout(5 seconds)
+  with BeforeAndAfter
+  with ImplicitSender
+  with DefaultTimeout{
 
   val redisPool = new RedisClientPool("localhost", 6379, database = 1)
   val listOfStrings = List("笹子トンネル、設計時に風圧見落とし　天井崩落の一因か", "米の戦闘機Ｆ１５、沖縄の東海上に墜落　パイロット無事", "朝井リョウ、アイドル小説構想中　「夢と卒業」テーマ")
@@ -27,11 +28,9 @@ class MorphemesAnalyzerActorSpec extends FunSpec
   }
 
   describe("sending a request to dumpMorphemesToRedis") {
-
     it("should return true") {
-      val future = (morphemesAnalyzerActor ? List('dumpMorphemesToRedis, RedisKey(redisKey), listOfStrings.head, true, true)).mapTo[Boolean]
-      val result = Await.result(future, timeout.duration)
-      result should be(true)
+      morphemesAnalyzerActor ! List('dumpMorphemesToRedis, RedisKey(redisKey), listOfStrings.head, true, true)
+      expectMsg(true)
     }
 
   }
