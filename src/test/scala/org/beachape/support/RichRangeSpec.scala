@@ -29,7 +29,6 @@ class RichRangeSpec extends FunSpec
 
     it("should return a list with the proper number of items") {
       val list = range.listOfConsecutivePairsInSteps(5)
-      println(list)
       list.length should be(5)
     }
 

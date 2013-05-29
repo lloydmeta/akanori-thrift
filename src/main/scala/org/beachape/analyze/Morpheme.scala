@@ -62,8 +62,7 @@ object Morpheme {
 
   private def nodeToList(node: Node): List[Node] = {
 
-    @tailrec
-    def nodeToListSupport(node: Node, acc: List[Node]): List[Node] = {
+    @tailrec def nodeToListSupport(node: Node, acc: List[Node]): List[Node] = {
       node.getNext match {
         case null => acc
         case next: Node => nodeToListSupport(next, node::acc)
