@@ -9,6 +9,7 @@ import com.redis._
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.redis.RedisClient._
+import scala.language.postfixOps
 
 object MainOrchestrator {
   def apply(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int): Props = Props(new MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top))

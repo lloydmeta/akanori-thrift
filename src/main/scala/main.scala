@@ -12,6 +12,7 @@ import org.apache.thrift.protocol._
 import org.apache.thrift.server._
 import org.apache.thrift.transport._
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object TrendApp {
 
@@ -34,7 +35,7 @@ object TrendApp {
 
     def printUsageAndExit[T](default: T = "String"): T = {
       println(usage)
-      exit(1)
+      sys.exit(1)
       default
     }
 
@@ -70,7 +71,7 @@ object TrendApp {
           nextOption(map ++ Map('redisDb -> value.toInt), tail)
         case option :: tail =>
           println("Unknown option " + option)
-          exit(1)
+          sys.exit(1)
       }
     }
 

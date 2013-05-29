@@ -9,6 +9,7 @@ import scala.concurrent.{ Await, Future }
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.github.nscala_time.time.Imports._
+import scala.language.postfixOps
 
 class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) extends Actor with RedisStorageHelper {
 
