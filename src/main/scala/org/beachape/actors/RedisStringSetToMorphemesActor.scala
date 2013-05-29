@@ -48,7 +48,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
     case _ => println("RedisStringSetToMorphemesActor says 'huh?'")
   }
 
-  def listOfUnixTimeSpanInSteps(unixTimeSpan: UnixTimeSpan, stepInSeconds: Int = 1800): List[UnixTimeSpan] = {
+  def listOfUnixTimeSpanInSteps(unixTimeSpan: UnixTimeSpan, stepInSeconds: Int = 3600): List[UnixTimeSpan] = {
     val originalUnixTimeRange = (unixTimeSpan.start.time to unixTimeSpan.end.time)
     originalUnixTimeRange.listOfConsecutivePairsInSteps(stepInSeconds) map { double =>
       UnixTimeSpan(UnixTime(double._1), UnixTime(double._2))

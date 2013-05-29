@@ -37,9 +37,12 @@ object Morpheme {
       tagger.parseToNode(str) //wtf
       tagger.parseToNode(str)
     }
-    val morphemes = nodeListFromNode(node) map (x => parseMorpheme(x.getSurface.trim, x.getFeature))
 
-    val justMorphemes = morphemes dropRight 1 drop 1
+    val morphemes = nodeToList(node) map { x =>
+      parseMorpheme(x.getSurface.trim, x.getFeature)
+    }
+
+    val justMorphemes = morphemes.toList dropRight 1 drop 1
 
     if (dropBlacklisted && onlyWhitelisted)
       justMorphemes.filter(whiteListFilter).filter(blackListFilter)
@@ -55,14 +58,11 @@ object Morpheme {
     stringToMorphemes(str) map { _.surface }
   }
 
-  private def nodeListFromNode(node: Node): List[Node] = {
-    var nodes = List(node)
-    var working_node = node.getNext
-    while (working_node != null) {
-      nodes = nodes ::: List(working_node)
-      working_node = working_node.getNext
+  private def nodeToList(node: Node): List[Node] = {
+    node.getNext match {
+      case next:Node => node :: nodeToList(next)
+      case null => Nil
     }
-    nodes
   }
 
   private def parseMorpheme(surface: String, chasenData: String): Morpheme = {
