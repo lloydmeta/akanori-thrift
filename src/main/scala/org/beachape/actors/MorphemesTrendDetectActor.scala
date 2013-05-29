@@ -9,6 +9,7 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 

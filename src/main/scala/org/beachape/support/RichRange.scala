@@ -1,5 +1,7 @@
 package org.beachape.support
 
+import scala.language.implicitConversions
+
 object RichRange {
   implicit def range2RichRange(r: Range) = RichRange(r)
 }

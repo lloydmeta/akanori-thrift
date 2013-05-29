@@ -2,6 +2,7 @@
 package org.beachape.analyze
 
 import org.chasen.mecab.{ MeCab, Tagger, Node }
+import scala.annotation.tailrec
 
 object Morpheme {
 
@@ -58,11 +59,18 @@ object Morpheme {
     stringToMorphemes(str) map { _.surface }
   }
 
+
   private def nodeToList(node: Node): List[Node] = {
-    node.getNext match {
-      case next:Node => node :: nodeToList(next)
-      case null => Nil
+
+    @tailrec
+    def nodeToListSupport(node: Node, acc: List[Node]): List[Node] = {
+      node.getNext match {
+        case null => acc
+        case next: Node => nodeToListSupport(next, node::acc)
+      }
     }
+
+    nodeToListSupport(node, Nil).reverse
   }
 
   private def parseMorpheme(surface: String, chasenData: String): Morpheme = {

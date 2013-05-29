@@ -10,6 +10,8 @@ import akka.actor.ActorRef
 import scala.concurrent.duration._
 import collection.JavaConversions._
 import trendServer.gen.TrendResult
+import scala.language.postfixOps
+import scala.language.implicitConversions
 
 class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
   implicit val timeout = Timeout(600 seconds)
