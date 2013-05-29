@@ -26,31 +26,31 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
       if (cachedKeyExists(redisKey)) {
         zender ! redisKey
       } else {
-        val listOfAnalyzeAndDumpFutures = listOfUnixTimeSpanInSteps(unixTimeSpan) flatMap {steppedUnixTimeSpan =>
-          listOfTermsInRedisStoredSetBetweenUnixTimeSpan(steppedUnixTimeSpan) map { phrase =>
+        val analyzeAndDumpResultsList = listOfUnixTimeSpanInSteps(unixTimeSpan) flatMap { steppedUnixTimeSpan =>
+          val listOfAnalyzeAndDumpFuturesForStep = listOfTermsInRedisStoredSetBetweenUnixTimeSpan(steppedUnixTimeSpan) map { phrase =>
             ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, phrase, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
           }
+          val futureListOfAnalyzeAndDumpResultsForStep = Future.sequence(listOfAnalyzeAndDumpFuturesForStep)
+          Await.result(futureListOfAnalyzeAndDumpResultsForStep, timeout.duration).asInstanceOf[List[Boolean]]
         }
-        val futureListOfAnalyzeAndDumpResults = Future.sequence(listOfAnalyzeAndDumpFutures)
 
-        futureListOfAnalyzeAndDumpResults map { analyzeAndDumpResultsList =>
-          analyzeAndDumpResultsList match {
-            case x: List[Boolean] if x.forall(_ == true) => {
-              setExpiryOnRedisKey(redisKey, (RichInt(15).minutes.millis / 1000).toInt)
-              zender ! redisKey
-            }
-            case _ => throw new Exception("morphemeAnalyzerRoundRobin failed to generate morphemes for that timespan")
+        analyzeAndDumpResultsList match {
+          case x: List[Boolean] if x.forall(_ == true) => {
+            setExpiryOnRedisKey(redisKey, (RichInt(15).minutes.millis / 1000).toInt)
+            zender ! redisKey
           }
+          case _ => throw new Exception("morphemeAnalyzerRoundRobin failed to generate morphemes for that timespan")
         }
+
       }
     }
 
     case _ => println("RedisStringSetToMorphemesActor says 'huh?'")
   }
 
-  def listOfUnixTimeSpanInSteps(unixTimeSpan: UnixTimeSpan, stepInSeconds: Int = 1800) : List[UnixTimeSpan] = {
+  def listOfUnixTimeSpanInSteps(unixTimeSpan: UnixTimeSpan, stepInSeconds: Int = 1800): List[UnixTimeSpan] = {
     val originalUnixTimeRange = (unixTimeSpan.start.time to unixTimeSpan.end.time)
-    originalUnixTimeRange.listOfConsecutivePairsInSteps(stepInSeconds) map {double =>
+    originalUnixTimeRange.listOfConsecutivePairsInSteps(stepInSeconds) map { double =>
       UnixTimeSpan(UnixTime(double._1), UnixTime(double._2))
     }
   }
