@@ -21,19 +21,11 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
   }
 
   def byChiSquared: List[(String, Double)] = {
-    val oldSetTotalScore = redisPool.withClient { redis =>
-      redis.zscore(redisKeyOlder, zSetTotalScoreKey) match {
-        case None => 0
-        case Some(x) => x
-      }
-    }
 
-    val newSetTotalScore = redisPool.withClient { redis =>
-      redis.zscore(redisKeyNewer, zSetTotalScoreKey) match {
-        case None => 0
-        case Some(x) => x
-      }
-    }
+    val oldSetCard = zCard(redisKeyOlder)
+    val oldSetTotalScore = totalMorphemesScoreAtSet(redisKeyOlder)
+    val newSetCard = zCard(redisKeyNewer)
+    val newSetTotalScore = totalMorphemesScoreAtSet(redisKeyNewer)
 
     val morphemeChiSquaredList: List[(String, Double)] = {
       for ((term, newForTermScore) <- newTermsWithScoresList) yield {
@@ -58,6 +50,24 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
       redis.zrangebyscoreWithScore(redisKeyNewer, minScore, limit = None, sortAs = DESC) match {
         case Some(x: List[(String, Double)]) => x.filter(_._1 != zSetTotalScoreKey)
         case _ => Nil
+      }
+    }
+  }
+
+  def totalMorphemesScoreAtSet(redisKey: String) = {
+    redisPool.withClient { redis =>
+      redis.zscore(redisKey, zSetTotalScoreKey) match {
+        case None => 0
+        case Some(x) => x
+      }
+    }
+  }
+
+  def zCard(redisKey: String) = {
+    redisPool.withClient { redis =>
+      redis.zcard(redisKey) match {
+        case Some(x: Long) => x.toInt
+        case None => 0
       }
     }
   }
