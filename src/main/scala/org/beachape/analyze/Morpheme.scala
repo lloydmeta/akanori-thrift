@@ -34,7 +34,7 @@ object Morpheme {
     System.loadLibrary("MeCab")
     val tagger = new Tagger
     val node = {
-      tagger.parseToNode(str) //wtf
+      tagger.parse(str) //wtf
       tagger.parseToNode(str)
     }
 
