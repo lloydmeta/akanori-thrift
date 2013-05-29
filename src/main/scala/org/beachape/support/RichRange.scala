@@ -1,6 +1,7 @@
 package org.beachape.support
 
 import scala.language.implicitConversions
+import scala.annotation.tailrec
 
 object RichRange {
   implicit def range2RichRange(r: Range) = RichRange(r)
@@ -11,21 +12,20 @@ case class RichRange(range: Range) {
   def listOfConsecutivePairsInSteps(step: Int) = {
     val steppedRange = range by step
 
-    def splitIntoConsecutivePairs(xs: List[Int]):List[(Int,Int)] = {
+    @tailrec def splitIntoConsecutivePairs(xs: List[Int], acc: List[(Int, Int)]): List[(Int, Int)] = {
       xs match {
         case x :: y :: Nil => {
           if (y != range.end) {
-            List((x, range.end))
+            (x, range.end) :: acc
           } else {
-            List((x, y))
+            (x, y) :: acc
           }
         }
-        case x :: y :: ys => List((x,y)) ::: splitIntoConsecutivePairs(y::ys)
-        case x :: Nil => List((x, range.end))
-        case _ => Nil
+        case x :: Nil => List((x, range.end)) ::: acc
+        case x :: y :: ys => splitIntoConsecutivePairs(y :: ys, (x, y) :: acc)
       }
     }
 
-    splitIntoConsecutivePairs(steppedRange.toList)
+    splitIntoConsecutivePairs(steppedRange.toList, Nil).reverse
   }
 }
