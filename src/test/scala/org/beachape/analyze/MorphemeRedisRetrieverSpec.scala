@@ -37,27 +37,19 @@ class MorphemesRedisRetrieverSpec extends FunSpec
   describe("#byChiSquared") {
 
     it("should be empty for a MorphemesRedisRetriever given empty keys") {
-      morphemeRedisRetrieverEmpty.byChiSquared.isEmpty should be(true)
+      morphemeRedisRetrieverEmpty.byChiSquared().isEmpty should be(true)
     }
 
     it("should not be empty for a MorphemesRedisRetriever with redis keys that contain morphemes with scores") {
-      morphemeRedisRetriever.byChiSquared.isEmpty should be(false)
+      morphemeRedisRetriever.byChiSquared().isEmpty should be(false)
     }
 
   }
 
-  describe("#byChiSquaredReversed") {
-
-    it("should be the reverse of #byChiSquared") {
-      morphemeRedisRetriever.byChiSquared.reverse should be(morphemeRedisRetriever.byChiSquaredReversed)
-    }
-
-  }
-
-  describe("#storeChiSquared") {
+  describe("#generateAndStoreChiSquared") {
 
     it("should return a string that can be used as a key") {
-      val storedChiSquared = morphemeRedisRetriever.storeChiSquared
+      val storedChiSquared = morphemeRedisRetriever.generateAndStoreChiSquared
       redisPool.withClient(redis =>
         redis.exists(storedChiSquared)) should be(true)
     }
@@ -65,7 +57,7 @@ class MorphemesRedisRetrieverSpec extends FunSpec
     describe("should return a key and the key itself") {
 
       it("should point to a value in Redis that is a zSet (responds to zCard with a number greater than 0)") {
-        val storedChiSquared = morphemeRedisRetriever.storeChiSquared
+        val storedChiSquared = morphemeRedisRetriever.generateAndStoreChiSquared
         zcardOfRedisKey(storedChiSquared) should be > 0
       }
 

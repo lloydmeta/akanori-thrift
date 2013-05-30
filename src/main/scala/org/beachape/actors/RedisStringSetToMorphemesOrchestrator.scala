@@ -20,7 +20,7 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
 
   def receive = {
 
-    case List('generateTrendsFor, (unixEndAtTime: Int, spanInSeconds: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)) => {
+    case List('generateMorphemesFor, (unixEndAtTime: Int, spanInSeconds: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)) => {
 
       val zender = sender
 

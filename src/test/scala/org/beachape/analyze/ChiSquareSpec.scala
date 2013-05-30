@@ -8,13 +8,13 @@ import scala.math.pow
 class DummyClass extends ChiSquare
 
 class ChisquareSpec extends FunSpec
-                       with ShouldMatchers
-                       with BeforeAndAfterEach
-                       with BeforeAndAfterAll {
+  with ShouldMatchers
+  with BeforeAndAfterEach
+  with BeforeAndAfterAll {
 
   val dummy = new DummyClass
 
-  val calculateChiSquaredPart = {(expectedFrequency: Double, observedFrequency: Double) =>
+  val calculateChiSquaredPart = { (expectedFrequency: Double, observedFrequency: Double) =>
     pow(((observedFrequency * 100 - expectedFrequency * 100).abs - 0.5), 2) / (100 * expectedFrequency)
   }
 
@@ -36,7 +36,7 @@ class ChisquareSpec extends FunSpec
       val otherExpectedFrequency = expectedOtherOccurence / expectedTotal
 
       val assertTotal = calculateChiSquaredPart(expectedTermFrequency, observedTermFrequency) + calculateChiSquaredPart(otherExpectedFrequency, otherObservedFrequency)
-      dummy.calculateChiSquaredForTerm(expectedInterestedOccurence, observedInterestedOccurence, expectedTotal, observedTotal) should be (assertTotal)
+      dummy.calculateChiSquaredForTerm(expectedInterestedOccurence, observedInterestedOccurence, expectedTotal, observedTotal) should be(assertTotal)
     }
 
   }

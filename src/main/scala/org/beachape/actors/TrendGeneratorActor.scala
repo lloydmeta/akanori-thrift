@@ -16,26 +16,32 @@ class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boole
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600) seconds)
 
-  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(SmallestMailboxRouter(2)), "morphemeRetrievalRouter")
+  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "morphemeRetrievalRouter")
   val redisStringSetToMorphemesOrchestrator = context.actorOf(Props(new RedisStringSetToMorphemesOrchestrator(redisPool)))
-  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(SmallestMailboxRouter(2)), "morphemesTrendDetectRoundRobin")
+  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "morphemesTrendDetectRoundRobin")
 
   def receive = {
 
     case List('generateTrendsFor, (redisCacheKey: RedisKey, unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
 
       val zender = sender
-      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateTrendsFor, (unixEndAtTime, spanInSeconds, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)))
 
+      //Get 2 sets of keys that point to the morphemes
+      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateMorphemesFor, (unixEndAtTime, spanInSeconds, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)))
       listOfRedisKeysFuture map { listOfRedisKeys =>
         listOfRedisKeys match {
           case List(oldSet: RedisKeySet, newSet: RedisKeySet) => {
-            val oldNewMorphemesSetKeys = ask(morphemesTrendDetectRoundRobin, List('detectTrends, (oldSet, newSet, callMinOccurrence)))
-            oldNewMorphemesSetKeys map { keySet =>
+
+            //Using the morphemes for each for the time periods(old observed vs expected and
+            // new observed vs expected), generate the ChiSquared scores for each term
+            val oldNewTrendSetKeys = ask(morphemesTrendDetectRoundRobin, List('detectTrends, (oldSet, newSet, callMinOccurrence)))
+            oldNewTrendSetKeys map { keySet =>
               keySet match {
                 case newlyGeneratedSet: RedisKeySet => {
+                  // Using the 2 keys pointing to old ChiSquared and new ChiSquared, retrieve ChiChi
                   val listOfReverseSortedTermsAndScoresFuture = ask(morphemeRetrieveRoundRobin, List('retrieveChiChi, newlyGeneratedSet, callMinOccurrence, callMinLength, callMaxLength, callTop)).mapTo[List[(String, Double)]]
                   listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
+                    // Cache the result
                     cacheTrendsAtScore(redisCacheKey, listOfReverseSortedTermsAndScores)
                     zender ! listOfReverseSortedTermsAndScores
                   }
