@@ -16,7 +16,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "redisStringSetToMorphemesMorphemesAnalyzerRoundRobin")
+  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(SmallestMailboxRouter(2)), "redisStringSetToMorphemesMorphemesAnalyzerRoundRobin")
 
   def receive = {
 
@@ -28,13 +28,16 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
       if (cachedKeyExists(redisKey)) {
         zender ! redisKey
       } else {
-        val count = 300 //amount of strings to retrieve at once from the store
+        val count = 100 //amount of strings to retrieve at once from the store
         val analyzeAndDumpResultsList: List[Boolean] = (for (offSet <- (0 to countOfTermsInSpan(unixTimeSpan) by count)) yield {
-          val listOfAnalyzeAndDumpFuturesForOffSet = listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count)) map { phrase =>
-            ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, phrase, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
-          }
-          val futureListOfAnalyzeAndDumpResultsForOffSet = Future.sequence(listOfAnalyzeAndDumpFuturesForOffSet)
-          Await.result(futureListOfAnalyzeAndDumpResultsForOffSet, timeout.duration).asInstanceOf[List[Boolean]].forall(_ == true)
+          val listOfTerms = listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count))
+          val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
+
+          val futureStringOneDump = ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, listOfStringsOne.mkString(sys.props("line.separator")), dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
+          val futureStringTwoDump = ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, listOfStringsTwo.mkString(sys.props("line.separator")), dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
+
+          Await.result(futureStringOneDump, timeout.duration).asInstanceOf[Boolean] &&
+            Await.result(futureStringTwoDump, timeout.duration).asInstanceOf[Boolean]
         })(collection.breakOut)
 
         analyzeAndDumpResultsList match {

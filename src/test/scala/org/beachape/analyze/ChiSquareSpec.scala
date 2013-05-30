@@ -30,12 +30,16 @@ class ChisquareSpec extends FunSpec
       val observedTotal = observedInterestedOccurence + observedOtherOccurence
 
       val observedTermFrequency = observedInterestedOccurence / observedTotal
+      val observedTermFrequencyPlus1 = observedInterestedOccurence / observedTotal + 1
       val expectedTermFrequency = expectedInterestedOccurence / expectedTotal
+      val expectedTermFrequencyPlus1 = expectedInterestedOccurence / expectedTotal + 1
 
       val otherObservedFrequency = observedOtherOccurence / observedTotal
+      val otherObservedFrequencyPlus1 = observedOtherOccurence / observedTotal + 1
       val otherExpectedFrequency = expectedOtherOccurence / expectedTotal
+      val otherExpectedFrequencyPlus1 = expectedOtherOccurence / expectedTotal + 1
 
-      val assertTotal = calculateChiSquaredPart(expectedTermFrequency, observedTermFrequency) + calculateChiSquaredPart(otherExpectedFrequency, otherObservedFrequency)
+      val assertTotal = calculateChiSquaredPart(expectedTermFrequencyPlus1, observedTermFrequencyPlus1) + calculateChiSquaredPart(otherExpectedFrequencyPlus1, otherObservedFrequencyPlus1)
       dummy.calculateChiSquaredForTerm(expectedInterestedOccurence, observedInterestedOccurence, expectedTotal, observedTotal) should be(assertTotal)
     }
 
