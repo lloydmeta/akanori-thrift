@@ -28,7 +28,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
       if (cachedKeyExists(redisKey)) {
         zender ! redisKey
       } else {
-        val count = 100 //amount of strings to retrieve at once from the store
+        val count = 200 //amount of strings to retrieve at once from the store
         val analyzeAndDumpResultsList: List[Boolean] = (for (offSet <- (0 to countOfTermsInSpan(unixTimeSpan) by count)) yield {
           val listOfTerms = listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count))
           val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
