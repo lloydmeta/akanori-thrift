@@ -1,6 +1,6 @@
 import org.chasen.mecab.{ Tagger, Node, MeCab }
 import org.beachape.analyze.{ Morpheme, MorphemesRedisRetriever }
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{ Actor, ActorSystem, Props }
 import akka.routing.SmallestMailboxRouter
 import com.redis._
 import java.io._

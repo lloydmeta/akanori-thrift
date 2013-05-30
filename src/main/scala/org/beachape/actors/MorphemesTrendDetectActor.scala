@@ -32,8 +32,8 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
       futureListOfStoredRankedTrendsKeys map { storedRankKeyList =>
         storedRankKeyList match {
-          case List(olderMorphemesKey: RedisKey, newerMorphemesKey: RedisKey) => {
-            zender ! RedisKeySet(olderMorphemesKey, newerMorphemesKey)
+          case List(olderTrendsKey: RedisKey, newerTrendsKey: RedisKey) => {
+            zender ! RedisKeySet(olderTrendsKey, newerTrendsKey)
           }
           case _ => throw new Exception("MorphemesTrendDetectActor did not receive proper RedisKeys pointing to ranked morphemes")
         }

@@ -1,64 +1,121 @@
 package org.beachape.analyze
+
 import com.redis._
 import com.redis.RedisClient._
 import scala.math.pow
+import com.github.nscala_time.time.Imports._
 
 case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: String, redisKeyNewer: String, minScore: Double = 10) extends ChiSquare with RedisHelper {
 
-  def byChiSquaredReversed = {
-    byChiSquared.reverse
+  def retrieveStorageKey = {
+    if (zCardExists(storageKey)) {
+      storageKey
+    } else {
+      generateAndStoreChiSquared
+      storageKey
+    }
   }
 
-  def storeChiSquared = {
-    val storageKey = f"MorphemesChiSquared:$redisKeyOlder%s-$redisKeyNewer%s"
-    for ((term, chiSquaredScore) <- byChiSquared) {
-      redisPool.withClient { redis =>
-        redis.zincrby(storageKey, chiSquaredScore, term)
-        redis.zincrby(storageKey, chiSquaredScore, zSetTotalScoreKey)
-      }
+  def byChiSquared(limit: Option[(Int, Int)] = None, sortAs: SortOrder = DESC) = {
+    if (zCardExists(storageKey)) {
+      termsWithScoresList(storageKey, limit = limit, sort = sortAs)
+    } else {
+      generateAndStoreChiSquared
+      termsWithScoresList(storageKey, limit = limit, sort = sortAs)
     }
-    storageKey
   }
 
-  def byChiSquared: List[(String, Double)] = {
-    val oldSetTotalScore = redisPool.withClient { redis =>
-      redis.zscore(redisKeyOlder, zSetTotalScoreKey) match {
-        case None => 0
-        case Some(x) => x
+  def termsWithScoresList(redisKey: String, min: Double = Double.NegativeInfinity, limit: Option[(Int, Int)] = None, sort: SortOrder = DESC) = {
+    redisPool.withClient { redis =>
+      redis.zrangebyscoreWithScore(redisKey, min, limit = limit, sortAs = sort) match {
+        case Some(x: List[(String, Double)]) => x.filter(_._1 != zSetTotalScoreKey)
+        case _ => Nil
       }
     }
+  }
 
-    val newSetTotalScore = redisPool.withClient { redis =>
-      redis.zscore(redisKeyNewer, zSetTotalScoreKey) match {
-        case None => 0
-        case Some(x) => x
-      }
-    }
+  def newTermsWithScoresList: List[(String, Double)] = {
+    termsWithScoresList(redisKeyNewer, min = minScore, limit = None, sort = DESC)
+  }
 
-    val morphemeChiSquaredList: List[(String, Double)] = {
-      for ((term, newForTermScore) <- newTermsWithScoresList) yield {
-        val oldScoreForTerm = redisPool.withClient { redis =>
-          redis.zscore(redisKeyOlder, term) match {
-            case Some(y) => y
-            case _ => 1
-          }
-        }
+  def newTermsWithScoresListWithLimit(limitDesired: Option[(Int, Int)] = Some(0, 50)): List[(String, Double)] = {
+    termsWithScoresList(redisKeyNewer, min = minScore, limit = limitDesired, sort = DESC)
+  }
+
+  def generateAndStoreChiSquared: String = {
+    val oldSetCard = zCard(redisKeyOlder)
+    val oldSetTotalScore = totalMorphemesScoreAtSet(redisKeyOlder)
+    val newSetCard = zCard(redisKeyNewer)
+    val newSetTotalScore = totalMorphemesScoreAtSet(redisKeyNewer)
+
+    val count = 500 // How many to retrieve at once
+    val offSets = 0 to newSetCard by count // Generate range to page over the new set
+
+    offSets foreach { offSet =>
+      val morphemeSquaredListForOffset = for ((term, newForTermScore) <- newTermsWithScoresListWithLimit(Some(offSet, count))) yield {
+        val oldScoreForTerm = getOldScoreForTerm(term)
+
         if (newForTermScore > oldScoreForTerm)
           (term, calculateChiSquaredForTerm(oldScoreForTerm, newForTermScore, oldSetTotalScore, newSetTotalScore))
         else
           (term, -55378008.0)
       }
+      storeScoresInZSet(morphemeSquaredListForOffset.filter(_._2 != -55378008.0))
     }
 
-    morphemeChiSquaredList.filter(_._2 != -55378008.0).sortBy(_._2)
+    setExpiryOnRedisKey(storageKey, 60 * 5)
+    storageKey
   }
 
-  def newTermsWithScoresList: List[(String, Double)] = {
-    redisPool.withClient { redis =>
-      redis.zrangebyscoreWithScore(redisKeyNewer, minScore, limit = None, sortAs = DESC) match {
-        case Some(x: List[(String, Double)]) => x.filter(_._1 != zSetTotalScoreKey)
-        case _ => Nil
+  def storageKey = f"MorphemesChiSquared:$redisKeyOlder%s-$redisKeyNewer%s-minScore$minScore%f"
+
+  def storeScoresInZSet(morphemeSquaredList: List[(String, Double)]) = {
+    for ((term: String, chiSquaredScore: Double) <- morphemeSquaredList) {
+      redisPool.withClient { redis =>
+        redis.pipeline { p =>
+          p.zincrby(storageKey, chiSquaredScore, term)
+          p.zincrby(storageKey, chiSquaredScore, zSetTotalScoreKey)
+        }
       }
+    }
+  }
+
+  def getOldScoreForTerm(term: String) = {
+    redisPool.withClient { redis =>
+      redis.zscore(redisKeyOlder, term) match {
+        case Some(y) => y
+        case _ => 1
+      }
+    }
+  }
+
+  def totalMorphemesScoreAtSet(redisKey: String) = {
+    redisPool.withClient { redis =>
+      redis.zscore(redisKey, zSetTotalScoreKey) match {
+        case None => 0
+        case Some(x) => x
+      }
+    }
+  }
+
+  def zCard(redisKey: String) = {
+    redisPool.withClient { redis =>
+      redis.zcard(redisKey) match {
+        case Some(x: Long) => x.toInt
+        case None => 0
+      }
+    }
+  }
+
+  def setExpiryOnRedisKey(key: String, expiryInSeconds: Int) = {
+    redisPool.withClient { redis =>
+      redis.pexpire(key, RichInt(expiryInSeconds).seconds.millis.toInt)
+    }
+  }
+
+  def zCardExists(redisKey: String) = {
+    redisPool.withClient { redis =>
+      redis.exists(redisKey)
     }
   }
 

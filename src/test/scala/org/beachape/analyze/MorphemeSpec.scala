@@ -5,9 +5,9 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.ShouldMatchers
 
 class MorphemeSpec extends FunSpec
-                       with ShouldMatchers
-                       with BeforeAndAfterEach
-                       with BeforeAndAfterAll {
+  with ShouldMatchers
+  with BeforeAndAfterEach
+  with BeforeAndAfterAll {
 
   val stringToAnalyse = "隣の客はよく柿食う客だ"
 
@@ -15,9 +15,9 @@ class MorphemeSpec extends FunSpec
 
     describe(".stringToMorphemes({anyString})") {
 
-      it ("should return a List[Morpheme]") {
+      it("should return a List[Morpheme]") {
         val morphemes = Morpheme.stringToMorphemes(stringToAnalyse)
-        morphemes.isInstanceOf[List[Morpheme]] should be (true)
+        morphemes.isInstanceOf[List[Morpheme]] should be(true)
       }
 
       describe("each morpheme in the list") {
@@ -28,7 +28,7 @@ class MorphemeSpec extends FunSpec
 
           it("should be a string") {
             for (m <- morphemes)
-              m.surface.isInstanceOf[String] should be (true)
+              m.surface.isInstanceOf[String] should be(true)
           }
 
         }
@@ -39,9 +39,9 @@ class MorphemeSpec extends FunSpec
 
     describe(".stringToWords({anyString})") {
 
-      it("should return a List[String]"){
+      it("should return a List[String]") {
         val words = Morpheme.stringToWords(stringToAnalyse)
-        words.isInstanceOf[List[String]] should be (true)
+        words.isInstanceOf[List[String]] should be(true)
       }
 
     }
