@@ -34,10 +34,8 @@ object Morpheme {
   def stringToMorphemes(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
     System.loadLibrary("MeCab")
     val tagger = new Tagger
-    val node = {
-      tagger.parse(str) //wtf
-      tagger.parseToNode(str)
-    }
+    tagger.parse(str) //wtf
+    val node = tagger.parseToNode(str)
 
     val morphemes = nodeToList(node) map { x =>
       parseMorpheme(x.getSurface.trim, x.getFeature)
@@ -60,14 +58,12 @@ object Morpheme {
   }
 
   private def nodeToList(node: Node): List[Node] = {
-
     @tailrec def nodeToListSupport(node: Node, acc: List[Node]): List[Node] = {
       node.getNext match {
         case null => acc
         case next: Node => nodeToListSupport(next, node :: acc)
       }
     }
-
     nodeToListSupport(node, Nil).reverse
   }
 

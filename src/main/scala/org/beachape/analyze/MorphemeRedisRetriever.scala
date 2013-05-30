@@ -48,7 +48,7 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
     val newSetCard = zCard(redisKeyNewer)
     val newSetTotalScore = totalMorphemesScoreAtSet(redisKeyNewer)
 
-    val count = 500 // How many to retrieve at once
+    val count = 300 // How many to retrieve at once
     val offSets = 0 to newSetCard by count // Generate range to page over the new set
 
     offSets foreach { offSet =>
@@ -92,7 +92,7 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
   def totalMorphemesScoreAtSet(redisKey: String) = {
     redisPool.withClient { redis =>
       redis.zscore(redisKey, zSetTotalScoreKey) match {
-        case None => 0
+        case None => 1
         case Some(x) => x
       }
     }
