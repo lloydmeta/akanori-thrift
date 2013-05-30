@@ -18,7 +18,7 @@ class MorphemesAnalyzerActorSpec extends TestKit(ActorSystem("akkaTest"))
   with ImplicitSender
   with DefaultTimeout{
 
-  val redisPool = new RedisClientPool("localhost", 6379, database = 1)
+  val redisPool = new RedisClientPool("localhost", 6379, database = 3)
   val listOfStrings = List("笹子トンネル、設計時に風圧見落とし　天井崩落の一因か", "米の戦闘機Ｆ１５、沖縄の東海上に墜落　パイロット無事", "朝井リョウ、アイドル小説構想中　「夢と卒業」テーマ")
   val redisKey = "test:key"
   val morphemesAnalyzerActor = TestActorRef(new MorphemesAnalyzerActor(redisPool))

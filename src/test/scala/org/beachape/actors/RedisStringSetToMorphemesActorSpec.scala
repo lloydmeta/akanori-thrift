@@ -18,7 +18,7 @@ class RedisStringSetToMorphemesActorSpec extends TestKit(ActorSystem("akkaTest")
   with ImplicitSender
   with DefaultTimeout {
 
-  val redisPool = new RedisClientPool("localhost", 6379, database = 2)
+  val redisPool = new RedisClientPool("localhost", 6379, database = 4)
 
   val unixTimeStart = UnixTime(10000)
   val unixTimeEnd = UnixTime(20000)

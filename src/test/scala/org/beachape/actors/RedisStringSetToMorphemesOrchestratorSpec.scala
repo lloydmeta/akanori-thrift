@@ -18,7 +18,7 @@ class RedisStringSetToMorphemesOrchestratorSpec extends TestKit(ActorSystem("akk
   with ImplicitSender
   with DefaultTimeout {
 
-  val redisPool = new RedisClientPool("localhost", 6379, database = 2)
+  val redisPool = new RedisClientPool("localhost", 6379, database = 5)
 
   val unixTimeStart = UnixTime(1369821708)
   val unixTimeEnd = UnixTime(1369908108)
