@@ -43,24 +43,23 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
   }
 
   def generateAndStoreChiSquared: String = {
-    val oldSetCard = zCard(redisKeyOlder)
     val oldSetTotalScore = totalMorphemesScoreAtSet(redisKeyOlder)
     val newSetCard = zCard(redisKeyNewer)
     val newSetTotalScore = totalMorphemesScoreAtSet(redisKeyNewer)
 
-    val count = 500 // How many to retrieve at once
+    val count = 300 // How many to retrieve at once
     val offSets = 0 to newSetCard by count // Generate range to page over the new set
 
     offSets foreach { offSet =>
-      val morphemeSquaredListForOffset = for ((term, newForTermScore) <- newTermsWithScoresListWithLimit(Some(offSet, count))) yield {
+      val morphemeSquaredListForOffset = for ((term, newScoreForTerm) <- newTermsWithScoresListWithLimit(Some(offSet, count))) yield {
         val oldScoreForTerm = getOldScoreForTerm(term)
-
-        if (newForTermScore > oldScoreForTerm)
-          (term, calculateChiSquaredForTerm(oldScoreForTerm, newForTermScore, oldSetTotalScore, newSetTotalScore))
-        else
-          (term, -55378008.0)
+        if (newScoreForTerm > oldScoreForTerm && newScoreForTerm != 0) {
+          (term, calculateChiSquaredForTerm(oldScoreForTerm, newScoreForTerm, oldSetTotalScore, newSetTotalScore))
+        } else {
+          (term, Double.PositiveInfinity)
+        }
       }
-      storeScoresInZSet(morphemeSquaredListForOffset.filter(_._2 != -55378008.0))
+      storeScoresInZSet(morphemeSquaredListForOffset.filter(_._2 != Double.PositiveInfinity))
     }
 
     setExpiryOnRedisKey(storageKey, 60 * 5)
@@ -83,7 +82,7 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
   def getOldScoreForTerm(term: String) = {
     redisPool.withClient { redis =>
       redis.zscore(redisKeyOlder, term) match {
-        case Some(y) => y
+        case Some(y) if (y != 0 ) => y
         case _ => 1
       }
     }
@@ -92,8 +91,8 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
   def totalMorphemesScoreAtSet(redisKey: String) = {
     redisPool.withClient { redis =>
       redis.zscore(redisKey, zSetTotalScoreKey) match {
-        case None => 0
-        case Some(x) => x
+        case Some(x) if (x != 0) => x
+        case _ => 1
       }
     }
   }

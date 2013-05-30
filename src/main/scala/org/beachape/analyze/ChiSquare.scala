@@ -5,11 +5,11 @@ trait ChiSquare {
 
   def calculateChiSquaredForTerm(oldTermScore: Double, termScore: Double, oldSetTotalScore: Double, newSetTotalScore: Double): Double = {
 
-    // Calculate frequencies
-    val observedTermFrequency = termScore / newSetTotalScore
-    val expectedTermFrequency = oldTermScore / oldSetTotalScore
-    val otherObservedFrequency = (newSetTotalScore - termScore) / newSetTotalScore
-    val otherExpectedFrequency = (oldSetTotalScore - oldTermScore) / oldSetTotalScore
+    // Calculate frequencies with add 1 smoothing
+    val observedTermFrequency = termScore / newSetTotalScore + 1
+    val expectedTermFrequency = oldTermScore / oldSetTotalScore + 1
+    val otherObservedFrequency = (newSetTotalScore - termScore) / newSetTotalScore + 1
+    val otherExpectedFrequency = (oldSetTotalScore - oldTermScore) / oldSetTotalScore + 1
 
     val termChiSquaredPart = calculateChiSquaredPart(expectedTermFrequency, observedTermFrequency)
     val otherChiSquaredPart = calculateChiSquaredPart(otherExpectedFrequency, otherObservedFrequency)
