@@ -15,18 +15,18 @@ Usage
 
 ```
 Usage: Akanori-thrift (options are for currentTrendsDefault)
-          --clear-redis Boolean
-          [--span-in-seconds Int, defaults to 3 hours (10800)]
-          [--min-occurrence Int, defaults to 10]
-          [--min-length Int, defaults to 1]
-          [--max-length Int, defaults to 50]
-          [--top Int, defaults to 50]
-          [--drop-blacklisted Boolean, defaults to true]
-          [--only-whitelisted Boolean, defaults to false]
-          [--redis-host String, defaults to localhost]
-          [--redis-db Int, defaults to 0]
-          [--redis-port Int, defaults to 6379]
-
+    --clear-redis Boolean
+    [--thrift-server-port Int, defaults to 9090]
+    [--span-in-seconds Int, defaults to 3 hours (10800)]
+    [--min-occurrence Int, defaults to 10]
+    [--min-length Int, defaults to 1]
+    [--max-length Int, defaults to 50]
+    [--top Int, defaults to 50]
+    [--drop-blacklisted Boolean, defaults to true]
+    [--only-whitelisted Boolean, defaults to false]
+    [--redis-host String, defaults to localhost]
+    [--redis-db Int, defaults to 0]
+    [--redis-port Int, defaults to 6379]
 ```
 
 Example
