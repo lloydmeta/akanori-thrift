@@ -5,20 +5,16 @@ import akka.routing.SmallestMailboxRouter
 import com.redis._
 import java.io._
 import org.beachape.actors._
-import org.beachape.server.TrendServer
-import trendServer.gen.TrendThriftServer
-import org.apache.thrift._
-import org.apache.thrift.protocol._
-import org.apache.thrift.server._
-import org.apache.thrift.transport._
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import org.beachape.server.TrendServerBuilder
 
 object TrendApp {
 
   val usage = """
       Usage: Akanori-thrift (options are for currentTrendsDefault)
           --clear-redis Boolean
+          [--thrift-server-port Int, defaults to 9090]
           [--span-in-seconds Int, defaults to 3 hours (10800)]
           [--min-occurrence Int, defaults to 10]
           [--min-length Int, defaults to 1]
@@ -49,6 +45,8 @@ object TrendApp {
         case Nil => map
         case "--clear-redis" :: value :: tail =>
           nextOption(map ++ Map('clearRedis -> value.toBoolean), tail)
+        case "--thrift-server-port" :: value :: tail =>
+          nextOption(map ++ Map('thriftServerPort -> value.toInt), tail)
         case "--min-occurrence" :: value :: tail =>
           nextOption(map ++ Map('minOccurrence -> value.toDouble), tail)
         case "--span-in-seconds" :: value :: tail =>
@@ -81,6 +79,7 @@ object TrendApp {
       case Some(x) => x.asInstanceOf[Boolean]
       case _ => printUsageAndExit(true)
     }
+    val thriftServerPort = options.getOrElse('thriftServerPort, 9090).asInstanceOf[Int]
     val spanInSeconds = options.getOrElse('spanInSeconds, 10800).asInstanceOf[Int]
     val minLength = options.getOrElse('minLength, 1).asInstanceOf[Int]
     val maxLength = options.getOrElse('maxLength, 50).asInstanceOf[Int]
@@ -101,11 +100,7 @@ object TrendApp {
     import system.dispatcher
     val generateDefaultTrendsCancellableSchedule = system.scheduler.schedule(5 seconds, 1 minute, mainOrchestratorRoundRobin, List('generateDefaultTrends))
 
-    val st = new TServerSocket(9090)
-    val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestratorRoundRobin))
-    val arg = new TThreadPoolServer.Args(st)
-    arg.processor(processor)
-    val server = new TThreadPoolServer(arg)
+    val server = TrendServerBuilder.buildServer(thriftServerPort, mainOrchestratorRoundRobin)
     server.serve()
 
   }
