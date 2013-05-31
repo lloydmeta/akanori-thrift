@@ -9,7 +9,7 @@ class MorphemesRedisRetrieverSpec extends FunSpec
   with ShouldMatchers
   with BeforeAndAfter {
 
-  val redisPool = new RedisClientPool("localhost", 6379, database = 1)
+  val redisPool = new RedisClientPool("localhost", 6379, database = 4)
   val listOfMorphemes = Morpheme.stringToMorphemes("笹子トンネル、設計時に風圧見落とし　天井崩落の一因か") ::: Morpheme.stringToMorphemes("米の戦闘機Ｆ１５、沖縄の東海上に墜落　パイロット無事") ::: Morpheme.stringToMorphemes("朝井リョウ、アイドル小説構想中　「夢と卒業」テーマ")
   val listOfMorphemes2 = Morpheme.stringToMorphemes("笹子トンネル、設計時に風圧見落とし　天井崩落の一因か2") ::: Morpheme.stringToMorphemes("米の戦闘機Ｆ１５、沖縄の東海上に墜落　パイロット無事2") ::: Morpheme.stringToMorphemes("朝井リョウ、アイドル小説構想中　「夢と卒業」テーマ2") ::: Morpheme.stringToMorphemes("笹子トンネル、設計時に風圧見落とし　天井崩落の一因か2") ::: Morpheme.stringToMorphemes("笹子トンネル、設計時に風圧見落とし　天井崩落の一因か2") ::: Morpheme.stringToMorphemes("笹子トンネル、設計時に風圧見落とし　天井崩落の一因か2")
   val redisKey = "test:RedisKeyForMorphemesTracker"
