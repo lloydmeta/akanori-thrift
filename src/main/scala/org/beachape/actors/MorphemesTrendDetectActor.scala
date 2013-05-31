@@ -21,8 +21,10 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
   def receive = {
 
+    // Given 2 sets of Redis Keys representing morpheme counts [(T1)(T2)] and [(T3, T4)]
+    // where Ts are timespans, goes and builds 2 sorted sets of morphemes by chi-squared scores
+    // returns the keys
     case List('detectTrends, (oldSet: RedisKeySet, newSet: RedisKeySet, minOccurrence: Double)) => {
-
       val zender = sender
       val listOfStoredRankedTrendsKeysFutures = List(
         ask(morphemeRetrieveRoundRobin, (oldSet, minOccurrence)).mapTo[RedisKey],
