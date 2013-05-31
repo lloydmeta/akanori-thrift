@@ -14,7 +14,7 @@ object TrendApp {
   val usage = """
       Usage: Akanori-thrift (options are for currentTrendsDefault)
           --clear-redis Boolean
-          [--thrift-server-port Int, defaults 9090]
+          [--thrift-server-port Int, defaults to 9090]
           [--span-in-seconds Int, defaults to 3 hours (10800)]
           [--min-occurrence Int, defaults to 10]
           [--min-length Int, defaults to 1]
