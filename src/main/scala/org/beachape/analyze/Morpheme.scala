@@ -32,16 +32,21 @@ object Morpheme {
   }
 
   def stringToMorphemes(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
+    stringToMorphemesReverse(str, dropBlacklisted, onlyWhitelisted).reverse
+  }
+
+  // Just slightly faster than the above variant because doesn't use reversing
+  def stringToMorphemesReverse(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
     System.loadLibrary("MeCab")
     val tagger = new Tagger
     tagger.parse(str) //wtf
     val node = tagger.parseToNode(str)
 
-    val morphemes = nodeToList(node) map { x =>
+    val morphemes = nodeToListReverse(node) map { x =>
       parseMorpheme(x.getSurface.trim, x.getFeature)
     }
 
-    val justMorphemes = morphemes.toList dropRight 1 drop 1
+    val justMorphemes = morphemes.dropRight(1) // drops the BOS/EOS, which comes first, or in this case last
 
     if (dropBlacklisted && onlyWhitelisted)
       justMorphemes.filter(whiteListFilter).filter(blackListFilter)
@@ -58,13 +63,18 @@ object Morpheme {
   }
 
   private def nodeToList(node: Node): List[Node] = {
+    nodeToListReverse(node).reverse
+  }
+
+  // Slightly faster than nodeToList because no reversing
+  private def nodeToListReverse(node: Node): List[Node] = {
     @tailrec def nodeToListSupport(node: Node, acc: List[Node]): List[Node] = {
       node.getNext match {
         case null => acc
         case next: Node => nodeToListSupport(next, node :: acc)
       }
     }
-    nodeToListSupport(node, Nil).reverse
+    nodeToListSupport(node, Nil)
   }
 
   private def parseMorpheme(surface: String, chasenData: String): Morpheme = {

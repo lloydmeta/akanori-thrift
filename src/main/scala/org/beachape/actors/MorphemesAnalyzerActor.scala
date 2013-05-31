@@ -10,7 +10,7 @@ class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor with 
   def receive = {
 
     case List('dumpMorphemesToRedis, redisKey: RedisKey, line: String, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) => {
-      val morphemes = Morpheme.stringToMorphemes(line, dropBlacklisted, onlyWhitelisted)
+      val morphemes = Morpheme.stringToMorphemesReverse(line, dropBlacklisted, onlyWhitelisted)
       storeAllInRedis(morphemes, redisKey)
       sender ! true
     }
