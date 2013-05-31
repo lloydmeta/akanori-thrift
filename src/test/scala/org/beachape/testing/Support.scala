@@ -36,11 +36,14 @@ trait Support {
     }
     (
       RedisKeySet(
+        RedisKey(oldExpectedRedisKey),
+        RedisKey(oldObservedRedisKey)
+      ),
+      RedisKeySet(
         RedisKey(newExpectedRedisKey),
-        RedisKey(newObservedRedisKey)),
-        RedisKeySet(
-          RedisKey(oldExpectedRedisKey),
-          RedisKey(oldObservedRedisKey)))
+        RedisKey(newObservedRedisKey)
+      )
+    )
 
   }
 
@@ -51,5 +54,7 @@ trait Support {
       case _ => 0
     }
   }
+
+  def roughRound(double: Double, precision: Double) = double - double % precision
 
 }
