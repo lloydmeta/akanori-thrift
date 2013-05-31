@@ -22,7 +22,7 @@ class MorphemesTrendDetectActorSpec extends TestKit(ActorSystem("akkaTest"))
 
   val redisPool = new RedisClientPool("localhost", 6379, database = 6)
 
-  val (oldSet: RedisKeySet, newSet: RedisKeySet) = dumpMorphemesToRedis(redisPool)
+  val (oldSet: RedisKeySet, newSet: RedisKeySet) = dumpMorphemesToRedis
   val RedisKeySet(oldExpectedKey: RedisKey, oldObservedKey: RedisKey) = oldSet
   val RedisKeySet(newExpectedKey: RedisKey, newObservedKey: RedisKey) = newSet
 
@@ -31,7 +31,7 @@ class MorphemesTrendDetectActorSpec extends TestKit(ActorSystem("akkaTest"))
 
   before {
     redisPool.withClient(redis => redis.flushdb)
-    dumpMorphemesToRedis(redisPool)
+    dumpMorphemesToRedis
   }
 
   describe("sending messages") {
