@@ -10,6 +10,7 @@ class MorphemeSpec extends FunSpec
   with BeforeAndAfterAll {
 
   val stringToAnalyse = "隣の客はよく柿食う客だ"
+  val knownMorphemeSurfaces = List("隣", "の", "客", "は", "よく", "柿", "食う", "客", "だ")
 
   describe("Morpheme") {
 
@@ -24,11 +25,20 @@ class MorphemeSpec extends FunSpec
 
         val morphemes = Morpheme.stringToMorphemes(stringToAnalyse)
 
+        it("should be the reverse of .stringToMorphemesReverse") {
+          morphemes.reverse should be (Morpheme.stringToMorphemesReverse(stringToAnalyse))
+        }
+
         describe(".surface") {
 
           it("should be a string") {
             for (m <- morphemes)
               m.surface.isInstanceOf[String] should be(true)
+          }
+
+          it("should match one for one with the known list") {
+            for ((m: Morpheme, km: String) <- (morphemes, knownMorphemeSurfaces).zipped.toList)
+              m.surface should be(km)
           }
 
         }
