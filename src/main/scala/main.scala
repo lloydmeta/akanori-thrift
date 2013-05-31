@@ -5,14 +5,9 @@ import akka.routing.SmallestMailboxRouter
 import com.redis._
 import java.io._
 import org.beachape.actors._
-import org.beachape.server.TrendServer
-import trendServer.gen.TrendThriftServer
-import org.apache.thrift._
-import org.apache.thrift.protocol._
-import org.apache.thrift.server._
-import org.apache.thrift.transport._
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import org.beachape.server.TrendServerBuilder
 
 object TrendApp {
 
@@ -101,11 +96,7 @@ object TrendApp {
     import system.dispatcher
     val generateDefaultTrendsCancellableSchedule = system.scheduler.schedule(5 seconds, 1 minute, mainOrchestratorRoundRobin, List('generateDefaultTrends))
 
-    val st = new TServerSocket(9090)
-    val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestratorRoundRobin))
-    val arg = new TThreadPoolServer.Args(st)
-    arg.processor(processor)
-    val server = new TThreadPoolServer(arg)
+    val server = TrendServerBuilder.buildServer(9090, mainOrchestratorRoundRobin)
     server.serve()
 
   }
