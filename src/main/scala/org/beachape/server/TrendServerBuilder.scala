@@ -9,7 +9,7 @@ import akka.actor.ActorRef
 
 object TrendServerBuilder {
 
-  def buildServer(socket: Int = 9090, mainOrchestratorRoundRobin: ActorRef) = {
+  def buildServer(socket: Int = 9090, mainOrchestratorRoundRobin: ActorRef): TNonblockingServer = {
     val transport = new TNonblockingServerSocket(socket)
     val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestratorRoundRobin))
     val args = new TNonblockingServer.Args(transport)
