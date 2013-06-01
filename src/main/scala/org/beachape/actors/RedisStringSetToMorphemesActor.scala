@@ -55,9 +55,9 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   }
 
   def forEachPagedListOfTermsInUnixTimeSpan[A](unixTimeSpan: UnixTimeSpan, count: Int = 300)(callBack: List[String] => A): List[A] = {
-   (for (offSet <- (0 to countOfTermsInSpan(unixTimeSpan) by count)) yield {
-    callBack(listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count)))
-   })(collection.breakOut)
+    (for (offSet <- (0 to countOfTermsInSpan(unixTimeSpan) by count)) yield {
+      callBack(listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count)))
+    })(collection.breakOut)
   }
 
   def dumpListOfStringsToMorphemes(listOfTerms: List[String], redisKey: RedisKey, dropBlacklisted: Boolean, onlyWhitelisted: Boolean): Boolean = {
