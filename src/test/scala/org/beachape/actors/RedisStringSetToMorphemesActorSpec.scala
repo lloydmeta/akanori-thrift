@@ -73,7 +73,9 @@ class RedisStringSetToMorphemesActorSpec extends TestKit(ActorSystem("akkaTest")
     describe("#forEachPagedListOfTermsInUnixTimeSpan") {
 
       it("should return a list of the return callback function type") {
-        val returnsList = redisStringSetToMorphemesActor.forEachPagedListOfTermsInUnixTimeSpan(unixTimeSpan, { listTerms => true })
+        val returnsList = redisStringSetToMorphemesActor.forEachPagedListOfTermsInUnixTimeSpan(unixTimeSpan){
+          listTerms => true
+        }
         returnsList.forall(_ == true) should be (true)
       }
 

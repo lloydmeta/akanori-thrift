@@ -28,7 +28,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
       if (cachedKeyExists(redisKey)) {
         zender ! redisKey
       } else {
-        val analyzeAndDumpResultsList: List[Boolean] = forEachPagedListOfTermsInUnixTimeSpan(unixTimeSpan, dumpListOfStringsToMorphemes(_: List[String], redisKey, dropBlacklisted, onlyWhitelisted))
+        val analyzeAndDumpResultsList: List[Boolean] = forEachPagedListOfTermsInUnixTimeSpan(unixTimeSpan)(dumpListOfStringsToMorphemes(_: List[String], redisKey, dropBlacklisted, onlyWhitelisted))
         analyzeAndDumpResultsList match {
           case x: List[Boolean] if x.forall(_ == true) => {
             setExpiryOnRedisKey(redisKey, (RichInt(15).minutes.millis / 1000).toInt)
@@ -54,7 +54,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
     }
   }
 
-  def forEachPagedListOfTermsInUnixTimeSpan[A](unixTimeSpan: UnixTimeSpan, callBack: List[String] => A, count: Int = 300): List[A] = {
+  def forEachPagedListOfTermsInUnixTimeSpan[A](unixTimeSpan: UnixTimeSpan, count: Int = 300)(callBack: List[String] => A): List[A] = {
    (for (offSet <- (0 to countOfTermsInSpan(unixTimeSpan) by count)) yield {
     callBack(listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count)))
    })(collection.breakOut)
