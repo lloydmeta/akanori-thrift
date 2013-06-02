@@ -27,6 +27,9 @@ Usage: Akanori-thrift (options are for currentTrendsDefault)
     [--redis-host String, defaults to localhost]
     [--redis-db Int, defaults to 0]
     [--redis-port Int, defaults to 6379]
+    [--sample-data-filepath String]
+    [--sample-data-from Unix timetamp, defaults to 3 days ago]
+    [--sample-data-until Unix timetamp, defaults to now]
 ```
 
 Example
