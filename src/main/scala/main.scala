@@ -8,6 +8,7 @@ import org.beachape.actors._
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import org.beachape.server.TrendServerBuilder
+import org.beachape.support.SampleFileToRedisDumper
 
 object TrendApp {
 
@@ -25,6 +26,9 @@ object TrendApp {
           [--redis-host String, defaults to localhost]
           [--redis-db Int, defaults to 0]
           [--redis-port Int, defaults to 6379]
+          [--sample-data-filepath String]
+          [--sample-data-from Unix timetamp, defaults to 3 days ago]
+          [--sample-data-until Unix timetamp, defaults to now]
     """
 
   def main(args: Array[String]) {
@@ -67,6 +71,12 @@ object TrendApp {
           nextOption(map ++ Map('redisPort -> value.toInt), tail)
         case "--redis-db" :: value :: tail =>
           nextOption(map ++ Map('redisDb -> value.toInt), tail)
+        case "--sample-data-filepath" :: value :: tail =>
+          nextOption(map ++ Map('sampleDataFilepath -> value), tail)
+        case "--sample-data-from" :: value :: tail =>
+          nextOption(map ++ Map('sampleDataFrom -> value.toInt), tail)
+        case "--sample-data-until" :: value :: tail =>
+          nextOption(map ++ Map('sampleDataUntil -> value.toInt), tail)
         case option :: tail =>
           println("Unknown option " + option)
           sys.exit(1)
@@ -90,6 +100,9 @@ object TrendApp {
     val redisHost = options.getOrElse('redisHost, "localhost").toString
     val redisPort = options.getOrElse('redisPort, 6379).asInstanceOf[Int]
     val redisDb = options.getOrElse('redisPort, 7).asInstanceOf[Int]
+    val sampleDataFilepath = options.getOrElse('sampleDataFilepath, "").toString
+    val sampleDataFrom = options.getOrElse('sampleDataFrom, (System.currentTimeMillis / 1000 - 259200).toInt).asInstanceOf[Int]
+    val sampleDataUntil = options.getOrElse('sampleDataUntil, (System.currentTimeMillis / 1000).toInt).asInstanceOf[Int]
 
     val redisPool = new RedisClientPool(redisHost, redisPort, database = redisDb)
     if (clearRedis) redisPool.withClient { _.flushdb }
@@ -100,8 +113,13 @@ object TrendApp {
     import system.dispatcher
     val generateDefaultTrendsCancellableSchedule = system.scheduler.schedule(5 seconds, 1 minute, mainOrchestratorRoundRobin, List('generateDefaultTrends))
 
-    val server = TrendServerBuilder.buildServer(thriftServerPort, mainOrchestratorRoundRobin)
-    server.serve()
+    if (! sampleDataFilepath.isEmpty) {
+      println(s"Dumping sample data from file for $sampleDataFrom to sampleDataUntil")
+      SampleFileToRedisDumper(redisPool).dumpToRedis(sampleDataFilepath, sampleDataFrom, sampleDataUntil)
+    }
 
+    println("Server is ready for duty.")
+    val server = TrendServerBuilder.buildServer(thriftServerPort, mainOrchestratorRoundRobin)
+    server.serve
   }
 }
