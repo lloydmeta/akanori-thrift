@@ -69,6 +69,7 @@ case class SampleFileToRedisDumper(redisPool: RedisClientPool)
           case _:Throwable =>
         }
     }
+    reader.close
   }
 
 }
