@@ -61,7 +61,7 @@ trait Support extends RedisStorageHelper {
         "設計" -> 3,
         "見落とし" -> 1),
         //newExpectededStrings
-         (unixEndTime - span - 1) -> Map(
+         (unixEndTime - 2 * span + 1) -> Map(
         "笹子" -> 2,
         "トンネル" -> 1,
         "設計" -> 4,
