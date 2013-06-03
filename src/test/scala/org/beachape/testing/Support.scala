@@ -42,7 +42,7 @@ trait Support extends RedisStorageHelper {
 
   }
 
-  def dumpStringsToRedisStoredStringSet: (Int, Int, Int) = {
+  def dumpStringsToRedisStoredStringSet: Map[Symbol, Int] = {
     val unixStartTime = 996400
     val unixEndTime = 1086400
     val span = 1800
@@ -76,11 +76,21 @@ trait Support extends RedisStorageHelper {
 
     for ((unixTime, frequencyMap) <- timeStampsToStringFrequencyMap) {
       for ((term, frequency) <- frequencyMap) {
-        //add x number of times
+        for (i <- (0 to (frequency - 1))) {
+          val uniquishTimestamp = unixTime + i
+          val storableString = stringToSetStorableString(term, uniquishTimestamp)
+          redisPool.withClient {redis =>
+            redis.zadd(storedStringsSetKey, uniquishTimestamp, storableString)
+          }
+        }
       }
     }
 
-    (unixStartTime, unixEndTime, span)
+    Map(
+      'unixStartTime -> unixStartTime,
+      'unixEndTime -> unixEndTime,
+      'span -> span
+      )
   }
 
   def zcardOfRedisKey(key: String) = {

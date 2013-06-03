@@ -30,8 +30,10 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   val trendGeneratorActorRef = TestActorRef(new TrendGeneratorActor(redisPool, true, true))
   val trendGeneratorActor = trendGeneratorActorRef.underlyingActor
 
+  println(dumpStringsToRedisStoredStringSet)
+
   before {
     redisPool.withClient(redis => redis.flushdb)
-    dumpMorphemesToRedis
+    dumpStringsToRedisStoredStringSet
   }
 }
