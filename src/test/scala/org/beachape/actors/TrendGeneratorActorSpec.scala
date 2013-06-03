@@ -36,9 +36,9 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   val span = map.getOrElse('span, 0)
 
   val validTrend = List(
-    ("見落とし",9739.509318505337),
-    ("トンネル",6670.792725392501),
-    ("坂本",367.3888435418149))
+    ("見落とし",96.43719849267039),
+    ("トンネル",69.19112926569775),
+    ("坂本",67.52193993181336))
 
 
   // Map(
