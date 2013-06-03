@@ -65,13 +65,15 @@ trait Support extends RedisStorageHelper {
         "笹子" -> 2,
         "トンネル" -> 1,
         "設計" -> 4,
-        "見落とし" -> 5),
+        "見落とし" -> 5,
+        "坂本" -> 2),
         //newObservedStrings
-        (unixEndTime - 1) -> Map(
+        (unixEndTime - span + 1) -> Map(
         "笹子" -> 4,
         "トンネル" -> 6,
         "設計" -> 4,
-        "見落とし" -> 9)
+        "見落とし" -> 9,
+        "坂本" -> 10)
         )
 
     for ((unixTime, frequencyMap) <- timeStampsToStringFrequencyMap) {

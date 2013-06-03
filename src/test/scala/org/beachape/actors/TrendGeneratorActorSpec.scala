@@ -27,7 +27,7 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   val RedisKeySet(oldExpectedKey: RedisKey, oldObservedKey: RedisKey) = oldSet
   val RedisKeySet(newExpectedKey: RedisKey, newObservedKey: RedisKey) = newSet
 
-  val trendGeneratorActorRef = TestActorRef(new TrendGeneratorActor(redisPool, true, true))
+  val trendGeneratorActorRef = TestActorRef(new TrendGeneratorActor(redisPool, false, false))
   val trendGeneratorActor = trendGeneratorActorRef.underlyingActor
 
   val map = dumpStringsToRedisStoredStringSet
@@ -35,6 +35,41 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   val unixEnd = map.getOrElse('unixEndTime, 0)
   val span = map.getOrElse('span, 0)
 
+  val validTrend = List(
+    ("設計",9149.999450348081),
+    ("笹子",9149.999450348081),
+    ("見落とし",8993.938822345623),
+    ("トンネル",8641.676691656523),
+    ("坂本",415.1120490848477))
+
+  // Map(
+  //   //oldExpectedStrings
+  //   (unixStartTime + 1) -> Map(
+  //   "笹子" -> 2,
+  //   "トンネル" -> 1,
+  //   "設計" -> 2,
+  //   "見落とし" -> 2),
+  //   //oldObservedStrings
+  //   (unixStartTime + span + 1) -> Map(
+  //   "笹子" -> 3,
+  //   "トンネル" -> 4,
+  //   "設計" -> 3,
+  //   "見落とし" -> 1),
+  //   //newExpectededStrings
+  //    (unixEndTime - span - 1) -> Map(
+  //   "笹子" -> 2,
+  //   "トンネル" -> 1,
+  //   "設計" -> 4,
+  //   "見落とし" -> 5,
+  //   "坂本" -> 2),
+  //   //newObservedStrings
+  //   (unixEndTime - span + 1) -> Map(
+  //   "笹子" -> 4,
+  //   "トンネル" -> 6,
+  //   "設計" -> 4,
+  //   "見落とし" -> 9,
+  //   "坂本" -> 10)
+  //   )
 
   before {
     redisPool.withClient(redis => redis.flushdb)
@@ -43,6 +78,10 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
 
   describe("sending a message to List('generateTrendsFor....)") {
 
-    //List('generateTrendsFor, (redisCacheKey: RedisKey, unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int))
+    it("should respond with an expected trend") {
+      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20))
+      expectMsg(validTrend)
+    }
+
   }
 }
