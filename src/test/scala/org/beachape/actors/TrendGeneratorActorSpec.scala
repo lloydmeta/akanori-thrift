@@ -30,10 +30,19 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   val trendGeneratorActorRef = TestActorRef(new TrendGeneratorActor(redisPool, true, true))
   val trendGeneratorActor = trendGeneratorActorRef.underlyingActor
 
-  println(dumpStringsToRedisStoredStringSet)
+  val map = dumpStringsToRedisStoredStringSet
+  val unixStart = map.getOrElse('unixStartTime, 0)
+  val unixEnd = map.getOrElse('unixEndTime, 0)
+  val span = map.getOrElse('span, 0)
+
 
   before {
     redisPool.withClient(redis => redis.flushdb)
     dumpStringsToRedisStoredStringSet
+  }
+
+  describe("sending a message to List('generateTrendsFor....)") {
+
+    //List('generateTrendsFor, (redisCacheKey: RedisKey, unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int))
   }
 }
