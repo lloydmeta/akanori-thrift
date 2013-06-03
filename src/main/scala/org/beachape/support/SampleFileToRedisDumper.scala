@@ -61,10 +61,11 @@ case class SampleFileToRedisDumper(redisPool: RedisClientPool)
         try {
           val string = row(0)
           val dateString = row(1)
-          println(s"$string inserted at $dateString")
           val dateUnix = dateString.toDateTime.millis / 1000
           val dateUnixAdjusted = (currentTime - (newestDateUnixTimestamp - dateUnix)).toInt
           storeLineInRedis(storedStringsSetKey, string, dateUnixAdjusted)
+          val dateAdjusted = (dateUnixAdjusted * 1000L).toDateTime
+          println(s"$string inserted at $dateAdjusted")
         } catch {
           case _:Throwable =>
         }
