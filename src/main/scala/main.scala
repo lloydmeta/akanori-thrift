@@ -114,7 +114,7 @@ object TrendApp {
     val generateDefaultTrendsCancellableSchedule = system.scheduler.schedule(5 seconds, 1 minute, mainOrchestratorRoundRobin, List('generateDefaultTrends))
 
     if (! sampleDataFilepath.isEmpty) {
-      println(s"Dumping sample data from file for $sampleDataFrom to $sampleDataUntil")
+      println(s"Dumping sample data from file")
       SampleFileToRedisDumper(redisPool).dumpToRedis(sampleDataFilepath, sampleDataFrom, sampleDataUntil)
     }
 
