@@ -1,4 +1,5 @@
-import org.beachape.actors.{ MorphemesAnalyzerActor, RedisStringSetToMorphemesActor, RedisKey, UnixTime, UnixTimeSpan }
+package org.beachape.actors
+
 import com.redis._
 import org.scalatest.FunSpec
 import org.scalatest.BeforeAndAfter
@@ -18,7 +19,7 @@ class RedisStringSetToMorphemesActorSpec extends TestKit(ActorSystem("akkaTest")
   with ImplicitSender
   with DefaultTimeout {
 
-  val redisPool = new RedisClientPool("localhost", 6379, database = 2)
+  val redisPool = new RedisClientPool("localhost", 6379, database = 3)
 
   val unixTimeStart = UnixTime(10000)
   val unixTimeEnd = UnixTime(20000)

@@ -10,7 +10,7 @@ class SampleFileToRedisDumperSpec extends FunSpec
   with BeforeAndAfter
   with ShouldMatchers {
 
-  val redisPool = new RedisClientPool("localhost", 6379, database = 8)
+  val redisPool = new RedisClientPool("localhost", 6379, database = 9)
   val dumper = SampleFileToRedisDumper(redisPool)
 
   val temp1 = java.io.File.createTempFile("temp1", "first")

@@ -3,9 +3,7 @@ package org.beachape.testing
 import com.redis._
 import org.beachape.actors._
 
-trait Support {
-
-  val redisPool: RedisClientPool
+trait Support extends RedisStorageHelper {
 
   def dumpMorphemesToRedis: (RedisKeySet, RedisKeySet) = {
     val morphemesCountMapOldExpected = Map("a" -> 3, "b" -> 4, "c" -> 5, "d" -> 5, "e" -> 4)
@@ -37,14 +35,52 @@ trait Support {
     (
       RedisKeySet(
         RedisKey(oldExpectedRedisKey),
-        RedisKey(oldObservedRedisKey)
-      ),
-      RedisKeySet(
-        RedisKey(newExpectedRedisKey),
-        RedisKey(newObservedRedisKey)
-      )
-    )
+        RedisKey(oldObservedRedisKey)),
+        RedisKeySet(
+          RedisKey(newExpectedRedisKey),
+          RedisKey(newObservedRedisKey)))
 
+  }
+
+  def dumpStringsToRedisStoredStringSet: (Int, Int, Int) = {
+    val unixStartTime = 996400
+    val unixEndTime = 1086400
+    val span = 1800
+
+    val timeStampsToStringFrequencyMap = Map(
+        //oldExpectedStrings
+        (unixStartTime + 1) -> Map(
+        "笹子" -> 2,
+        "トンネル" -> 1,
+        "設計" -> 2,
+        "見落とし" -> 2),
+        //oldObservedStrings
+        (unixStartTime + span + 1) -> Map(
+        "笹子" -> 3,
+        "トンネル" -> 4,
+        "設計" -> 3,
+        "見落とし" -> 1),
+        //newExpectededStrings
+         (unixEndTime - span - 1) -> Map(
+        "笹子" -> 2,
+        "トンネル" -> 1,
+        "設計" -> 4,
+        "見落とし" -> 5),
+        //newObservedStrings
+        (unixEndTime - 1) -> Map(
+        "笹子" -> 4,
+        "トンネル" -> 6,
+        "設計" -> 4,
+        "見落とし" -> 9)
+        )
+
+    for ((unixTime, frequencyMap) <- timeStampsToStringFrequencyMap) {
+      for ((term, frequency) <- frequencyMap) {
+        //add x number of times
+      }
+    }
+
+    (unixStartTime, unixEndTime, span)
   }
 
   def zcardOfRedisKey(key: String) = {

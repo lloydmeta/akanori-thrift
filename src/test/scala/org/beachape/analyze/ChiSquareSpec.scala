@@ -1,4 +1,5 @@
-import org.beachape.analyze.ChiSquare
+package org.beachape.analyze
+
 import org.scalatest.FunSpec
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.BeforeAndAfterAll

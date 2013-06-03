@@ -1,18 +1,18 @@
-import org.beachape.analyze.{ MorphemesRedisTracker, MorphemesRedisRetriever, Morpheme, RedisHelper }
+package org.beachape.analyze
+
 import org.beachape.actors.{ RedisKey, RedisKeySet }
 import org.beachape.testing.Support
 import com.redis._
 import org.scalatest.FunSpec
 import org.scalatest.BeforeAndAfter
 import org.scalatest.matchers.ShouldMatchers
-import org.beachape.analyze.MorphemesRedisRetriever
 
 class MorphemesRedisRetrieverSpec extends FunSpec
   with ShouldMatchers
   with BeforeAndAfter
   with Support {
 
-  val redisPool = new RedisClientPool("localhost", 6379, database = 4)
+  val redisPool = new RedisClientPool("localhost", 6379, database = 6)
 
   val (oldSet: RedisKeySet, newSet: RedisKeySet) = dumpMorphemesToRedis
   val RedisKeySet(oldExpectedKey: RedisKey, oldObservedKey: RedisKey) = oldSet
