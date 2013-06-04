@@ -20,9 +20,8 @@ class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boole
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600) seconds)
 
-  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "morphemeRetrievalRouter")
   val redisStringSetToMorphemesOrchestrator = context.actorOf(Props(new RedisStringSetToMorphemesOrchestrator(redisPool)))
-  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(SmallestMailboxRouter(10)), "morphemesTrendDetectRoundRobin")
+  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(SmallestMailboxRouter(30)), "morphemesTrendDetectRoundRobin")
 
   def receive = {
 
@@ -48,12 +47,6 @@ class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boole
   //Using the morphemes for each for the time periods(old observed vs expected and
   // new observed vs expected), generate the ChiSquared scores for each term and store
   def generateTrends(trendsCacheKey: RedisKey, oldSet: RedisKeySet, newSet: RedisKeySet, minOccurrence: Double): RedisKey = {
-    val oldExpected = oldSet.expectedKey.redisKey
-    val oldObserved = oldSet.observedKey.redisKey
-
-    val newExpected = newSet.expectedKey.redisKey
-    val newObserved = newSet.observedKey.redisKey
-
     val oldSetMorphemesRetriever = MorphemesRedisRetriever(redisPool, oldSet.expectedKey.redisKey, oldSet.observedKey.redisKey, minOccurrence)
     val newSetMorphemesRetriever = MorphemesRedisRetriever(redisPool, newSet.expectedKey.redisKey, newSet.observedKey.redisKey, minOccurrence)
 
@@ -66,10 +59,10 @@ class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boole
     val newObservedSetCard = newSetMorphemesRetriever.observedZCard
 
     val results = newSetMorphemesRetriever.forEachPageOfObservedTermsWithScores(500) { termsWithScoresList =>
-      // pass to roundRobin to calculate overall ChiChi and store in the cachedkey set.
+      // pass to roundRobin to calculate ChiChi and store in the cachedkey set.
       val listOfChichiSquareCalculationResultFutures = for ((term, newObservedScore) <- termsWithScoresList) yield {
         ask(morphemesTrendDetectRoundRobin, List(
-          'calculateAndStoreChiChi,
+          'calculateAndStoreTrendiness,
           (term,
             newObservedScore,
             trendsCacheKey,

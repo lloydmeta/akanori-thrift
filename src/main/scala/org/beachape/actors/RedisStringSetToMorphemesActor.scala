@@ -20,7 +20,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(SmallestMailboxRouter(2)), "redisStringSetToMorphemesMorphemesAnalyzerRoundRobin")
+  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "redisStringSetToMorphemesMorphemesAnalyzerRoundRobin")
 
   def receive = {
 
@@ -74,29 +74,11 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
       Await.result(futureStringTwoDump, timeout.duration).asInstanceOf[Boolean]
   }
 
-  def listOfUnixTimeSpanInSteps(unixTimeSpan: UnixTimeSpan, stepInSeconds: Int = 3600): List[UnixTimeSpan] = {
-    val originalUnixTimeRange = (unixTimeSpan.start.time to unixTimeSpan.end.time)
-    originalUnixTimeRange.listOfConsecutivePairsInSteps(stepInSeconds) map { double =>
-      UnixTimeSpan(UnixTime(double._1), UnixTime(double._2))
-    }
-  }
-
   def countOfTermsInSpan(unixTimeSpan: UnixTimeSpan) = {
     redisPool.withClient { redis =>
       redis.zcount(storedStringsSetKey, unixTimeSpan.start.time.toDouble, unixTimeSpan.end.time.toDouble, true, true) match {
         case Some(x: Long) => x.toInt
         case None => 0
-      }
-    }
-  }
-
-  def listOfTermsInRedisStoredSetBetweenUnixTimeSpan(timeSpan: UnixTimeSpan): List[String] = {
-    redisPool.withClient { redis =>
-      redis.zrangebyscore(storedStringsSetKey, timeSpan.start.time.toDouble, true, timeSpan.end.time.toDouble, true, None) match {
-        case Some(x: List[String]) => {
-          x map (storedStringToString(_))
-        }
-        case _ => throw new Exception("morphemeAnalyzerRoundRobin couldn't retrieve strings for that timespan")
       }
     }
   }
