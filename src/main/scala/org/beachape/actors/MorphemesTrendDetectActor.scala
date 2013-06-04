@@ -21,8 +21,6 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "morphemeRetrievalRouter")
-
   def receive = {
 
     case List('calculateAndStoreTrendiness, (

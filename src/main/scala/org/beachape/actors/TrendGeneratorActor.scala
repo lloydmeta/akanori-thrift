@@ -56,8 +56,6 @@ class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boole
     val newSetExpectedTotalScore = newSetMorphemesRetriever.totalExpectedSetMorphemesScore
     val newSetObservedTotalScore = newSetMorphemesRetriever.totalObservedSetMorphemesScore
 
-    val newObservedSetCard = newSetMorphemesRetriever.observedZCard
-
     val results = newSetMorphemesRetriever.forEachPageOfObservedTermsWithScores(500) { termsWithScoresList =>
       // pass to roundRobin to calculate ChiChi and store in the cachedkey set.
       val listOfChichiSquareCalculationResultFutures = for ((term, newObservedScore) <- termsWithScoresList) yield {
