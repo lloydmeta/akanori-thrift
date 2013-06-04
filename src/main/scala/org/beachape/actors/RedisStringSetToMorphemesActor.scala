@@ -1,15 +1,19 @@
 package org.beachape.actors
 
-import akka.actor.{ Actor, Props }
-import akka.event.Logging
-import com.redis._
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
+
+import org.beachape.support.RichRange.range2RichRange
+
+import com.github.nscala_time.time.Imports.RichInt
+import com.redis.RedisClientPool
+
+import akka.actor.Actor
+import akka.actor.Props
+import akka.actor.actorRef2Scala
 import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
-import scala.concurrent.{ Await, Future }
 import akka.util.Timeout
-import scala.concurrent.duration._
-import com.github.nscala_time.time.Imports._
-import org.beachape.support.RichRange._
 
 class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 

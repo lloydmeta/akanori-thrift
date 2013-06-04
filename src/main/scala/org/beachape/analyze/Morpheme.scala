@@ -1,8 +1,10 @@
 // from http://blog.kenkov.jp/2013/04/04/mecab_scala.html
 package org.beachape.analyze
 
-import org.chasen.mecab.{ MeCab, Tagger, Node }
 import scala.annotation.tailrec
+
+import org.chasen.mecab.Node
+import org.chasen.mecab.Tagger
 
 object Morpheme {
 

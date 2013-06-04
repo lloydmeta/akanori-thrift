@@ -1,12 +1,15 @@
 package org.beachape.support
 
-import com.redis._
-import java.io._
-import org.beachape.actors.RedisStorageHelper
-import org.beachape.support.RichRange._
-import com.github.nscala_time.time.Imports._
+import java.io.FileReader
 
 import scala.io.Source
+
+import org.beachape.actors.RedisStorageHelper
+
+import com.github.nscala_time.time.Imports.RichLong
+import com.github.nscala_time.time.Imports.RichReadableInstant
+import com.github.nscala_time.time.Imports.RichString
+import com.redis.RedisClientPool
 
 case class SampleFileToRedisDumper(redisPool: RedisClientPool)
   extends RedisStorageHelper {

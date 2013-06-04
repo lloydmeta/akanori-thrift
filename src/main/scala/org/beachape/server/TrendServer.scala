@@ -1,17 +1,15 @@
 package org.beachape.server
 
-import trendServer.gen._
-import org.beachape.actors._
-import trendServer.gen.TrendResult
-import scala.concurrent.{ Future, Await }
+import scala.collection.JavaConversions.seqAsJavaList
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
+
+import akka.actor.ActorRef
+import akka.actor.actorRef2Scala
 import akka.pattern.ask
 import akka.util.Timeout
-import akka.actor.ActorRef
-import scala.concurrent.duration._
-import collection.JavaConversions._
 import trendServer.gen.TrendResult
-import scala.language.postfixOps
-import scala.language.implicitConversions
+import trendServer.gen.TrendThriftServer
 
 class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
   implicit val timeout = Timeout(600 seconds)

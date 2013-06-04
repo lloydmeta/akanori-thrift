@@ -1,7 +1,8 @@
 package org.beachape.testing
 
-import com.redis._
-import org.beachape.actors._
+import org.beachape.actors.RedisKey
+import org.beachape.actors.RedisKeySet
+import org.beachape.actors.RedisStorageHelper
 
 trait Support extends RedisStorageHelper {
 

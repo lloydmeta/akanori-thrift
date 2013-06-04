@@ -1,17 +1,17 @@
 package org.beachape.actors
 
-import com.redis._
-import org.scalatest.FunSpec
-import org.scalatest.BeforeAndAfter
-import org.scalatest.matchers.ShouldMatchers
-import akka.testkit.{ TestActorRef, TestKit, ImplicitSender, DefaultTimeout }
-import scala.concurrent.duration._
-import scala.concurrent.{ Future, Await }
-import akka.pattern.ask
-import akka.actor.ActorSystem
-import akka.util.Timeout
 import org.beachape.testing.Support
-import scala.util.{ Try, Success, Failure }
+import org.scalatest.BeforeAndAfter
+import org.scalatest.FunSpec
+import org.scalatest.matchers.ShouldMatchers
+
+import com.redis.RedisClientPool
+
+import akka.actor.ActorSystem
+import akka.testkit.DefaultTimeout
+import akka.testkit.ImplicitSender
+import akka.testkit.TestActorRef
+import akka.testkit.TestKit
 
 class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   with FunSpec

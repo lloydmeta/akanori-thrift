@@ -1,9 +1,9 @@
 package org.beachape.analyze
 
-import com.redis._
-import com.redis.RedisClient._
-import scala.math.pow
-import com.github.nscala_time.time.Imports._
+import com.github.nscala_time.time.Imports.RichInt
+import com.redis.RedisClient.DESC
+import com.redis.RedisClient.SortOrder
+import com.redis.RedisClientPool
 
 case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: String, redisKeyNewer: String, minScore: Double = 10) extends ChiSquare with RedisHelper {
 

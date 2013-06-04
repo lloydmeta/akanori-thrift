@@ -1,7 +1,10 @@
 package org.beachape.support
 
 import scala.math.floor
-import com.github.nscala_time.time.Imports._
+
+import com.github.nscala_time.time.Imports.DateTime
+import com.github.nscala_time.time.Imports.RichInt
+import com.github.nscala_time.time.Imports.RichReadableInstant
 
 trait TimeHelper {
 

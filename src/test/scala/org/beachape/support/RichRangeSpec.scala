@@ -1,6 +1,5 @@
-import org.beachape.support.RichRange._
+import org.beachape.support.RichRange.range2RichRange
 import org.scalatest.FunSpec
-import org.scalatest.BeforeAndAfter
 import org.scalatest.matchers.ShouldMatchers
 
 class RichRangeSpec extends FunSpec

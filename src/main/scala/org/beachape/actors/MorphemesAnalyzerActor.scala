@@ -1,9 +1,12 @@
 package org.beachape.actors
 
+import org.beachape.analyze.Morpheme
+import org.beachape.analyze.RedisHelper
+
+import com.redis.RedisClientPool
+
 import akka.actor.Actor
-import akka.event.Logging
-import com.redis._
-import org.beachape.analyze.{ Morpheme, RedisHelper }
+import akka.actor.actorRef2Scala
 
 class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor with RedisHelper with RedisStorageHelper {
 

@@ -1,8 +1,10 @@
 package org.beachape.analyze
 
-import org.scalatest.FunSpec
-import org.scalatest.BeforeAndAfterEach
+import scala.runtime.ZippedTraversable2.zippedTraversable2ToTraversable
+
 import org.scalatest.BeforeAndAfterAll
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 
 class MorphemeSpec extends FunSpec

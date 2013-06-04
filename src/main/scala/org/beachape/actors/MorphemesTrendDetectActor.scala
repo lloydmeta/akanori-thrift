@@ -1,16 +1,19 @@
 package org.beachape.actors
 
-import akka.actor.{ Actor, Props }
-import akka.event.Logging
-import com.redis._
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
+
 import org.beachape.analyze.MorphemesRedisRetriever
-import scala.concurrent.{ Future, Await }
+
+import com.github.nscala_time.time.Imports.RichInt
+import com.redis.RedisClientPool
+
+import akka.actor.Actor
+import akka.actor.Props
+import akka.actor.actorRef2Scala
 import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
-import scala.concurrent.duration._
-import com.github.nscala_time.time.Imports._
-import scala.language.postfixOps
 
 class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 

@@ -1,7 +1,7 @@
 package org.beachape.actors
 
-import com.redis._
-import com.github.nscala_time.time.Imports._
+import com.github.nscala_time.time.Imports.RichInt
+import com.redis.RedisClientPool
 
 trait RedisStorageHelper {
 

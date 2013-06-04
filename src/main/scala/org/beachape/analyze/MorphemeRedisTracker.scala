@@ -1,5 +1,6 @@
 package org.beachape.analyze
-import com.redis._
+
+import com.redis.RedisClientPool
 
 case class MorphemesRedisTracker(morphemeList: List[Morpheme], redisPool: RedisClientPool, redisKey: String) extends RedisHelper {
 

@@ -1,10 +1,11 @@
 package org.beachape.analyze
 
-import org.scalatest.FunSpec
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.matchers.ShouldMatchers
 import scala.math.pow
+
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.FunSpec
+import org.scalatest.matchers.ShouldMatchers
 
 class DummyClass extends ChiSquare
 
