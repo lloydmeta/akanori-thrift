@@ -23,71 +23,68 @@ class MorphemesRedisRetrieverSpec extends FunSpec
   val RedisKeySet(newExpectedKey: RedisKey, newObservedKey: RedisKey) = newSet
 
   val morphemeRedisRetriever = new MorphemesRedisRetriever(redisPool, oldExpectedKey.redisKey, oldObservedKey.redisKey, minScore = Double.NegativeInfinity)
-  val morphemeRedisRetrieverEmpty = new MorphemesRedisRetriever(redisPool, oldExpectedKey.redisKey + "fake", oldExpectedKey.redisKey + "fake", minScore = Double.NegativeInfinity)
 
   before {
     redisPool.withClient(redis => redis.flushdb)
     dumpMorphemesToRedis
   }
 
-  describe("#byChiSquared") {
+  describe("#forEachPageOfObservedTermsWithScores") {
 
-    it("should be empty for a MorphemesRedisRetriever given empty keys") {
-      morphemeRedisRetrieverEmpty.byChiSquared().isEmpty should be(true)
-    }
-
-    it("should not be empty for a MorphemesRedisRetriever with redis keys that contain morphemes with scores") {
-      morphemeRedisRetriever.byChiSquared().isEmpty should be(false)
-    }
-
-    describe("results checking. Consider this a way of making sure things are still working WRT the math") {
-
-      val morphemesByChiSquared = morphemeRedisRetriever.byChiSquared()
-      // based on org.beachape.testing.Support trait
-      val properResults = List(("c", 11.040408468934922), ("b", 0.8078073877479973), ("e", 0.006510833623390149))
-
-      it("should give me properly ranked results") {
-        val zippedList = (morphemesByChiSquared, morphemesByChiSquared.tail).zipped.toList
-        for (((_: String, priorScore: Double), (_: String, afterScore: Double)) <- zippedList) {
-          priorScore should be > afterScore
-        }
-      }
-
-      it("should give me proper morphemes at each result") {
-        val rankedMorphemesProper = for ((term: String, _: Double) <- properResults) yield term
-        val zippedProperAndResults = (rankedMorphemesProper, morphemesByChiSquared).zipped.toList
-        for ((properMorpheme: String, (rankedMorpheme: String, _: Double)) <- zippedProperAndResults) {
-          rankedMorpheme should be(properMorpheme)
-        }
-      }
-
-      it("should give me proper scores at each result") {
-        val rankedScoresProper = for ((_: String, score: Double) <- properResults) yield score
-        val zippedProperAndResults = (rankedScoresProper, morphemesByChiSquared).zipped.toList
-        for ((score: Double, (_: String, resultScore: Double)) <- zippedProperAndResults) {
-          roughRound(resultScore, 0.00000001) should be(roughRound(score, 0.00000001))
-        }
-      }
-
+    it("should yield for every page found") {
+      morphemeRedisRetriever.forEachPageOfObservedTermsWithScores() { _ => true }.forall(x => x == true) should be(true)
     }
 
   }
 
-  describe("#generateAndStoreChiSquared") {
+  describe("#getOldScoreForTerm") {
 
-    it("should return a string that can be used as a key") {
-      val storedChiSquared = morphemeRedisRetriever.generateAndStoreChiSquared
-      redisPool.withClient(redis =>
-        redis.exists(storedChiSquared)) should be(true)
+    it("should get me the right number") {
+      morphemeRedisRetriever.getOldScoreForTerm("b") should be(4)
     }
 
-    describe("should return a key and the key itself") {
+  }
 
-      it("should point to a value in Redis that is a zSet (responds to zCard with a number greater than 0)") {
-        val storedChiSquared = morphemeRedisRetriever.generateAndStoreChiSquared
-        zcardOfRedisKey(storedChiSquared) should be > 0
-      }
+  describe("#getNewScoreForTerm") {
 
+    it("should get me the right number") {
+      morphemeRedisRetriever.getNewScoreForTerm("b") should be(6)
+    }
+
+  }
+
+  describe("#totalExpectedSetMorphemesScore") {
+
+    it("should get me the right number") {
+      morphemeRedisRetriever.totalExpectedSetMorphemesScore should be(21.0)
+    }
+
+  }
+
+  describe("#totalObservedSetMorphemesScore") {
+
+    it("should get me the right number") {
+      morphemeRedisRetriever.totalObservedSetMorphemesScore should be(26.0)
+    }
+
+  }
+
+  describe("#observedZCard") {
+
+    it("should get me the right number") {
+      morphemeRedisRetriever.observedZCard should be(6)
+    }
+
+  }
+
+  describe("#chiSquaredForTerm") {
+
+    it("should get me the right score with observedScore provided") {
+      morphemeRedisRetriever.chiSquaredForTerm("b", 6, 21, 26) should be(0.8078073877479973)
+    }
+
+    it("should get me the right score without observedScore provided") {
+      morphemeRedisRetriever.chiSquaredForTerm("b", 21, 26) should be(0.8078073877479973)
     }
 
   }

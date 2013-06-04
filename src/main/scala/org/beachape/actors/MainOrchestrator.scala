@@ -23,9 +23,7 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
   implicit val timeout = Timeout(600 seconds)
 
   val stringToRedisRoundRobin = context.actorOf(Props(new StringToRedisActor(redisPool)).withRouter(SmallestMailboxRouter(5)), "mainOrchestratorStringToRedisRoundRobin")
-  val redisStringSetToMorphemesOrchestrator = context.actorOf(Props(new RedisStringSetToMorphemesOrchestrator(redisPool)))
-  val morphemesTrendDetectRoundRobin = context.actorOf(Props(new MorphemesTrendDetectActor(redisPool)).withRouter(SmallestMailboxRouter(2)), "morphemesTrendDetectRoundRobin")
-  val trendGeneratorRoundRobin = context.actorOf(Props(new TrendGeneratorActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(SmallestMailboxRouter(2)), "trendGeneratorRoundRobin")
+  val trendGeneratorRoundRobin = context.actorOf(Props(new TrendGeneratorActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(SmallestMailboxRouter(3)), "trendGeneratorRoundRobin")
 
   def receive = {
 

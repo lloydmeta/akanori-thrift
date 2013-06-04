@@ -18,7 +18,7 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val redisStringSetToMorphemesActorsRoundRobin = context.actorOf(Props(new RedisStringSetToMorphemesActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "redisStringSetToMorphemesActorsRoundRobin")
+  val redisStringSetToMorphemesActorsRoundRobin = context.actorOf(Props(new RedisStringSetToMorphemesActor(redisPool)).withRouter(SmallestMailboxRouter(4)), "redisStringSetToMorphemesActorsRoundRobin")
 
   def receive = {
 
