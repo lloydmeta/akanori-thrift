@@ -49,28 +49,6 @@ class RedisStringSetToMorphemesActorSpec extends TestKit(ActorSystem("akkaTest")
 
   describe("methods testing") {
 
-    describe("#listOfUnixTimeSpanInSteps") {
-
-      it("should yield a list of UnixTimeSpans with the first element having a #start same as the original span thrown in") {
-        redisStringSetToMorphemesActor.listOfUnixTimeSpanInSteps(unixTimeSpan).head.start should be(unixTimeSpan.start)
-      }
-
-      it("should yield a list of UnixTimeSpans with the last element having an #.end same as the original span thrown in") {
-        redisStringSetToMorphemesActor.listOfUnixTimeSpanInSteps(unixTimeSpan).last.end should be(unixTimeSpan.end)
-      }
-
-      describe("retrieving strings") {
-
-        it("should allow me to get the same strings as if I had looped over the original span") {
-          val retrievedStringsViaStep = redisStringSetToMorphemesActor.listOfUnixTimeSpanInSteps(unixTimeSpan) flatMap { steppedUnixTimeSpan =>
-            redisStringSetToMorphemesActor.listOfTermsInRedisStoredSetBetweenUnixTimeSpan(steppedUnixTimeSpan)
-          }
-
-          retrievedStringsViaStep should be(redisStringSetToMorphemesActor.listOfTermsInRedisStoredSetBetweenUnixTimeSpan(unixTimeSpan))
-        }
-      }
-    }
-
     describe("#forEachPagedListOfTermsInUnixTimeSpan") {
 
       it("should return a list of the return callback function type") {

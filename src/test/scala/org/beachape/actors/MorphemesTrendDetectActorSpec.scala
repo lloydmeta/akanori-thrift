@@ -1,6 +1,7 @@
 package org.beachape.actors
 
 import org.beachape.testing.Support
+import org.beachape.analyze.MorphemesRedisRetriever
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
@@ -30,6 +31,17 @@ class MorphemesTrendDetectActorSpec extends TestKit(ActorSystem("akkaTest"))
   val morphemesTrendDetectActorRef = TestActorRef(new MorphemesTrendDetectActor(redisPool))
   val morphemesTrendDetectActor = morphemesTrendDetectActorRef.underlyingActor
 
+  val oldSetMorphemesRetriever = MorphemesRedisRetriever(redisPool, oldSet.expectedKey.redisKey, oldSet.observedKey.redisKey, 0)
+  val newSetMorphemesRetriever = MorphemesRedisRetriever(redisPool, newSet.expectedKey.redisKey, newSet.observedKey.redisKey, 0)
+
+  val oldSetExpectedTotalScore = oldSetMorphemesRetriever.totalExpectedSetMorphemesScore
+  val oldSetObservedTotalScore = oldSetMorphemesRetriever.totalObservedSetMorphemesScore
+
+  val newSetExpectedTotalScore = newSetMorphemesRetriever.totalExpectedSetMorphemesScore
+  val newSetObservedTotalScore = newSetMorphemesRetriever.totalObservedSetMorphemesScore
+
+  val newObservedSetCard = newSetMorphemesRetriever.observedZCard
+
   before {
     redisPool.withClient(redis => redis.flushdb)
     dumpMorphemesToRedis
@@ -37,11 +49,22 @@ class MorphemesTrendDetectActorSpec extends TestKit(ActorSystem("akkaTest"))
 
   describe("sending messages") {
 
-    describe("sending List('detectTrends, (oldSet: RedisKeySet, newSet: RedisKeySet, minOccurrence: Double)) ") {
+    describe("sending 'calculateAndStoreTrendiness ") {
+
+      val message = List('calculateAndStoreTrendiness, (
+        "lol",
+        3.0,
+        RedisKey("a key"),
+        oldSetMorphemesRetriever,
+        newSetMorphemesRetriever,
+        oldSetObservedTotalScore,
+        oldSetExpectedTotalScore,
+        newSetObservedTotalScore,
+        newSetExpectedTotalScore))
 
       it("should return a RedisKeySet") {
-        morphemesTrendDetectActorRef ! List('detectTrends, (oldSet, newSet, 0.0))
-        expectMsgType[RedisKeySet]
+        morphemesTrendDetectActorRef ! message
+        expectMsg(true)
       }
 
     }
