@@ -43,7 +43,7 @@ trait Support extends RedisStorageHelper {
   }
 
   def dumpStringsToRedisStoredStringSet: Map[Symbol, Int] = {
-    val unixStartTime = 996400
+    val unixStartTime = 478000
     val unixEndTime = 1086400
     val span = 1800
 
