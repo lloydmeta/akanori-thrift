@@ -52,7 +52,6 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
   }
 
   override def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) = {
-    val startTime = System.currentTimeMillis()
     val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrendsEndingAt, (unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)))
     val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
     val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
@@ -61,9 +60,6 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
         case _ => new TrendResult("fail", -55378008)
       }
     }
-
-    val timeTaken = System.currentTimeMillis() - startTime
-    println(s"Time taken in milliseconds is $timeTaken")
     listOfTrendResults
   }
 
