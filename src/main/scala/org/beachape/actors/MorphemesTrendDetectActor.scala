@@ -1,21 +1,25 @@
 package org.beachape.actors
 
-import akka.actor.{ Actor, Props }
-import akka.event.Logging
-import com.redis._
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
+
 import org.beachape.analyze.MorphemesRedisRetriever
-import scala.concurrent.{ Future, Await }
+
+import com.github.nscala_time.time.Imports.RichInt
+import com.redis.RedisClientPool
+
+import akka.actor.Actor
+import akka.actor.Props
+import akka.actor.actorRef2Scala
 import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
-import scala.concurrent.duration._
-import scala.language.postfixOps
 
 class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
   import context.dispatcher
 
-  implicit val timeout = Timeout(600 seconds)
+  implicit val timeout = Timeout(DurationInt(600).seconds)
 
   val morphemeRetrieveRoundRobin = context.actorOf(Props(new MorphemeRedisRetrieverActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "morphemeRetrievalRouter")
 
@@ -42,7 +46,39 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
       }
     }
 
+    case List('calculateAndStoreChiChi, (
+      term: String,
+      newObservedScore: Double,
+      trendsCacheKey: RedisKey,
+      oldSetMorphemesRetriever: MorphemesRedisRetriever,
+      newSetMorphemesRetriever: MorphemesRedisRetriever,
+      oldSetObservedTotalScore: Double,
+      oldSetExpectedTotalScore: Double,
+      newSetObservedTotalScore: Double,
+      newSetExpectedTotalScore: Double
+      )) => {
+
+      val newSetChiSquaredForTerm = newSetMorphemesRetriever.chiSquaredForTerm(term, newObservedScore, newSetExpectedTotalScore, newSetObservedTotalScore)
+      val oldSetChiSquaredForTerm = oldSetMorphemesRetriever.chiSquaredForTerm(term, oldSetExpectedTotalScore, oldSetObservedTotalScore)
+
+      if (newSetChiSquaredForTerm > oldSetChiSquaredForTerm) {
+        cacheChiSquaredDiff(trendsCacheKey, term, (newSetChiSquaredForTerm - oldSetChiSquaredForTerm))
+      }
+      sender ! true
+    }
+
     case _ => println("MorphemesTrendDetectActor says 'huh???'")
+  }
+
+  def cacheChiSquaredDiff(cacheKey: RedisKey, term: String, difference: Double) = {
+    redisPool.withClient { redis =>
+      {
+        redis.pipeline { pipe =>
+          pipe.zincrby(cacheKey.redisKey, difference, term)
+          pipe.pexpire(cacheKey.redisKey, RichInt(15).minute.millis.toInt)
+        }
+      }
+    }
   }
 
 }

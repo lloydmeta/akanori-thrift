@@ -1,6 +1,5 @@
 package org.beachape.support
 
-import scala.language.implicitConversions
 import scala.annotation.tailrec
 
 object RichRange {

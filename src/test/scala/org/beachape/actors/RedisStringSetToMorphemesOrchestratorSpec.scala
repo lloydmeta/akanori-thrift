@@ -1,16 +1,16 @@
 package org.beachape.actors
 
-import com.redis._
-import org.scalatest.FunSpec
 import org.scalatest.BeforeAndAfter
+import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-import akka.testkit.{ TestActorRef, TestKit, ImplicitSender, DefaultTimeout }
-import scala.concurrent.duration._
-import scala.concurrent.Await
-import akka.pattern.ask
+
+import com.redis.RedisClientPool
+
 import akka.actor.ActorSystem
-import akka.util.Timeout
-import scala.util.{ Try, Success, Failure }
+import akka.testkit.DefaultTimeout
+import akka.testkit.ImplicitSender
+import akka.testkit.TestActorRef
+import akka.testkit.TestKit
 
 class RedisStringSetToMorphemesOrchestratorSpec extends TestKit(ActorSystem("akkaTest"))
   with FunSpec

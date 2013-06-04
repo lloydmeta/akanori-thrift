@@ -1,9 +1,10 @@
 package org.beachape.analyze
 
-import com.redis._
-import org.scalatest.FunSpec
 import org.scalatest.BeforeAndAfter
+import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
+
+import com.redis.RedisClientPool
 
 class MorphemeRedisTrackerSpec extends FunSpec
   with ShouldMatchers

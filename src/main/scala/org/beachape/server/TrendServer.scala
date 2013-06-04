@@ -1,17 +1,15 @@
 package org.beachape.server
 
-import trendServer.gen._
-import org.beachape.actors._
-import trendServer.gen.TrendResult
-import scala.concurrent.{ Future, Await }
+import scala.collection.JavaConversions.seqAsJavaList
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
+
+import akka.actor.ActorRef
+import akka.actor.actorRef2Scala
 import akka.pattern.ask
 import akka.util.Timeout
-import akka.actor.ActorRef
-import scala.concurrent.duration._
-import collection.JavaConversions._
 import trendServer.gen.TrendResult
-import scala.language.postfixOps
-import scala.language.implicitConversions
+import trendServer.gen.TrendThriftServer
 
 class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
   implicit val timeout = Timeout(600 seconds)
@@ -54,7 +52,6 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
   }
 
   override def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) = {
-    val startTime = System.currentTimeMillis()
     val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrendsEndingAt, (unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)))
     val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
     val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
@@ -63,9 +60,6 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
         case _ => new TrendResult("fail", -55378008)
       }
     }
-
-    val timeTaken = System.currentTimeMillis() - startTime
-    println(s"Time taken in milliseconds is $timeTaken")
     listOfTrendResults
   }
 

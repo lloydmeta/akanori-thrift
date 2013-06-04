@@ -1,15 +1,16 @@
 package org.beachape.actors
 
-import akka.actor.{ Actor, Props }
-import scala.concurrent.{ Future, Await }
+import scala.concurrent.duration.DurationInt
+
+import com.redis.RedisClient.DESC
+import com.redis.RedisClientPool
+
+import akka.actor.Actor
+import akka.actor.Props
+import akka.actor.actorRef2Scala
 import akka.pattern.ask
-import akka.event.Logging
 import akka.routing.SmallestMailboxRouter
-import com.redis._
 import akka.util.Timeout
-import scala.concurrent.duration._
-import com.redis.RedisClient._
-import scala.language.postfixOps
 
 object MainOrchestrator {
   def apply(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int): Props = Props(new MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top))

@@ -1,7 +1,8 @@
 package org.beachape.testing
 
-import com.redis._
-import org.beachape.actors._
+import org.beachape.actors.RedisKey
+import org.beachape.actors.RedisKeySet
+import org.beachape.actors.RedisStorageHelper
 
 trait Support extends RedisStorageHelper {
 
@@ -43,7 +44,7 @@ trait Support extends RedisStorageHelper {
   }
 
   def dumpStringsToRedisStoredStringSet: Map[Symbol, Int] = {
-    val unixStartTime = 996400
+    val unixStartTime = 478000
     val unixEndTime = 1086400
     val span = 1800
 

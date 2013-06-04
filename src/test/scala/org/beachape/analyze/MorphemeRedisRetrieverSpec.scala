@@ -1,11 +1,15 @@
 package org.beachape.analyze
 
-import org.beachape.actors.{ RedisKey, RedisKeySet }
+import scala.runtime.ZippedTraversable2.zippedTraversable2ToTraversable
+
+import org.beachape.actors.RedisKey
+import org.beachape.actors.RedisKeySet
 import org.beachape.testing.Support
-import com.redis._
-import org.scalatest.FunSpec
 import org.scalatest.BeforeAndAfter
+import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
+
+import com.redis.RedisClientPool
 
 class MorphemesRedisRetrieverSpec extends FunSpec
   with ShouldMatchers

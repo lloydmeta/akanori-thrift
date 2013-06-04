@@ -1,11 +1,10 @@
 package org.beachape.server
 
-import trendServer.gen.TrendThriftServer
-import org.apache.thrift._
-import org.apache.thrift.protocol._
-import org.apache.thrift.server._
-import org.apache.thrift.transport._
+import org.apache.thrift.server.TNonblockingServer
+import org.apache.thrift.transport.TNonblockingServerSocket
+
 import akka.actor.ActorRef
+import trendServer.gen.TrendThriftServer
 
 object TrendServerBuilder {
 

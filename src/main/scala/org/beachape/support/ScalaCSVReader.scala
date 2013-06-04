@@ -1,7 +1,8 @@
 package org.beachape.support
 
-// From http://d.hatena.ne.jp/egghour/20100903/1283574898
-import java.io._
+import java.io.Closeable
+import java.io.Reader
+
 import au.com.bytecode.opencsv.CSVReader
 
 class ScalaCSVReader(reader: Reader) extends Iterator[Array[String]] with Closeable {
