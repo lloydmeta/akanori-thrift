@@ -1,17 +1,17 @@
 package org.beachape.actors
 
-import com.redis._
-import org.scalatest.FunSpec
-import org.scalatest.BeforeAndAfter
-import org.scalatest.matchers.ShouldMatchers
-import akka.testkit.{ TestActorRef, TestKit, ImplicitSender, DefaultTimeout }
-import scala.concurrent.duration._
-import scala.concurrent.{ Future, Await }
-import akka.pattern.ask
-import akka.actor.ActorSystem
-import akka.util.Timeout
 import org.beachape.testing.Support
-import scala.util.{ Try, Success, Failure }
+import org.scalatest.BeforeAndAfter
+import org.scalatest.FunSpec
+import org.scalatest.matchers.ShouldMatchers
+
+import com.redis.RedisClientPool
+
+import akka.actor.ActorSystem
+import akka.testkit.DefaultTimeout
+import akka.testkit.ImplicitSender
+import akka.testkit.TestActorRef
+import akka.testkit.TestKit
 
 class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   with FunSpec
@@ -36,10 +36,9 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   val span = map.getOrElse('span, 0)
 
   val validTrend = List(
-    ("見落とし",96.43719849267039),
-    ("トンネル",69.19112926569775),
-    ("坂本",67.52193993181336))
-
+      ("坂本",86.02896251475796),
+      ("見落とし",1.3914152892562006),
+      ("笹子",0.012626827717736593))
 
   // Map(
   //   //oldExpectedStrings

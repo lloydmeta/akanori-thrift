@@ -1,8 +1,11 @@
 package org.beachape.actors
-import akka.actor.Actor
-import akka.event.Logging
-import com.redis._
+
 import org.beachape.analyze.MorphemesRedisRetriever
+
+import com.redis.RedisClientPool
+
+import akka.actor.Actor
+import akka.actor.actorRef2Scala
 
 class MorphemeRedisRetrieverActor(val redisPool: RedisClientPool) extends Actor {
 

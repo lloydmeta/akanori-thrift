@@ -1,9 +1,12 @@
 package org.beachape.actors
 
+import com.github.nscala_time.time.Imports.DateTime
+import com.github.nscala_time.time.Imports.RichDateTime
+import com.github.nscala_time.time.Imports.RichInt
+import com.github.nscala_time.time.Imports.RichReadableInstant
+import com.redis.RedisClientPool
+
 import akka.actor.Actor
-import akka.event.Logging
-import com.redis._
-import com.github.nscala_time.time.Imports._
 
 class StringToRedisActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 

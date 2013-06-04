@@ -1,14 +1,13 @@
-import org.chasen.mecab.{ Tagger, Node, MeCab }
-import org.beachape.analyze.{ Morpheme, MorphemesRedisRetriever }
-import akka.actor.{ Actor, ActorSystem, Props }
-import akka.routing.SmallestMailboxRouter
-import com.redis._
-import java.io._
-import org.beachape.actors._
-import scala.concurrent.duration._
-import scala.language.postfixOps
+import scala.concurrent.duration.DurationInt
+
+import org.beachape.actors.MainOrchestrator
 import org.beachape.server.TrendServerBuilder
 import org.beachape.support.SampleFileToRedisDumper
+
+import com.redis.RedisClientPool
+
+import akka.actor.ActorSystem
+import akka.routing.SmallestMailboxRouter
 
 object TrendApp {
 

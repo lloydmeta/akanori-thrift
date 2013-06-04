@@ -1,4 +1,5 @@
 package org.beachape.analyze
+
 import scala.math.pow
 
 trait ChiSquare {

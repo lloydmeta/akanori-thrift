@@ -1,10 +1,11 @@
+import java.io.FileWriter
+
 import org.beachape.support.SampleFileToRedisDumper
-import org.scalatest.FunSpec
-import com.redis._
-import java.io._
-import scala.io.Source
 import org.scalatest.BeforeAndAfter
+import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
+
+import com.redis.RedisClientPool
 
 class SampleFileToRedisDumperSpec extends FunSpec
   with BeforeAndAfter
