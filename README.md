@@ -5,6 +5,12 @@ Scala Thrift project/tool for extracting trends from Japanese phrases. Still in 
 
 Thrift clients send strings to the Scala server, which then stores it initially. Clients can then ask for trends at specific time slices in the past (granted the data for that timeslice), with certain parameters such as dropblacklisted, whitelisted only, etc, and the server will reply with a list of TrendResults by doing Chi-squared fitness tests and comparing results from the timeslice requested and the same timeslice 24 hours before.
 
+Todo
+===
+1. Make usage of some terms more consistent (e.g. using expected instead of 'old' in many places)
+2. More tests
+3. Less usage of futures with closures and move towards FSM ?
+
 Compiling
 =======
 
