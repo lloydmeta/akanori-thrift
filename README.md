@@ -7,8 +7,6 @@ Thrift clients send strings to the Scala server, which then stores it initially.
 
 Todo
 ===
-* Support for retrieving Trends and/or working with the server in an easy way via the console
-* Add Scala-side client for testing
 * Support dropBlacklisted and onlyWhitelisted in function calls / messages to Actors instead of in constructors for more flexibility
 * Return trends as TrendResults from MorphemesTrendDetectorActor?
 * More tests
