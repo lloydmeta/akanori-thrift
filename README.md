@@ -7,9 +7,10 @@ Thrift clients send strings to the Scala server, which then stores it initially.
 
 Todo
 ===
-1. Support for retrieving Trends and/or working with the server in an easy way via the console
-2. More tests
-3. Less usage of futures with closures and move towards FSM ?
+* Support for retrieving Trends and/or working with the server in an easy way via the console
+* Support dropBlacklisted and onlyWhitelisted in function calls / messages to Actors instead of in constructors for more flexibility
+* More tests
+* Less usage of futures with closures and move towards FSM ?
 
 Compiling
 =======
