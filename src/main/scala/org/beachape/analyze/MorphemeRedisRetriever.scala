@@ -17,11 +17,11 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected:
     })(collection.breakOut)
   }
 
-  def getOldScoreForTerm(term: String) = {
+  def getExpectedScoreForTerm(term: String) = {
     getScoreForTerm(redisKeyExpected, term)
   }
 
-  def getNewScoreForTerm(term: String) = {
+  def getObservedScoreForTerm(term: String) = {
     getScoreForTerm(redisKeyObserved, term)
   }
 
@@ -38,7 +38,7 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected:
   }
 
   def chiSquaredForTerm(term: String, observedScoreForTerm: Double, expectedSetTotalScore: Double, observedSetTotalScore: Double) = {
-    val expectedScoreForTerm = getOldScoreForTerm(term)
+    val expectedScoreForTerm = getExpectedScoreForTerm(term)
     if (observedScoreForTerm > expectedScoreForTerm)
       calculateChiSquaredForTerm(expectedScoreForTerm, observedScoreForTerm, expectedSetTotalScore, observedSetTotalScore)
     else
@@ -46,7 +46,7 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected:
   }
 
   def chiSquaredForTerm(term: String, expectedSetTotalScore: Double, observedSetTotalScore: Double): Double = {
-    val observedScoreForTerm = getNewScoreForTerm(term)
+    val observedScoreForTerm = getObservedScoreForTerm(term)
     chiSquaredForTerm(term, observedScoreForTerm, expectedSetTotalScore, observedSetTotalScore)
   }
 
