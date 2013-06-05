@@ -40,7 +40,7 @@ class MorphemesRedisRetrieverSpec extends FunSpec
   describe("#getOldScoreForTerm") {
 
     it("should get me the right number") {
-      morphemeRedisRetriever.getOldScoreForTerm("b") should be(4)
+      morphemeRedisRetriever.getExpectedScoreForTerm("b") should be(4)
     }
 
   }
@@ -48,7 +48,7 @@ class MorphemesRedisRetrieverSpec extends FunSpec
   describe("#getNewScoreForTerm") {
 
     it("should get me the right number") {
-      morphemeRedisRetriever.getNewScoreForTerm("b") should be(6)
+      morphemeRedisRetriever.getObservedScoreForTerm("b") should be(6)
     }
 
   }
