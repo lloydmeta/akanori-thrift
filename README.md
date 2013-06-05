@@ -10,6 +10,7 @@ Todo
 1. Make usage of some terms more consistent (e.g. using expected instead of 'old' in many places)
 2. More tests
 3. Less usage of futures with closures and move towards FSM ?
+4. Support for retrieving Trends and/or working with the server in an easy way via the console
 
 Compiling
 =======
