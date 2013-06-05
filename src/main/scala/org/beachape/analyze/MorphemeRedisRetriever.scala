@@ -5,7 +5,7 @@ import com.redis.RedisClient.DESC
 import com.redis.RedisClient.SortOrder
 import com.redis.RedisClientPool
 
-case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: String, redisKeyNewer: String, minScore: Double = 10) extends ChiSquare with RedisHelper {
+case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected: String, redisKeyObserved: String, minScore: Double = 10) extends ChiSquare with RedisHelper {
 
   def forEachPageOfObservedTermsWithScores[A](pageCount: Int = 300)(callBack: List[(String, Double)] => A): List[A] = {
     val newObservedSetCard = observedZCard
@@ -17,28 +17,28 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
     })(collection.breakOut)
   }
 
-  def getOldScoreForTerm(term: String) = {
-    getScoreForTerm(redisKeyOlder, term)
+  def getExpectedScoreForTerm(term: String) = {
+    getScoreForTerm(redisKeyExpected, term)
   }
 
-  def getNewScoreForTerm(term: String) = {
-    getScoreForTerm(redisKeyNewer, term)
+  def getObservedScoreForTerm(term: String) = {
+    getScoreForTerm(redisKeyObserved, term)
   }
 
   def totalExpectedSetMorphemesScore = {
-    totalMorphemesScoreAtSet(redisKeyOlder)
+    totalMorphemesScoreAtSet(redisKeyExpected)
   }
 
   def totalObservedSetMorphemesScore = {
-    totalMorphemesScoreAtSet(redisKeyNewer)
+    totalMorphemesScoreAtSet(redisKeyObserved)
   }
 
   def observedZCard = {
-    zCard(redisKeyNewer)
+    zCard(redisKeyObserved)
   }
 
   def chiSquaredForTerm(term: String, observedScoreForTerm: Double, expectedSetTotalScore: Double, observedSetTotalScore: Double) = {
-    val expectedScoreForTerm = getOldScoreForTerm(term)
+    val expectedScoreForTerm = getExpectedScoreForTerm(term)
     if (observedScoreForTerm > expectedScoreForTerm)
       calculateChiSquaredForTerm(expectedScoreForTerm, observedScoreForTerm, expectedSetTotalScore, observedSetTotalScore)
     else
@@ -46,7 +46,7 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
   }
 
   def chiSquaredForTerm(term: String, expectedSetTotalScore: Double, observedSetTotalScore: Double): Double = {
-    val observedScoreForTerm = getNewScoreForTerm(term)
+    val observedScoreForTerm = getObservedScoreForTerm(term)
     chiSquaredForTerm(term, observedScoreForTerm, expectedSetTotalScore, observedSetTotalScore)
   }
 
@@ -60,7 +60,7 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyOlder: St
   }
 
   private def newTermsWithScoresListWithLimit(limitDesired: Option[(Int, Int)] = Some(0, 50)): List[(String, Double)] = {
-    termsWithScoresList(redisKeyNewer, min = minScore, limit = limitDesired, sort = DESC)
+    termsWithScoresList(redisKeyObserved, min = minScore, limit = limitDesired, sort = DESC)
   }
 
   private def zCard(redisKey: String) = {
