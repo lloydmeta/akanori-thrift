@@ -9,6 +9,7 @@ Todo
 ===
 * Support for retrieving Trends and/or working with the server in an easy way via the console
 * Support dropBlacklisted and onlyWhitelisted in function calls / messages to Actors instead of in constructors for more flexibility
+* Combile RedisHelper and RedisStorageHelper
 * More tests
 * Less usage of futures with closures and move towards FSM ?
 
