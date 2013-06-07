@@ -27,7 +27,7 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   val RedisKeySet(oldExpectedKey: RedisKey, oldObservedKey: RedisKey) = oldSet
   val RedisKeySet(newExpectedKey: RedisKey, newObservedKey: RedisKey) = newSet
 
-  val trendGeneratorActorRef = TestActorRef(new TrendGeneratorActor(redisPool, false, false))
+  val trendGeneratorActorRef = TestActorRef(new TrendGeneratorActor(redisPool))
   val trendGeneratorActor = trendGeneratorActorRef.underlyingActor
 
   val map = dumpStringsToRedisStoredStringSet
@@ -77,7 +77,7 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
   describe("sending a message to List('generateTrendsFor....)") {
 
     it("should respond with an expected trend") {
-      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20))
+      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20, false, false))
       expectMsg(validTrend)
     }
 

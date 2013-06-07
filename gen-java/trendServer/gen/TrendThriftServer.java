@@ -38,9 +38,9 @@ public class TrendThriftServer {
 
     public List<TrendResult> currentTrendsDefault() throws org.apache.thrift.TException;
 
-    public List<TrendResult> currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
+    public List<TrendResult> currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException;
 
-    public List<TrendResult> trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException;
+    public List<TrendResult> trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException;
 
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException;
 
@@ -52,9 +52,9 @@ public class TrendThriftServer {
 
     public void currentTrendsDefault(org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrendsDefault_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
+    public void currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.trendsEndingAt_call> resultHandler) throws org.apache.thrift.TException;
+    public void trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.trendsEndingAt_call> resultHandler) throws org.apache.thrift.TException;
 
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.storeString_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -124,13 +124,13 @@ public class TrendThriftServer {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "currentTrendsDefault failed: unknown result");
     }
 
-    public List<TrendResult> currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    public List<TrendResult> currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException
     {
-      send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top);
+      send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted);
       return recv_currentTrends();
     }
 
-    public void send_currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    public void send_currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException
     {
       currentTrends_args args = new currentTrends_args();
       args.setSpanInSeconds(spanInSeconds);
@@ -138,6 +138,8 @@ public class TrendThriftServer {
       args.setMinLength(minLength);
       args.setMaxLength(maxLength);
       args.setTop(top);
+      args.setDropBlacklisted(dropBlacklisted);
+      args.setOnlyWhitelisted(onlyWhitelisted);
       sendBase("currentTrends", args);
     }
 
@@ -151,13 +153,13 @@ public class TrendThriftServer {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "currentTrends failed: unknown result");
     }
 
-    public List<TrendResult> trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    public List<TrendResult> trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException
     {
-      send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top);
+      send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted);
       return recv_trendsEndingAt();
     }
 
-    public void send_trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top) throws org.apache.thrift.TException
+    public void send_trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException
     {
       trendsEndingAt_args args = new trendsEndingAt_args();
       args.setUnixEndAtTime(unixEndAtTime);
@@ -166,6 +168,8 @@ public class TrendThriftServer {
       args.setMinLength(minLength);
       args.setMaxLength(maxLength);
       args.setTop(top);
+      args.setDropBlacklisted(dropBlacklisted);
+      args.setOnlyWhitelisted(onlyWhitelisted);
       sendBase("trendsEndingAt", args);
     }
 
@@ -269,9 +273,9 @@ public class TrendThriftServer {
       }
     }
 
-    public void currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler) throws org.apache.thrift.TException {
+    public void currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      currentTrends_call method_call = new currentTrends_call(spanInSeconds, minOccurrence, minLength, maxLength, top, resultHandler, this, ___protocolFactory, ___transport);
+      currentTrends_call method_call = new currentTrends_call(spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -282,13 +286,17 @@ public class TrendThriftServer {
       private int minLength;
       private int maxLength;
       private int top;
-      public currentTrends_call(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private boolean dropBlacklisted;
+      private boolean onlyWhitelisted;
+      public currentTrends_call(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<currentTrends_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.spanInSeconds = spanInSeconds;
         this.minOccurrence = minOccurrence;
         this.minLength = minLength;
         this.maxLength = maxLength;
         this.top = top;
+        this.dropBlacklisted = dropBlacklisted;
+        this.onlyWhitelisted = onlyWhitelisted;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -299,6 +307,8 @@ public class TrendThriftServer {
         args.setMinLength(minLength);
         args.setMaxLength(maxLength);
         args.setTop(top);
+        args.setDropBlacklisted(dropBlacklisted);
+        args.setOnlyWhitelisted(onlyWhitelisted);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -313,9 +323,9 @@ public class TrendThriftServer {
       }
     }
 
-    public void trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<trendsEndingAt_call> resultHandler) throws org.apache.thrift.TException {
+    public void trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<trendsEndingAt_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      trendsEndingAt_call method_call = new trendsEndingAt_call(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, resultHandler, this, ___protocolFactory, ___transport);
+      trendsEndingAt_call method_call = new trendsEndingAt_call(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -327,7 +337,9 @@ public class TrendThriftServer {
       private int minLength;
       private int maxLength;
       private int top;
-      public trendsEndingAt_call(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, org.apache.thrift.async.AsyncMethodCallback<trendsEndingAt_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private boolean dropBlacklisted;
+      private boolean onlyWhitelisted;
+      public trendsEndingAt_call(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<trendsEndingAt_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.unixEndAtTime = unixEndAtTime;
         this.spanInSeconds = spanInSeconds;
@@ -335,6 +347,8 @@ public class TrendThriftServer {
         this.minLength = minLength;
         this.maxLength = maxLength;
         this.top = top;
+        this.dropBlacklisted = dropBlacklisted;
+        this.onlyWhitelisted = onlyWhitelisted;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -346,6 +360,8 @@ public class TrendThriftServer {
         args.setMinLength(minLength);
         args.setMaxLength(maxLength);
         args.setTop(top);
+        args.setDropBlacklisted(dropBlacklisted);
+        args.setOnlyWhitelisted(onlyWhitelisted);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -474,7 +490,7 @@ public class TrendThriftServer {
 
       public currentTrends_result getResult(I iface, currentTrends_args args) throws org.apache.thrift.TException {
         currentTrends_result result = new currentTrends_result();
-        result.success = iface.currentTrends(args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top);
+        result.success = iface.currentTrends(args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top, args.dropBlacklisted, args.onlyWhitelisted);
         return result;
       }
     }
@@ -494,7 +510,7 @@ public class TrendThriftServer {
 
       public trendsEndingAt_result getResult(I iface, trendsEndingAt_args args) throws org.apache.thrift.TException {
         trendsEndingAt_result result = new trendsEndingAt_result();
-        result.success = iface.trendsEndingAt(args.unixEndAtTime, args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top);
+        result.success = iface.trendsEndingAt(args.unixEndAtTime, args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top, args.dropBlacklisted, args.onlyWhitelisted);
         return result;
       }
     }
@@ -1782,6 +1798,8 @@ public class TrendThriftServer {
     private static final org.apache.thrift.protocol.TField MIN_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("minLength", org.apache.thrift.protocol.TType.I32, (short)3);
     private static final org.apache.thrift.protocol.TField MAX_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("maxLength", org.apache.thrift.protocol.TType.I32, (short)4);
     private static final org.apache.thrift.protocol.TField TOP_FIELD_DESC = new org.apache.thrift.protocol.TField("top", org.apache.thrift.protocol.TType.I32, (short)5);
+    private static final org.apache.thrift.protocol.TField DROP_BLACKLISTED_FIELD_DESC = new org.apache.thrift.protocol.TField("dropBlacklisted", org.apache.thrift.protocol.TType.BOOL, (short)6);
+    private static final org.apache.thrift.protocol.TField ONLY_WHITELISTED_FIELD_DESC = new org.apache.thrift.protocol.TField("onlyWhitelisted", org.apache.thrift.protocol.TType.BOOL, (short)7);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -1794,6 +1812,8 @@ public class TrendThriftServer {
     public int minLength; // required
     public int maxLength; // required
     public int top; // required
+    public boolean dropBlacklisted; // required
+    public boolean onlyWhitelisted; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -1801,7 +1821,9 @@ public class TrendThriftServer {
       MIN_OCCURRENCE((short)2, "minOccurrence"),
       MIN_LENGTH((short)3, "minLength"),
       MAX_LENGTH((short)4, "maxLength"),
-      TOP((short)5, "top");
+      TOP((short)5, "top"),
+      DROP_BLACKLISTED((short)6, "dropBlacklisted"),
+      ONLY_WHITELISTED((short)7, "onlyWhitelisted");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -1826,6 +1848,10 @@ public class TrendThriftServer {
             return MAX_LENGTH;
           case 5: // TOP
             return TOP;
+          case 6: // DROP_BLACKLISTED
+            return DROP_BLACKLISTED;
+          case 7: // ONLY_WHITELISTED
+            return ONLY_WHITELISTED;
           default:
             return null;
         }
@@ -1871,6 +1897,8 @@ public class TrendThriftServer {
     private static final int __MINLENGTH_ISSET_ID = 2;
     private static final int __MAXLENGTH_ISSET_ID = 3;
     private static final int __TOP_ISSET_ID = 4;
+    private static final int __DROPBLACKLISTED_ISSET_ID = 5;
+    private static final int __ONLYWHITELISTED_ISSET_ID = 6;
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
@@ -1885,6 +1913,10 @@ public class TrendThriftServer {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.TOP, new org.apache.thrift.meta_data.FieldMetaData("top", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.DROP_BLACKLISTED, new org.apache.thrift.meta_data.FieldMetaData("dropBlacklisted", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+      tmpMap.put(_Fields.ONLY_WHITELISTED, new org.apache.thrift.meta_data.FieldMetaData("onlyWhitelisted", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(currentTrends_args.class, metaDataMap);
     }
@@ -1897,7 +1929,9 @@ public class TrendThriftServer {
       double minOccurrence,
       int minLength,
       int maxLength,
-      int top)
+      int top,
+      boolean dropBlacklisted,
+      boolean onlyWhitelisted)
     {
       this();
       this.spanInSeconds = spanInSeconds;
@@ -1910,6 +1944,10 @@ public class TrendThriftServer {
       setMaxLengthIsSet(true);
       this.top = top;
       setTopIsSet(true);
+      this.dropBlacklisted = dropBlacklisted;
+      setDropBlacklistedIsSet(true);
+      this.onlyWhitelisted = onlyWhitelisted;
+      setOnlyWhitelistedIsSet(true);
     }
 
     /**
@@ -1922,6 +1960,8 @@ public class TrendThriftServer {
       this.minLength = other.minLength;
       this.maxLength = other.maxLength;
       this.top = other.top;
+      this.dropBlacklisted = other.dropBlacklisted;
+      this.onlyWhitelisted = other.onlyWhitelisted;
     }
 
     public currentTrends_args deepCopy() {
@@ -1940,6 +1980,10 @@ public class TrendThriftServer {
       this.maxLength = 0;
       setTopIsSet(false);
       this.top = 0;
+      setDropBlacklistedIsSet(false);
+      this.dropBlacklisted = false;
+      setOnlyWhitelistedIsSet(false);
+      this.onlyWhitelisted = false;
     }
 
     public int getSpanInSeconds() {
@@ -2057,6 +2101,52 @@ public class TrendThriftServer {
       __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __TOP_ISSET_ID, value);
     }
 
+    public boolean isDropBlacklisted() {
+      return this.dropBlacklisted;
+    }
+
+    public currentTrends_args setDropBlacklisted(boolean dropBlacklisted) {
+      this.dropBlacklisted = dropBlacklisted;
+      setDropBlacklistedIsSet(true);
+      return this;
+    }
+
+    public void unsetDropBlacklisted() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID);
+    }
+
+    /** Returns true if field dropBlacklisted is set (has been assigned a value) and false otherwise */
+    public boolean isSetDropBlacklisted() {
+      return EncodingUtils.testBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID);
+    }
+
+    public void setDropBlacklistedIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID, value);
+    }
+
+    public boolean isOnlyWhitelisted() {
+      return this.onlyWhitelisted;
+    }
+
+    public currentTrends_args setOnlyWhitelisted(boolean onlyWhitelisted) {
+      this.onlyWhitelisted = onlyWhitelisted;
+      setOnlyWhitelistedIsSet(true);
+      return this;
+    }
+
+    public void unsetOnlyWhitelisted() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID);
+    }
+
+    /** Returns true if field onlyWhitelisted is set (has been assigned a value) and false otherwise */
+    public boolean isSetOnlyWhitelisted() {
+      return EncodingUtils.testBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID);
+    }
+
+    public void setOnlyWhitelistedIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID, value);
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case SPAN_IN_SECONDS:
@@ -2099,6 +2189,22 @@ public class TrendThriftServer {
         }
         break;
 
+      case DROP_BLACKLISTED:
+        if (value == null) {
+          unsetDropBlacklisted();
+        } else {
+          setDropBlacklisted((Boolean)value);
+        }
+        break;
+
+      case ONLY_WHITELISTED:
+        if (value == null) {
+          unsetOnlyWhitelisted();
+        } else {
+          setOnlyWhitelisted((Boolean)value);
+        }
+        break;
+
       }
     }
 
@@ -2118,6 +2224,12 @@ public class TrendThriftServer {
 
       case TOP:
         return Integer.valueOf(getTop());
+
+      case DROP_BLACKLISTED:
+        return Boolean.valueOf(isDropBlacklisted());
+
+      case ONLY_WHITELISTED:
+        return Boolean.valueOf(isOnlyWhitelisted());
 
       }
       throw new IllegalStateException();
@@ -2140,6 +2252,10 @@ public class TrendThriftServer {
         return isSetMaxLength();
       case TOP:
         return isSetTop();
+      case DROP_BLACKLISTED:
+        return isSetDropBlacklisted();
+      case ONLY_WHITELISTED:
+        return isSetOnlyWhitelisted();
       }
       throw new IllegalStateException();
     }
@@ -2199,6 +2315,24 @@ public class TrendThriftServer {
         if (!(this_present_top && that_present_top))
           return false;
         if (this.top != that.top)
+          return false;
+      }
+
+      boolean this_present_dropBlacklisted = true;
+      boolean that_present_dropBlacklisted = true;
+      if (this_present_dropBlacklisted || that_present_dropBlacklisted) {
+        if (!(this_present_dropBlacklisted && that_present_dropBlacklisted))
+          return false;
+        if (this.dropBlacklisted != that.dropBlacklisted)
+          return false;
+      }
+
+      boolean this_present_onlyWhitelisted = true;
+      boolean that_present_onlyWhitelisted = true;
+      if (this_present_onlyWhitelisted || that_present_onlyWhitelisted) {
+        if (!(this_present_onlyWhitelisted && that_present_onlyWhitelisted))
+          return false;
+        if (this.onlyWhitelisted != that.onlyWhitelisted)
           return false;
       }
 
@@ -2268,6 +2402,26 @@ public class TrendThriftServer {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetDropBlacklisted()).compareTo(typedOther.isSetDropBlacklisted());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetDropBlacklisted()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.dropBlacklisted, typedOther.dropBlacklisted);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetOnlyWhitelisted()).compareTo(typedOther.isSetOnlyWhitelisted());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetOnlyWhitelisted()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.onlyWhitelisted, typedOther.onlyWhitelisted);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -2306,6 +2460,14 @@ public class TrendThriftServer {
       if (!first) sb.append(", ");
       sb.append("top:");
       sb.append(this.top);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("dropBlacklisted:");
+      sb.append(this.dropBlacklisted);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("onlyWhitelisted:");
+      sb.append(this.onlyWhitelisted);
       first = false;
       sb.append(")");
       return sb.toString();
@@ -2392,6 +2554,22 @@ public class TrendThriftServer {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 6: // DROP_BLACKLISTED
+              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+                struct.dropBlacklisted = iprot.readBool();
+                struct.setDropBlacklistedIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 7: // ONLY_WHITELISTED
+              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+                struct.onlyWhitelisted = iprot.readBool();
+                struct.setOnlyWhitelistedIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -2421,6 +2599,12 @@ public class TrendThriftServer {
         oprot.writeFieldEnd();
         oprot.writeFieldBegin(TOP_FIELD_DESC);
         oprot.writeI32(struct.top);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(DROP_BLACKLISTED_FIELD_DESC);
+        oprot.writeBool(struct.dropBlacklisted);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(ONLY_WHITELISTED_FIELD_DESC);
+        oprot.writeBool(struct.onlyWhitelisted);
         oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
@@ -2455,7 +2639,13 @@ public class TrendThriftServer {
         if (struct.isSetTop()) {
           optionals.set(4);
         }
-        oprot.writeBitSet(optionals, 5);
+        if (struct.isSetDropBlacklisted()) {
+          optionals.set(5);
+        }
+        if (struct.isSetOnlyWhitelisted()) {
+          optionals.set(6);
+        }
+        oprot.writeBitSet(optionals, 7);
         if (struct.isSetSpanInSeconds()) {
           oprot.writeI32(struct.spanInSeconds);
         }
@@ -2471,12 +2661,18 @@ public class TrendThriftServer {
         if (struct.isSetTop()) {
           oprot.writeI32(struct.top);
         }
+        if (struct.isSetDropBlacklisted()) {
+          oprot.writeBool(struct.dropBlacklisted);
+        }
+        if (struct.isSetOnlyWhitelisted()) {
+          oprot.writeBool(struct.onlyWhitelisted);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, currentTrends_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(5);
+        BitSet incoming = iprot.readBitSet(7);
         if (incoming.get(0)) {
           struct.spanInSeconds = iprot.readI32();
           struct.setSpanInSecondsIsSet(true);
@@ -2496,6 +2692,14 @@ public class TrendThriftServer {
         if (incoming.get(4)) {
           struct.top = iprot.readI32();
           struct.setTopIsSet(true);
+        }
+        if (incoming.get(5)) {
+          struct.dropBlacklisted = iprot.readBool();
+          struct.setDropBlacklistedIsSet(true);
+        }
+        if (incoming.get(6)) {
+          struct.onlyWhitelisted = iprot.readBool();
+          struct.setOnlyWhitelistedIsSet(true);
         }
       }
     }
@@ -2919,6 +3123,8 @@ public class TrendThriftServer {
     private static final org.apache.thrift.protocol.TField MIN_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("minLength", org.apache.thrift.protocol.TType.I32, (short)4);
     private static final org.apache.thrift.protocol.TField MAX_LENGTH_FIELD_DESC = new org.apache.thrift.protocol.TField("maxLength", org.apache.thrift.protocol.TType.I32, (short)5);
     private static final org.apache.thrift.protocol.TField TOP_FIELD_DESC = new org.apache.thrift.protocol.TField("top", org.apache.thrift.protocol.TType.I32, (short)6);
+    private static final org.apache.thrift.protocol.TField DROP_BLACKLISTED_FIELD_DESC = new org.apache.thrift.protocol.TField("dropBlacklisted", org.apache.thrift.protocol.TType.BOOL, (short)7);
+    private static final org.apache.thrift.protocol.TField ONLY_WHITELISTED_FIELD_DESC = new org.apache.thrift.protocol.TField("onlyWhitelisted", org.apache.thrift.protocol.TType.BOOL, (short)8);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -2932,6 +3138,8 @@ public class TrendThriftServer {
     public int minLength; // required
     public int maxLength; // required
     public int top; // required
+    public boolean dropBlacklisted; // required
+    public boolean onlyWhitelisted; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -2940,7 +3148,9 @@ public class TrendThriftServer {
       MIN_OCCURRENCE((short)3, "minOccurrence"),
       MIN_LENGTH((short)4, "minLength"),
       MAX_LENGTH((short)5, "maxLength"),
-      TOP((short)6, "top");
+      TOP((short)6, "top"),
+      DROP_BLACKLISTED((short)7, "dropBlacklisted"),
+      ONLY_WHITELISTED((short)8, "onlyWhitelisted");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -2967,6 +3177,10 @@ public class TrendThriftServer {
             return MAX_LENGTH;
           case 6: // TOP
             return TOP;
+          case 7: // DROP_BLACKLISTED
+            return DROP_BLACKLISTED;
+          case 8: // ONLY_WHITELISTED
+            return ONLY_WHITELISTED;
           default:
             return null;
         }
@@ -3013,6 +3227,8 @@ public class TrendThriftServer {
     private static final int __MINLENGTH_ISSET_ID = 3;
     private static final int __MAXLENGTH_ISSET_ID = 4;
     private static final int __TOP_ISSET_ID = 5;
+    private static final int __DROPBLACKLISTED_ISSET_ID = 6;
+    private static final int __ONLYWHITELISTED_ISSET_ID = 7;
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
@@ -3029,6 +3245,10 @@ public class TrendThriftServer {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.TOP, new org.apache.thrift.meta_data.FieldMetaData("top", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.DROP_BLACKLISTED, new org.apache.thrift.meta_data.FieldMetaData("dropBlacklisted", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+      tmpMap.put(_Fields.ONLY_WHITELISTED, new org.apache.thrift.meta_data.FieldMetaData("onlyWhitelisted", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(trendsEndingAt_args.class, metaDataMap);
     }
@@ -3042,7 +3262,9 @@ public class TrendThriftServer {
       double minOccurrence,
       int minLength,
       int maxLength,
-      int top)
+      int top,
+      boolean dropBlacklisted,
+      boolean onlyWhitelisted)
     {
       this();
       this.unixEndAtTime = unixEndAtTime;
@@ -3057,6 +3279,10 @@ public class TrendThriftServer {
       setMaxLengthIsSet(true);
       this.top = top;
       setTopIsSet(true);
+      this.dropBlacklisted = dropBlacklisted;
+      setDropBlacklistedIsSet(true);
+      this.onlyWhitelisted = onlyWhitelisted;
+      setOnlyWhitelistedIsSet(true);
     }
 
     /**
@@ -3070,6 +3296,8 @@ public class TrendThriftServer {
       this.minLength = other.minLength;
       this.maxLength = other.maxLength;
       this.top = other.top;
+      this.dropBlacklisted = other.dropBlacklisted;
+      this.onlyWhitelisted = other.onlyWhitelisted;
     }
 
     public trendsEndingAt_args deepCopy() {
@@ -3090,6 +3318,10 @@ public class TrendThriftServer {
       this.maxLength = 0;
       setTopIsSet(false);
       this.top = 0;
+      setDropBlacklistedIsSet(false);
+      this.dropBlacklisted = false;
+      setOnlyWhitelistedIsSet(false);
+      this.onlyWhitelisted = false;
     }
 
     public int getUnixEndAtTime() {
@@ -3230,6 +3462,52 @@ public class TrendThriftServer {
       __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __TOP_ISSET_ID, value);
     }
 
+    public boolean isDropBlacklisted() {
+      return this.dropBlacklisted;
+    }
+
+    public trendsEndingAt_args setDropBlacklisted(boolean dropBlacklisted) {
+      this.dropBlacklisted = dropBlacklisted;
+      setDropBlacklistedIsSet(true);
+      return this;
+    }
+
+    public void unsetDropBlacklisted() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID);
+    }
+
+    /** Returns true if field dropBlacklisted is set (has been assigned a value) and false otherwise */
+    public boolean isSetDropBlacklisted() {
+      return EncodingUtils.testBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID);
+    }
+
+    public void setDropBlacklistedIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __DROPBLACKLISTED_ISSET_ID, value);
+    }
+
+    public boolean isOnlyWhitelisted() {
+      return this.onlyWhitelisted;
+    }
+
+    public trendsEndingAt_args setOnlyWhitelisted(boolean onlyWhitelisted) {
+      this.onlyWhitelisted = onlyWhitelisted;
+      setOnlyWhitelistedIsSet(true);
+      return this;
+    }
+
+    public void unsetOnlyWhitelisted() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID);
+    }
+
+    /** Returns true if field onlyWhitelisted is set (has been assigned a value) and false otherwise */
+    public boolean isSetOnlyWhitelisted() {
+      return EncodingUtils.testBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID);
+    }
+
+    public void setOnlyWhitelistedIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __ONLYWHITELISTED_ISSET_ID, value);
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case UNIX_END_AT_TIME:
@@ -3280,6 +3558,22 @@ public class TrendThriftServer {
         }
         break;
 
+      case DROP_BLACKLISTED:
+        if (value == null) {
+          unsetDropBlacklisted();
+        } else {
+          setDropBlacklisted((Boolean)value);
+        }
+        break;
+
+      case ONLY_WHITELISTED:
+        if (value == null) {
+          unsetOnlyWhitelisted();
+        } else {
+          setOnlyWhitelisted((Boolean)value);
+        }
+        break;
+
       }
     }
 
@@ -3302,6 +3596,12 @@ public class TrendThriftServer {
 
       case TOP:
         return Integer.valueOf(getTop());
+
+      case DROP_BLACKLISTED:
+        return Boolean.valueOf(isDropBlacklisted());
+
+      case ONLY_WHITELISTED:
+        return Boolean.valueOf(isOnlyWhitelisted());
 
       }
       throw new IllegalStateException();
@@ -3326,6 +3626,10 @@ public class TrendThriftServer {
         return isSetMaxLength();
       case TOP:
         return isSetTop();
+      case DROP_BLACKLISTED:
+        return isSetDropBlacklisted();
+      case ONLY_WHITELISTED:
+        return isSetOnlyWhitelisted();
       }
       throw new IllegalStateException();
     }
@@ -3394,6 +3698,24 @@ public class TrendThriftServer {
         if (!(this_present_top && that_present_top))
           return false;
         if (this.top != that.top)
+          return false;
+      }
+
+      boolean this_present_dropBlacklisted = true;
+      boolean that_present_dropBlacklisted = true;
+      if (this_present_dropBlacklisted || that_present_dropBlacklisted) {
+        if (!(this_present_dropBlacklisted && that_present_dropBlacklisted))
+          return false;
+        if (this.dropBlacklisted != that.dropBlacklisted)
+          return false;
+      }
+
+      boolean this_present_onlyWhitelisted = true;
+      boolean that_present_onlyWhitelisted = true;
+      if (this_present_onlyWhitelisted || that_present_onlyWhitelisted) {
+        if (!(this_present_onlyWhitelisted && that_present_onlyWhitelisted))
+          return false;
+        if (this.onlyWhitelisted != that.onlyWhitelisted)
           return false;
       }
 
@@ -3473,6 +3795,26 @@ public class TrendThriftServer {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetDropBlacklisted()).compareTo(typedOther.isSetDropBlacklisted());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetDropBlacklisted()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.dropBlacklisted, typedOther.dropBlacklisted);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetOnlyWhitelisted()).compareTo(typedOther.isSetOnlyWhitelisted());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetOnlyWhitelisted()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.onlyWhitelisted, typedOther.onlyWhitelisted);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -3515,6 +3857,14 @@ public class TrendThriftServer {
       if (!first) sb.append(", ");
       sb.append("top:");
       sb.append(this.top);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("dropBlacklisted:");
+      sb.append(this.dropBlacklisted);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("onlyWhitelisted:");
+      sb.append(this.onlyWhitelisted);
       first = false;
       sb.append(")");
       return sb.toString();
@@ -3609,6 +3959,22 @@ public class TrendThriftServer {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 7: // DROP_BLACKLISTED
+              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+                struct.dropBlacklisted = iprot.readBool();
+                struct.setDropBlacklistedIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 8: // ONLY_WHITELISTED
+              if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+                struct.onlyWhitelisted = iprot.readBool();
+                struct.setOnlyWhitelistedIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -3641,6 +4007,12 @@ public class TrendThriftServer {
         oprot.writeFieldEnd();
         oprot.writeFieldBegin(TOP_FIELD_DESC);
         oprot.writeI32(struct.top);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(DROP_BLACKLISTED_FIELD_DESC);
+        oprot.writeBool(struct.dropBlacklisted);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(ONLY_WHITELISTED_FIELD_DESC);
+        oprot.writeBool(struct.onlyWhitelisted);
         oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
@@ -3678,7 +4050,13 @@ public class TrendThriftServer {
         if (struct.isSetTop()) {
           optionals.set(5);
         }
-        oprot.writeBitSet(optionals, 6);
+        if (struct.isSetDropBlacklisted()) {
+          optionals.set(6);
+        }
+        if (struct.isSetOnlyWhitelisted()) {
+          optionals.set(7);
+        }
+        oprot.writeBitSet(optionals, 8);
         if (struct.isSetUnixEndAtTime()) {
           oprot.writeI32(struct.unixEndAtTime);
         }
@@ -3697,12 +4075,18 @@ public class TrendThriftServer {
         if (struct.isSetTop()) {
           oprot.writeI32(struct.top);
         }
+        if (struct.isSetDropBlacklisted()) {
+          oprot.writeBool(struct.dropBlacklisted);
+        }
+        if (struct.isSetOnlyWhitelisted()) {
+          oprot.writeBool(struct.onlyWhitelisted);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, trendsEndingAt_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(6);
+        BitSet incoming = iprot.readBitSet(8);
         if (incoming.get(0)) {
           struct.unixEndAtTime = iprot.readI32();
           struct.setUnixEndAtTimeIsSet(true);
@@ -3726,6 +4110,14 @@ public class TrendThriftServer {
         if (incoming.get(5)) {
           struct.top = iprot.readI32();
           struct.setTopIsSet(true);
+        }
+        if (incoming.get(6)) {
+          struct.dropBlacklisted = iprot.readBool();
+          struct.setDropBlacklistedIsSet(true);
+        }
+        if (incoming.get(7)) {
+          struct.onlyWhitelisted = iprot.readBool();
+          struct.setOnlyWhitelistedIsSet(true);
         }
       }
     }
