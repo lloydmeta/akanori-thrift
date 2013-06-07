@@ -38,7 +38,7 @@ case class SampleFileToRedisDumper(redisPool: RedisClientPool)
     redisPool.withClient {
       redis =>
         {
-          redis.zadd(redisKey, unixTimeStamp, line)
+          redis.zadd(redisKey, unixTimeStamp, stringToSetStorableString(line, unixTimeStamp))
         }
     }
   }

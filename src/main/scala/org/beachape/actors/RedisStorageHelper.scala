@@ -3,24 +3,13 @@ package org.beachape.actors
 import com.github.nscala_time.time.Imports.RichInt
 import com.redis.RedisClientPool
 
-trait RedisStorageHelper {
-
+trait RedisStorageHelper extends StringToStorableStringHelper {
   val redisPool: RedisClientPool
 
   def storedStringsSetKey = "trends:storedStrings"
-
   def defaultTrendCacheKey = "default:TrendCacheKey"
   def customTrendCacheKey = "default:customTrendCacheKey"
   def customTrendCacheKeyEndingNow = "default:customTrendCacheKeyEndingNow"
-
-  def stringToSetStorableString(stringToStore: String, unixCreateTime: Int) = {
-    val uniqueMarker = storedStringUniqueMarker(unixCreateTime)
-    f"$uniqueMarker%s$stringToStore%s"
-  }
-
-  def storedStringToString(storedString: String) = {
-    storedString.replaceFirst(f"$storedStringUniqueMarkerOpener%s.*$storedStringUniqueMarkerCloser%s", "")
-  }
 
   def cachedKeyExists(key: RedisKey): Boolean = {
     redisPool.withClient { redis =>
@@ -39,9 +28,5 @@ trait RedisStorageHelper {
       redis.del(key.redisKey)
     }
   }
-
-  private def storedStringUniqueMarker(unixCreateTime: Int) = f"$storedStringUniqueMarkerOpener%s$unixCreateTime%d$storedStringUniqueMarkerCloser%s"
-  private def storedStringUniqueMarkerOpener = "<--createdAt--"
-  private def storedStringUniqueMarkerCloser = "--createdAt-->"
 
 }
