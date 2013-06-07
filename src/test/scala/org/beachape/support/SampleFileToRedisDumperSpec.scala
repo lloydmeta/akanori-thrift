@@ -63,7 +63,7 @@ class SampleFileToRedisDumperSpec extends FunSpec
       redisPool.withClient {
         redis =>
           {
-            redis.zscore("test", "hello") match {
+            redis.zscore("test", dumper.stringToSetStorableString("hello", 1234)) match {
               case Some(x: Double) => x should be(1234)
               case None => true should be(false) // just fail
             }
