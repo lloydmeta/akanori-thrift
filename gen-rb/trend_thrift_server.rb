@@ -43,13 +43,13 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'currentTrendsDefault failed: unknown result')
         end
 
-        def currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top)
-          send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top)
+        def currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
+          send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
           return recv_currentTrends()
         end
 
-        def send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top)
-          send_message('currentTrends', CurrentTrends_args, :spanInSeconds => spanInSeconds, :minOccurrence => minOccurrence, :minLength => minLength, :maxLength => maxLength, :top => top)
+        def send_currentTrends(spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
+          send_message('currentTrends', CurrentTrends_args, :spanInSeconds => spanInSeconds, :minOccurrence => minOccurrence, :minLength => minLength, :maxLength => maxLength, :top => top, :dropBlacklisted => dropBlacklisted, :onlyWhitelisted => onlyWhitelisted)
         end
 
         def recv_currentTrends()
@@ -58,13 +58,13 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'currentTrends failed: unknown result')
         end
 
-        def trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)
-          send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)
+        def trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
+          send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
           return recv_trendsEndingAt()
         end
 
-        def send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)
-          send_message('trendsEndingAt', TrendsEndingAt_args, :unixEndAtTime => unixEndAtTime, :spanInSeconds => spanInSeconds, :minOccurrence => minOccurrence, :minLength => minLength, :maxLength => maxLength, :top => top)
+        def send_trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
+          send_message('trendsEndingAt', TrendsEndingAt_args, :unixEndAtTime => unixEndAtTime, :spanInSeconds => spanInSeconds, :minOccurrence => minOccurrence, :minLength => minLength, :maxLength => maxLength, :top => top, :dropBlacklisted => dropBlacklisted, :onlyWhitelisted => onlyWhitelisted)
         end
 
         def recv_trendsEndingAt()
@@ -102,14 +102,14 @@ module TrendServer
         def process_currentTrends(seqid, iprot, oprot)
           args = read_args(iprot, CurrentTrends_args)
           result = CurrentTrends_result.new()
-          result.success = @handler.currentTrends(args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top)
+          result.success = @handler.currentTrends(args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top, args.dropBlacklisted, args.onlyWhitelisted)
           write_result(result, oprot, 'currentTrends', seqid)
         end
 
         def process_trendsEndingAt(seqid, iprot, oprot)
           args = read_args(iprot, TrendsEndingAt_args)
           result = TrendsEndingAt_result.new()
-          result.success = @handler.trendsEndingAt(args.unixEndAtTime, args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top)
+          result.success = @handler.trendsEndingAt(args.unixEndAtTime, args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top, args.dropBlacklisted, args.onlyWhitelisted)
           write_result(result, oprot, 'trendsEndingAt', seqid)
         end
 
@@ -192,13 +192,17 @@ module TrendServer
         MINLENGTH = 3
         MAXLENGTH = 4
         TOP = 5
+        DROPBLACKLISTED = 6
+        ONLYWHITELISTED = 7
 
         FIELDS = {
           SPANINSECONDS => {:type => ::Thrift::Types::I32, :name => 'spanInSeconds'},
           MINOCCURRENCE => {:type => ::Thrift::Types::DOUBLE, :name => 'minOccurrence'},
           MINLENGTH => {:type => ::Thrift::Types::I32, :name => 'minLength'},
           MAXLENGTH => {:type => ::Thrift::Types::I32, :name => 'maxLength'},
-          TOP => {:type => ::Thrift::Types::I32, :name => 'top'}
+          TOP => {:type => ::Thrift::Types::I32, :name => 'top'},
+          DROPBLACKLISTED => {:type => ::Thrift::Types::BOOL, :name => 'dropBlacklisted'},
+          ONLYWHITELISTED => {:type => ::Thrift::Types::BOOL, :name => 'onlyWhitelisted'}
         }
 
         def struct_fields; FIELDS; end
@@ -233,6 +237,8 @@ module TrendServer
         MINLENGTH = 4
         MAXLENGTH = 5
         TOP = 6
+        DROPBLACKLISTED = 7
+        ONLYWHITELISTED = 8
 
         FIELDS = {
           UNIXENDATTIME => {:type => ::Thrift::Types::I32, :name => 'unixEndAtTime'},
@@ -240,7 +246,9 @@ module TrendServer
           MINOCCURRENCE => {:type => ::Thrift::Types::DOUBLE, :name => 'minOccurrence'},
           MINLENGTH => {:type => ::Thrift::Types::I32, :name => 'minLength'},
           MAXLENGTH => {:type => ::Thrift::Types::I32, :name => 'maxLength'},
-          TOP => {:type => ::Thrift::Types::I32, :name => 'top'}
+          TOP => {:type => ::Thrift::Types::I32, :name => 'top'},
+          DROPBLACKLISTED => {:type => ::Thrift::Types::BOOL, :name => 'dropBlacklisted'},
+          ONLYWHITELISTED => {:type => ::Thrift::Types::BOOL, :name => 'onlyWhitelisted'}
         }
 
         def struct_fields; FIELDS; end

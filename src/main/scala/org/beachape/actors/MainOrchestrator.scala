@@ -16,6 +16,13 @@ object MainOrchestrator {
   def apply(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int): Props = Props(new MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top))
 }
 
+/*
+ * As the name suggests, the main actor that takes care of sending and receiving
+ * messages from other actors.
+ * Also acts as a container for the arguments for certain default options
+ * passed in from the command line
+*/
+
 class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
@@ -23,7 +30,7 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
   implicit val timeout = Timeout(600 seconds)
 
   val stringToRedisRoundRobin = context.actorOf(Props(new StringToRedisActor(redisPool)).withRouter(SmallestMailboxRouter(5)), "mainOrchestratorStringToRedisRoundRobin")
-  val trendGeneratorRoundRobin = context.actorOf(Props(new TrendGeneratorActor(redisPool, dropBlacklisted, onlyWhitelisted)).withRouter(SmallestMailboxRouter(3)), "trendGeneratorRoundRobin")
+  val trendGeneratorRoundRobin = context.actorOf(Props(new TrendGeneratorActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "trendGeneratorRoundRobin")
 
   def receive = {
 
@@ -34,7 +41,7 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
     case List('generateDefaultTrends) => {
       val cacheKey = RedisKey(defaultTrendCacheKey)
       deleteKey(cacheKey)
-      trendGeneratorRoundRobin ! List('generateTrendsFor, (cacheKey, (System.currentTimeMillis / 1000).toInt, spanInSeconds, minOccurrence, minLength, maxLength, top))
+      trendGeneratorRoundRobin ! List('generateTrendsFor, (cacheKey, (System.currentTimeMillis / 1000).toInt, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted))
     }
 
     case 'getTrendsDefault => {
@@ -48,11 +55,9 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
       sender ! listOfReverseSortedTermsAndScores
     }
 
-    case List('getTrends, (spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
-      // If the cachedKey exists, use the cached results and return it
-      // Otherwise, call trendGeneratorRoundRobin and wait
+    case message @ List('getTrendsEndingAt, (unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int, callDropBlacklisted: Boolean, callOnlyWhitelisted: Boolean)) => {
       val zender = sender
-      val cachedKey = RedisKey(f"$customTrendCacheKeyEndingNow%s-span$spanInSeconds%s-minOccurence$callMinOccurrence%f-minLength-$callMinLength%d-maxLength$callMaxLength%d-callTop$callTop%d")
+      val cachedKey = RedisKey(customTrendCacheKey(unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop, callDropBlacklisted, callOnlyWhitelisted))
 
       if (cachedKeyExists(cachedKey)) {
         val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
@@ -63,28 +68,7 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
         }
         sender ! listOfReverseSortedTermsAndScores
       } else {
-        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? List('generateTrendsFor, (cachedKey, (System.currentTimeMillis / 1000).toInt, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop))
-        listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
-          zender ! listOfReverseSortedTermsAndScores
-        }
-      }
-    }
-
-    // Heavy code duplication with the default case
-    case message @ List('getTrendsEndingAt, (unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
-      val zender = sender
-      val cachedKey = RedisKey(f"$customTrendCacheKeyEndingNow%s-unixEndAtTime$unixEndAtTime%d-span$spanInSeconds%s-minOccurence$callMinOccurrence%f-minLength-$callMinLength%d-maxLength$callMaxLength%d-callTop$callTop%d")
-
-      if (cachedKeyExists(cachedKey)) {
-        val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
-          redis.zrangebyscoreWithScore(cachedKey.redisKey, Double.NegativeInfinity, limit = None, sortAs = DESC) match {
-            case Some(x: List[(String, Double)]) => x
-            case _ => Nil
-          }
-        }
-        sender ! listOfReverseSortedTermsAndScores
-      } else {
-        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? List('generateTrendsFor, (cachedKey, unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop))
+        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? List('generateTrendsFor, (cachedKey, unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop, callDropBlacklisted, callOnlyWhitelisted))
         listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
           zender ! listOfReverseSortedTermsAndScores
         }
@@ -93,6 +77,10 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
     }
 
     case unneededMessage @ _ => println(unneededMessage)
+  }
+
+  def customTrendCacheKey(unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int, callDropBlacklisted: Boolean, callOnlyWhitelisted: Boolean) = {
+    f"$customTrendCacheKeyEndingNow%s-unixEndAtTime$unixEndAtTime%d-span$spanInSeconds%s-minOccurence$callMinOccurrence%f-minLength-$callMinLength%d-maxLength$callMaxLength%d-callTop$callTop%d-callDropBlacklisted$callDropBlacklisted%b-callOnlyWhitelisted$callOnlyWhitelisted%b"
   }
 
 }

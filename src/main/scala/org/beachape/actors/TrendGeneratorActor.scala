@@ -15,7 +15,7 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
-class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) extends Actor with RedisStorageHelper {
+class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600) seconds)
@@ -25,10 +25,10 @@ class TrendGeneratorActor(val redisPool: RedisClientPool, dropBlacklisted: Boole
 
   def receive = {
 
-    case List('generateTrendsFor, (redisCacheKey: RedisKey, unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int)) => {
+    case List('generateTrendsFor, (redisCacheKey: RedisKey, unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int, callDropBlacklisted: Boolean, callOnlyWhitelisted: Boolean)) => {
       val zender = sender
       //Get 2 sets of keys that point to the morphemes
-      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateMorphemesFor, (unixEndAtTime, spanInSeconds, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)))
+      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateMorphemesFor, (unixEndAtTime, spanInSeconds, callDropBlacklisted, callOnlyWhitelisted)))
       listOfRedisKeysFuture map { listOfRedisKeys =>
         listOfRedisKeys match {
           case List(oldSet: RedisKeySet, newSet: RedisKeySet) => {

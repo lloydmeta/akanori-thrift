@@ -18,5 +18,5 @@ case class ConsoleServer(redisHost: String = "localhost", redisPort: Int = 6379,
 
   def generateCurrentTrends = mainOrchestratorRoundRobin ! List('generateDefaultTrends)
 
-  def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) = server.trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)
+  def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) = server.trendsEndingAt(unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
 }

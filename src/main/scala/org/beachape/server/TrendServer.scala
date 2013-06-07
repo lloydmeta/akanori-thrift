@@ -35,8 +35,21 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
     listOfTrendResults
   }
 
-  override def currentTrends(spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) = {
-    val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrends, (spanInSeconds, minOccurrence, minLength, maxLength, top)))
+  override def currentTrends(spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) = {
+    (System.currentTimeMillis / 1000).toInt
+    val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrendsEndingAt, ((System.currentTimeMillis / 1000).toInt, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)))
+    val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
+    val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
+      result match {
+        case (term: String, score: Double) => new TrendResult(term, score)
+        case _ => new TrendResult("fail", -55378008)
+      }
+    }
+    listOfTrendResults
+  }
+
+  override def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) = {
+    val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrendsEndingAt, (unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)))
     val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
     val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
       result match {
@@ -49,18 +62,6 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
 
   override def storeString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int): Unit = {
     mainOrchestrator ! List('storeString, (stringToStore, unixCreatedAtTime, weeksAgoDataToExpire))
-  }
-
-  override def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) = {
-    val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrendsEndingAt, (unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top)))
-    val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
-    val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
-      result match {
-        case (term: String, score: Double) => new TrendResult(term, score)
-        case _ => new TrendResult("fail", -55378008)
-      }
-    }
-    listOfTrendResults
   }
 
 }

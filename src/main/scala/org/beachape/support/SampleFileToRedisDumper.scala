@@ -54,21 +54,15 @@ case class SampleFileToRedisDumper(redisPool: RedisClientPool)
     val reader = new ScalaCSVReader(new FileReader(filePath))
     val currentTime = System.currentTimeMillis / 1000
 
-    val firstEntry = reader.next
-    val newestDateString = firstEntry(1) //assume second element is a string
-    val newestDateUnixTimestamp = (newestDateString.toDateTime.millis / 1000).toInt
-    storeLineInRedis(storedStringsSetKey, firstEntry(0), newestDateUnixTimestamp)
-
     reader foreach { row =>
       if (row.length == 2)
         try {
           val string = row(0)
           val dateString = row(1)
-          val dateUnix = dateString.toDateTime.millis / 1000
-          val dateUnixAdjusted = (currentTime - (newestDateUnixTimestamp - dateUnix)).toInt
-          storeLineInRedis(storedStringsSetKey, string, dateUnixAdjusted)
-          val dateAdjusted = (dateUnixAdjusted * 1000L).toDateTime
-          println(s"$string inserted at $dateAdjusted")
+          val dateUnix = (dateString.toDateTime.millis / 1000).toInt
+          storeLineInRedis(storedStringsSetKey, string, dateUnix)
+          val dateTime = (dateUnix * 1000L).toDateTime
+          println(s"$string inserted at $dateTime")
         } catch {
           case _:Throwable =>
         }
