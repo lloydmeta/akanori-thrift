@@ -5,7 +5,7 @@ import com.redis.RedisClient.DESC
 import com.redis.RedisClient.SortOrder
 import com.redis.RedisClientPool
 
-case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected: String, redisKeyObserved: String, minScore: Double = 10) extends ChiSquare with RedisHelper {
+case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected: String, redisKeyObserved: String, minScore: Double = 10) extends ChiSquare with MorphemeScoreRedisHelper {
 
   def forEachPageOfObservedTermsWithScores[A](pageCount: Int = 300)(callBack: List[(String, Double)] => A): List[A] = {
     val newObservedSetCard = observedZCard

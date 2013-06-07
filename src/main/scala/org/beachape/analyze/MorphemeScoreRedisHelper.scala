@@ -1,5 +1,5 @@
 package org.beachape.analyze
 
-trait RedisHelper {
+trait MorphemeScoreRedisHelper {
   def zSetTotalScoreKey = "{__akanori_score_counter__}"
 }

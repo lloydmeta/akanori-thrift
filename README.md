@@ -7,7 +7,7 @@ Thrift clients send strings to the Scala server, which then stores it initially.
 
 Todo
 ===
-* Combine RedisHelper and RedisStorageHelper
+* Filter repeating (same char above 3 per post collapse to 3) chars when saving text
 * Return trends as TrendResults from MorphemesTrendDetectorActor?
 * More tests
 * Less usage of futures with closures and move towards FSM ?
