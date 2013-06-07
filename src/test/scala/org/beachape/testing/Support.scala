@@ -54,27 +54,35 @@ trait Support extends RedisStorageHelper {
         "笹子" -> 2,
         "トンネル" -> 1,
         "設計" -> 2,
-        "見落とし" -> 2),
+        "見落とし" -> 2,
+        "ーーー" -> 3,
+        "殺す"-> 3),
         //oldObservedStrings
         (unixStartTime + span + 1) -> Map(
         "笹子" -> 3,
         "トンネル" -> 4,
         "設計" -> 3,
-        "見落とし" -> 1),
+        "見落とし" -> 1,
+        "ーーー" -> 3,
+        "殺す"-> 9),
         //newExpectededStrings
          (unixEndTime - 2 * span + 1) -> Map(
         "笹子" -> 2,
         "トンネル" -> 1,
         "設計" -> 4,
         "見落とし" -> 5,
-        "坂本" -> 2),
+        "坂本" -> 2,
+        "ーーー" -> 2,
+        "殺す"-> 1),
         //newObservedStrings
         (unixEndTime - span + 1) -> Map(
         "笹子" -> 4,
         "トンネル" -> 6,
         "設計" -> 4,
         "見落とし" -> 9,
-        "坂本" -> 10)
+        "坂本" -> 10,
+        "ーーー" -> 6,
+        "殺す"-> 9)
         )
 
     for ((unixTime, frequencyMap) <- timeStampsToStringFrequencyMap) {
