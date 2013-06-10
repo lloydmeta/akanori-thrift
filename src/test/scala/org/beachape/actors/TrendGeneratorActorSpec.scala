@@ -76,40 +76,40 @@ class TrendGeneratorActorSpec extends TestKit(ActorSystem("akkaTest"))
     dumpStringsToRedisStoredStringSet
   }
 
-  describe("sending a message to List('generateTrendsFor....) with given parameters") {
+  describe("sending a GenerateAndCacheTrendsFor with given parameters") {
 
     it("should respond with an expected trend with zero filtering") {
-      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20, false, false))
+      trendGeneratorActorRef ! GenerateAndCacheTrendsFor(RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20, false, false)
       expectMsg(validTrendNoFiltering)
     }
 
     it("should respond with an expected trend with blacklist filtering") {
-      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20, true, false))
+      trendGeneratorActorRef ! GenerateAndCacheTrendsFor(RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20, true, false)
       expectMsg(validTrendDropBlacklisted)
     }
 
     it("should respond with an expected trend with whitelist filtering") {
-      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20, false, true))
+      trendGeneratorActorRef ! GenerateAndCacheTrendsFor(RedisKey("test:something"), unixEnd, span, 0.0, 1, 20, 20, false, true)
       expectMsg(validTrendOnlyWhitelisted)
     }
 
     it("should respond with an expected trend when using tweaked minOccurrence") {
-      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 6.0, 1, 20, 20, false, false))
+      trendGeneratorActorRef ! GenerateAndCacheTrendsFor(RedisKey("test:something"), unixEnd, span, 6.0, 1, 20, 20, false, false)
       expectMsg(validTrendWithMinOccurrence)
     }
 
     it("should respond with an expected trend when using tweaked minLength") {
-      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 3, 20, 20, false, false))
+      trendGeneratorActorRef ! GenerateAndCacheTrendsFor(RedisKey("test:something"), unixEnd, span, 0.0, 3, 20, 20, false, false)
       expectMsg(validTrendWithMinLength)
     }
 
     it("should respond with an expected trend when using tweaked maxLength") {
-      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 1, 3, 20, false, false))
+      trendGeneratorActorRef ! GenerateAndCacheTrendsFor(RedisKey("test:something"), unixEnd, span, 0.0, 1, 3, 20, false, false)
       expectMsg(validTrendWithMaxLength)
     }
 
     it("should respond with an expected trend when using tweaked top") {
-      trendGeneratorActorRef ! List('generateTrendsFor, (RedisKey("test:something"), unixEnd, span, 0.0, 1, 10, 2, false, false))
+      trendGeneratorActorRef ! GenerateAndCacheTrendsFor(RedisKey("test:something"), unixEnd, span, 0.0, 1, 10, 2, false, false)
       expectMsg(validTrendWithTop)
     }
 

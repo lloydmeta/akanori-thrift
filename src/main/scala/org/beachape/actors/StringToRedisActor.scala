@@ -12,8 +12,8 @@ class StringToRedisActor(val redisPool: RedisClientPool) extends Actor with Redi
 
   def receive = {
 
-    case List('storeString, (stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)) => {
-      storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
+    case message: StoreString => {
+      storeString(message.stringToStore, message.unixCreatedAtTime, message.weeksAgoDataToExpire)
     }
 
     case _ => println("StringToRedisActor says 'huh?'")

@@ -1,7 +1,7 @@
 import scala.util.Success
 
 import org.beachape.actors.MorphemesAnalyzerActor
-import org.beachape.actors.RedisKey
+import org.beachape.actors.{RedisKey, AnalyseAndStoreInRedisKey}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
@@ -33,7 +33,7 @@ class MorphemesAnalyzerActorSpec extends TestKit(ActorSystem("akkaTest"))
 
   def dumpListAndRun(verifier: () => Unit) = {
     val listOfFutures = for (string <- listOfStrings) yield {
-      (morphemesAnalyzerActor ? List('dumpMorphemesToRedis, RedisKey(redisKey), string, true, true)).mapTo[Boolean]
+      (morphemesAnalyzerActor ? AnalyseAndStoreInRedisKey(string, RedisKey(redisKey), true, true)).mapTo[Boolean]
     }
 
     val listOfFutureValues = listOfFutures map (x => x.value.get)
@@ -47,7 +47,7 @@ class MorphemesAnalyzerActorSpec extends TestKit(ActorSystem("akkaTest"))
   describe("sending a request to dumpMorphemesToRedis") {
 
     it("should return true") {
-      morphemesAnalyzerActor ! List('dumpMorphemesToRedis, RedisKey(redisKey), listOfStrings.head, true, true)
+      morphemesAnalyzerActor ! AnalyseAndStoreInRedisKey(listOfStrings.head, RedisKey(redisKey), true, true)
       expectMsg(true)
     }
 
