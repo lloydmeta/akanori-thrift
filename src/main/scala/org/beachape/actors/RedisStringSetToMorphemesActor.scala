@@ -26,13 +26,13 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
 
     // Given a Unix timespan, get the Redis strings out of the storageKey and tally up
     // the morphemes
-    case (unixTimeSpan: UnixTimeSpan, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) => {
+    case message: GenerateMorphemesForSpan => {
       val zender = sender
-      val redisKey = RedisKey(redisKeyForUnixTimeSpanWithOptions(unixTimeSpan, dropBlacklisted, onlyWhitelisted))
+      val redisKey = RedisKey(redisKeyForUnixTimeSpanWithOptions(message.unixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted))
       if (cachedKeyExists(redisKey)) {
         zender ! redisKey
       } else {
-        val analyzeAndDumpResultsList: List[Boolean] = forEachPagedListOfTermsInUnixTimeSpan(unixTimeSpan)(dumpListOfStringsToMorphemes(_: List[String], redisKey, dropBlacklisted, onlyWhitelisted))
+        val analyzeAndDumpResultsList: List[Boolean] = forEachPagedListOfTermsInUnixTimeSpan(message.unixTimeSpan)(dumpListOfStringsToMorphemes(_: List[String], redisKey, message.dropBlacklisted, message.onlyWhitelisted))
         analyzeAndDumpResultsList match {
           case x: List[Boolean] if x.forall(_ == true) => {
             setExpiryOnRedisKey(redisKey, (RichInt(15).minutes.millis / 1000).toInt)

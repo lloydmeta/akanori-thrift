@@ -21,3 +21,14 @@ sealed case class GenerateAndCacheTrendsFor(
   top: Int,
   dropBlacklisted: Boolean,
   onlyWhitelisted: Boolean)
+
+sealed case class GenerateMorphemesFor(
+  unixEndAtTime: Int,
+  spanInSeconds: Int,
+  dropBlacklisted: Boolean,
+  onlyWhitelisted: Boolean)
+
+sealed case class GenerateMorphemesForSpan(
+  unixTimeSpan: UnixTimeSpan,
+  dropBlacklisted: Boolean,
+  onlyWhitelisted: Boolean)

@@ -47,9 +47,9 @@ class RedisStringSetToMorphemesOrchestratorSpec extends TestKit(ActorSystem("akk
     }
   }
 
-  describe("sending a request to List('generateMorphemesFor, (unixEndAtTime: Int, spanInSeconds: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean))") {
+  describe("sending a GenerateMorphemesFor(unixEndAtTime: Int, spanInSeconds: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean))") {
     it("should return true") {
-      redisStringSetToMorphemesOrchestratorRef ! List('generateMorphemesFor, (unixTimeEnd.time, unixTimeEnd.time - 10800, false, false))
+      redisStringSetToMorphemesOrchestratorRef ! GenerateMorphemesFor(unixTimeEnd.time, unixTimeEnd.time - 10800, false, false)
       expectMsgType[List[RedisKeySet]]
     }
 

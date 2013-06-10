@@ -22,19 +22,19 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
 
   def receive = {
 
-    case List('generateMorphemesFor, (unixEndAtTime: Int, spanInSeconds: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean)) => {
+    case message: GenerateMorphemesFor => {
 
       val zender = sender
 
-      val newObservedSetEndScore = unixEndAtTime.toDouble
-      val newObservedSetStartScore = newObservedSetEndScore - spanInSeconds
+      val newObservedSetEndScore = message.unixEndAtTime.toDouble
+      val newObservedSetStartScore = newObservedSetEndScore - message.spanInSeconds
       val newExpectedSetEndScore = newObservedSetStartScore
-      val newExpectedSetStartScore = newExpectedSetEndScore - spanInSeconds
+      val newExpectedSetStartScore = newExpectedSetEndScore - message.spanInSeconds
 
       val oldObservedSetEndScore = newObservedSetEndScore - (RichInt(7 * 24).hours.millis / 1000).toDouble // a week ago
-      val oldObservedSetStartScore = oldObservedSetEndScore - spanInSeconds
+      val oldObservedSetStartScore = oldObservedSetEndScore - message.spanInSeconds
       val oldExpectedSetEndScore = oldObservedSetStartScore
-      val oldExpectedSetStartScore = oldObservedSetStartScore - spanInSeconds
+      val oldExpectedSetStartScore = oldObservedSetStartScore - message.spanInSeconds
 
       val newObservedSetUnixTimeSpan = UnixTimeSpan(UnixTime(newObservedSetStartScore.toInt), UnixTime(newObservedSetEndScore.toInt))
       val newExpectedSetUnixTimeSpan = UnixTimeSpan(UnixTime(newExpectedSetStartScore.toInt), UnixTime(newExpectedSetEndScore.toInt))
@@ -42,10 +42,10 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
       val oldExpectedSetUnixTimeSpan = UnixTimeSpan(UnixTime(oldExpectedSetStartScore.toInt), UnixTime(oldExpectedSetEndScore.toInt))
 
       val listOfRedisKeyFutures = List(
-        ask(redisStringSetToMorphemesActorsRoundRobin, (oldExpectedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, (oldObservedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, (newExpectedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, (newObservedSetUnixTimeSpan, dropBlacklisted, onlyWhitelisted)).mapTo[RedisKey])
+        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(oldExpectedSetUnixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(oldObservedSetUnixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(newExpectedSetUnixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(newObservedSetUnixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted)).mapTo[RedisKey])
 
       val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
       futureListOfRedisKeys map { redisKeysList =>

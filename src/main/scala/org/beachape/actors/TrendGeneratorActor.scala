@@ -30,7 +30,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
       val zender = sender
 
       //Get 2 sets of keys that point to the morphemes
-      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateMorphemesFor, (message.unixEndAtTime, message.spanInSeconds, message.dropBlacklisted, message.onlyWhitelisted)))
+      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, GenerateMorphemesFor(message.unixEndAtTime, message.spanInSeconds, message.dropBlacklisted, message.onlyWhitelisted))
       listOfRedisKeysFuture map { listOfRedisKeys =>
         listOfRedisKeys match {
           case List(oldSet: RedisKeySet, newSet: RedisKeySet) => {
