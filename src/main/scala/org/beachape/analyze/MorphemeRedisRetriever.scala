@@ -7,14 +7,14 @@ import com.redis.RedisClientPool
 
 case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected: String, redisKeyObserved: String, minScore: Double = 10) extends ChiSquare with MorphemeScoreRedisHelper {
 
-  def forEachPageOfObservedTermsWithScores[A](pageCount: Int = 300)(callBack: List[(String, Double)] => A): List[A] = {
+  def forEachPageOfObservedTermsWithScores[A](pageCount: Int = 300)(callBack: Option[List[(String, Double)]] => A): Option[List[A]] = {
     val newObservedSetCard = observedZCard
     val offSets = 0 to newObservedSetCard by pageCount // Generate range to page over the new set
 
-    (for (offSet <- offSets) yield {
+    Some((for (offSet <- offSets) yield {
       val morphemesWithScoresAtOffSet = newTermsWithScoresListWithLimit(Some(offSet, pageCount))
       callBack(morphemesWithScoresAtOffSet)
-    })(collection.breakOut)
+    })(collection.breakOut))
   }
 
   def getExpectedScoreForTerm(term: String) = {
@@ -52,14 +52,11 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected:
 
   private def termsWithScoresList(redisKey: String, min: Double = Double.NegativeInfinity, limit: Option[(Int, Int)] = None, sort: SortOrder = DESC) = {
     redisPool.withClient { redis =>
-      redis.zrangebyscoreWithScore(redisKey, min, limit = limit, sortAs = sort) match {
-        case Some(x: List[(String, Double)]) => x.filter(_._1 != zSetTotalScoreKey)
-        case _ => Nil
-      }
+      redis.zrangebyscoreWithScore(redisKey, min, limit = limit, sortAs = sort)
     }
   }
 
-  private def newTermsWithScoresListWithLimit(limitDesired: Option[(Int, Int)] = Some(0, 50)): List[(String, Double)] = {
+  private def newTermsWithScoresListWithLimit(limitDesired: Option[(Int, Int)] = Some(0, 50)) = {
     termsWithScoresList(redisKeyObserved, min = minScore, limit = limitDesired, sort = DESC)
   }
 
