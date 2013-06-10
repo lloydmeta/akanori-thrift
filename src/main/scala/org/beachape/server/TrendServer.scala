@@ -25,39 +25,25 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
 
   override def currentTrendsDefault = {
     val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, 'getTrendsDefault)
-    val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
-    val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
-      result match {
-        case (term: String, score: Double) => new TrendResult(term, score)
-        case _ => new TrendResult("fail", -55378008)
-      }
-    }
-    listOfTrendResults
+    val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[Option[List[(String, Double)]]]
+    for ((term: String, score: Double) <- listOfReverseSortedTermsAndScores.getOrElse(Nil)) yield
+      new TrendResult(term, score)
   }
 
   override def currentTrends(spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) = {
     (System.currentTimeMillis / 1000).toInt
     val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrendsEndingAt, ((System.currentTimeMillis / 1000).toInt, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)))
-    val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
-    val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
-      result match {
-        case (term: String, score: Double) => new TrendResult(term, score)
-        case _ => new TrendResult("fail", -55378008)
-      }
-    }
-    listOfTrendResults
+    val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[Option[List[(String, Double)]]]
+    for ((term: String, score: Double) <- listOfReverseSortedTermsAndScores.getOrElse(Nil)) yield
+      new TrendResult(term, score)
   }
 
   override def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) = {
     val listOfReverseSortedTermsAndScoresFuture = ask(mainOrchestrator, List('getTrendsEndingAt, (unixEndAtTime, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)))
-    val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[List[(String, Double)]]
-    val listOfTrendResults = for (result <- listOfReverseSortedTermsAndScores) yield {
-      result match {
-        case (term: String, score: Double) => new TrendResult(term, score)
-        case _ => new TrendResult("fail", -55378008)
-      }
-    }
-    listOfTrendResults
+    val listOfReverseSortedTermsAndScores = Await.result(listOfReverseSortedTermsAndScoresFuture, 600 seconds).asInstanceOf[Option[List[(String, Double)]]]
+    println(listOfReverseSortedTermsAndScores)
+    for ((term: String, score: Double) <- listOfReverseSortedTermsAndScores.getOrElse(Nil)) yield
+      new TrendResult(term, score)
   }
 
   override def storeString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int): Unit = {

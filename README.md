@@ -7,7 +7,6 @@ Thrift clients send strings to the Scala server, which then stores it initially.
 
 Todo
 ===
-* Embrace Options
 * Return trends as TrendResults from MorphemesTrendDetectorActor?
 * More tests
 * Less usage of futures with closures and move towards FSM ?

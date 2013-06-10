@@ -49,48 +49,47 @@ trait Support extends RedisStorageHelper {
     val span = 1800
 
     val timeStampsToStringFrequencyMap = Map(
-        //oldExpectedStrings
-        (unixStartTime + 1) -> Map(
+      //oldExpectedStrings
+      (unixStartTime + 1) -> Map(
         "笹子" -> 2,
         "トンネル" -> 1,
         "設計" -> 2,
         "見落とし" -> 2,
         "ーーー" -> 3,
-        "殺す"-> 3),
-        //oldObservedStrings
-        (unixStartTime + span + 1) -> Map(
+        "殺す" -> 3),
+      //oldObservedStrings
+      (unixStartTime + span + 1) -> Map(
         "笹子" -> 3,
         "トンネル" -> 4,
         "設計" -> 3,
         "見落とし" -> 1,
         "ーーー" -> 3,
-        "殺す"-> 9),
-        //newExpectededStrings
-         (unixEndTime - 2 * span + 1) -> Map(
+        "殺す" -> 9),
+      //newExpectededStrings
+      (unixEndTime - 2 * span + 1) -> Map(
         "笹子" -> 2,
         "トンネル" -> 1,
         "設計" -> 4,
         "見落とし" -> 5,
         "坂本" -> 2,
         "ーーー" -> 2,
-        "殺す"-> 1),
-        //newObservedStrings
-        (unixEndTime - span + 1) -> Map(
+        "殺す" -> 1),
+      //newObservedStrings
+      (unixEndTime - span + 1) -> Map(
         "笹子" -> 4,
         "トンネル" -> 6,
         "設計" -> 4,
         "見落とし" -> 9,
         "坂本" -> 10,
         "ーーー" -> 6,
-        "殺す"-> 9)
-        )
+        "殺す" -> 9))
 
     for ((unixTime, frequencyMap) <- timeStampsToStringFrequencyMap) {
       for ((term, frequency) <- frequencyMap) {
         for (i <- (0 to (frequency - 1))) {
           val uniquishTimestamp = unixTime + i
           val storableString = stringToSetStorableString(term, uniquishTimestamp)
-          redisPool.withClient {redis =>
+          redisPool.withClient { redis =>
             redis.zadd(storedStringsSetKey, uniquishTimestamp, storableString)
           }
         }
@@ -100,8 +99,7 @@ trait Support extends RedisStorageHelper {
     Map(
       'unixStartTime -> unixStartTime,
       'unixEndTime -> unixEndTime,
-      'span -> span
-      )
+      'span -> span)
   }
 
   def zcardOfRedisKey(key: String) = {
@@ -111,6 +109,43 @@ trait Support extends RedisStorageHelper {
       case _ => 0
     }
   }
+
+  val validTrendNoFiltering = List(
+    ("殺す", 14.000470143155322),
+    ("坂本", 7.072925925925933),
+    ("見落とし", 4.973760416666666),
+    ("笹子", 0.5673898467981636),
+    ("ーー", 0.005333333333333368))
+
+  val validTrendDropBlacklisted = List(
+    ("見落とし", 18.247894967682377),
+    ("殺す", 14.508305069379858),
+    ("坂本", 3.9175442443828867),
+    ("笹子", 0.9371766039803595))
+
+  val validTrendOnlyWhitelisted = List(
+    ("坂本", 14.43038580246913),
+    ("笹子", 1.1631186536635252),
+    ("ーー", 0.1168055555555556))
+
+  val validTrendWithMinOccurrence = List(
+    ("殺す", 14.000470143155322),
+    ("坂本", 7.072925925925933),
+    ("見落とし", 4.973760416666666),
+    ("ーー", 0.005333333333333368))
+
+  val validTrendWithMinLength = List(
+    ("見落とし", 4.973760416666666))
+
+  val validTrendWithMaxLength = List(
+    ("殺す", 14.000470143155322),
+    ("坂本", 7.072925925925933),
+    ("笹子", 0.5673898467981636),
+    ("ーー", 0.005333333333333368))
+
+  val validTrendWithTop = List(
+    ("殺す", 14.000470143155322),
+    ("坂本", 7.072925925925933))
 
   def roughRound(double: Double, precision: Double) = double - double % precision
 

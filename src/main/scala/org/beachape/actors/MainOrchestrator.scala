@@ -44,33 +44,29 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
       trendGeneratorRoundRobin ! List('generateTrendsFor, (cacheKey, (System.currentTimeMillis / 1000).toInt, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted))
     }
 
+    // Replies with Some(List[(String, Double)]
     case 'getTrendsDefault => {
       val cacheKey = RedisKey(defaultTrendCacheKey)
       val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
-        redis.zrangebyscoreWithScore(cacheKey.redisKey, Double.NegativeInfinity, limit = None, sortAs = DESC) match {
-          case Some(x: List[(String, Double)]) => x
-          case _ => Nil
-        }
+        redis.zrangebyscoreWithScore(cacheKey.redisKey, Double.NegativeInfinity, limit = None, sortAs = DESC)
       }
       sender ! listOfReverseSortedTermsAndScores
     }
 
+    // Replies with Some(List[(String, Double)]
     case message @ List('getTrendsEndingAt, (unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int, callDropBlacklisted: Boolean, callOnlyWhitelisted: Boolean)) => {
       val zender = sender
       val cachedKey = RedisKey(customTrendCacheKey(unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop, callDropBlacklisted, callOnlyWhitelisted))
 
       if (cachedKeyExists(cachedKey)) {
         val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
-          redis.zrangebyscoreWithScore(cachedKey.redisKey, Double.NegativeInfinity, limit = None, sortAs = DESC) match {
-            case Some(x: List[(String, Double)]) => x
-            case _ => Nil
-          }
+          redis.zrangebyscoreWithScore(cachedKey.redisKey, Double.NegativeInfinity, limit = None, sortAs = DESC)
         }
         sender ! listOfReverseSortedTermsAndScores
       } else {
         val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? List('generateTrendsFor, (cachedKey, unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop, callDropBlacklisted, callOnlyWhitelisted))
         listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
-          zender ! listOfReverseSortedTermsAndScores
+          zender ! Some(listOfReverseSortedTermsAndScores)
         }
       }
 
