@@ -38,10 +38,10 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
       stringToRedisRoundRobin ! message
     }
 
-    case List('generateDefaultTrends) => {
+    case GenerateDefaultTrends => {
       val cacheKey = RedisKey(defaultTrendCacheKey)
       deleteKey(cacheKey)
-      trendGeneratorRoundRobin ! List('generateTrendsFor, (cacheKey, (System.currentTimeMillis / 1000).toInt, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted))
+      trendGeneratorRoundRobin ! GenerateAndCacheTrendsFor(cacheKey, (System.currentTimeMillis / 1000).toInt, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
     }
 
     // Replies with Some(List[(String, Double)]
@@ -64,7 +64,7 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
         }
         sender ! listOfReverseSortedTermsAndScores
       } else {
-        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? List('generateTrendsFor, (cachedKey, unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop, callDropBlacklisted, callOnlyWhitelisted))
+        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? GenerateAndCacheTrendsFor(cachedKey, unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop, callDropBlacklisted, callOnlyWhitelisted)
         listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
           zender ! Some(listOfReverseSortedTermsAndScores)
         }

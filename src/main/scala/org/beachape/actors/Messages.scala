@@ -8,3 +8,16 @@ sealed case class UnixTime(time: Int)
 sealed case class UnixTimeSpan(start: UnixTime, end: UnixTime)
 
 sealed case class StoreString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)
+
+sealed case class GenerateDefaultTrends
+
+sealed case class GenerateAndCacheTrendsFor(
+  redisCacheKey: RedisKey,
+  unixEndAtTime: Int,
+  spanInSeconds: Int,
+  minOccurrence: Double,
+  minLength: Int,
+  maxLength: Int,
+  top: Int,
+  dropBlacklisted: Boolean,
+  onlyWhitelisted: Boolean)

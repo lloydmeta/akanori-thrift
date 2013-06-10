@@ -26,17 +26,18 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
   def receive = {
 
     // Replies with a List[(String, Double)]
-    case List('generateTrendsFor, (redisCacheKey: RedisKey, unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int, callDropBlacklisted: Boolean, callOnlyWhitelisted: Boolean)) => {
+    case message:GenerateAndCacheTrendsFor => {
       val zender = sender
+
       //Get 2 sets of keys that point to the morphemes
-      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateMorphemesFor, (unixEndAtTime, spanInSeconds, callDropBlacklisted, callOnlyWhitelisted)))
+      val listOfRedisKeysFuture = ask(redisStringSetToMorphemesOrchestrator, List('generateMorphemesFor, (message.unixEndAtTime, message.spanInSeconds, message.dropBlacklisted, message.onlyWhitelisted)))
       listOfRedisKeysFuture map { listOfRedisKeys =>
         listOfRedisKeys match {
           case List(oldSet: RedisKeySet, newSet: RedisKeySet) => {
-            generateTrends(redisCacheKey, oldSet, newSet, callMinOccurrence)
+            generateTrends(message.redisCacheKey, oldSet, newSet, message.minOccurrence)
             // This .toList.flatten.filter works because the type returned by retrieveTrendsFromKey is Option[List[(String, Double)]]
             // So even if we were to filter on an empty list with None, it doesn't blow up doing ._2
-            zender ! retrieveTrendsFromKey(redisCacheKey).toList.flatten.filter(x => ((callMinLength to callMaxLength) contains x._1.length)).take(callTop)
+            zender ! retrieveTrendsFromKey(message.redisCacheKey).toList.flatten.filter(x => ((message.minLength to message.maxLength) contains x._1.length)).take(message.top)
           }
           case _ => throw new Exception("TrendGeneratorActor did not receive proper Redis keys pointing to morphemes")
         }

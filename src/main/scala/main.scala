@@ -1,5 +1,6 @@
 import scala.concurrent.duration.DurationInt
 
+import org.beachape.actors.GenerateDefaultTrends
 import org.beachape.actors.MainOrchestrator
 import org.beachape.server.TrendServerBuilder
 import org.beachape.support.SampleFileToRedisDumper
@@ -110,7 +111,7 @@ object TrendApp {
     val mainOrchestratorRoundRobin = system.actorOf(MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top).withRouter(SmallestMailboxRouter(3)), "mainOrchestrator")
 
     import system.dispatcher
-    val generateDefaultTrendsCancellableSchedule = system.scheduler.schedule(5 seconds, 1 minute, mainOrchestratorRoundRobin, List('generateDefaultTrends))
+    val generateDefaultTrendsCancellableSchedule = system.scheduler.schedule(5 seconds, 1 minute, mainOrchestratorRoundRobin, GenerateDefaultTrends)
 
     if (! sampleDataFilepath.isEmpty) {
       println(s"Dumping sample data from file")
