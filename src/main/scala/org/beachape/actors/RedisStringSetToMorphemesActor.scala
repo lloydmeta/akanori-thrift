@@ -67,8 +67,8 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   def dumpListOfStringsToMorphemes(listOfTerms: List[String], redisKey: RedisKey, dropBlacklisted: Boolean, onlyWhitelisted: Boolean): Boolean = {
     // Split into two
     val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
-    val futureStringOneDump = ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, listOfStringsOne.mkString(sys.props("line.separator")), dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
-    val futureStringTwoDump = ask(morphemeAnalyzerRoundRobin, List('dumpMorphemesToRedis, redisKey, listOfStringsTwo.mkString(sys.props("line.separator")), dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
+    val futureStringOneDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(listOfStringsOne.mkString(sys.props("line.separator")), redisKey, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
+    val futureStringTwoDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(listOfStringsTwo.mkString(sys.props("line.separator")), redisKey, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
 
     Await.result(futureStringOneDump, timeout.duration).asInstanceOf[Boolean] &&
       Await.result(futureStringTwoDump, timeout.duration).asInstanceOf[Boolean]

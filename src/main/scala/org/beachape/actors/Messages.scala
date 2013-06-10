@@ -60,3 +60,9 @@ sealed case class CalculateAndStoreTrendiness(
   newSetExpectedTotalScore: Double)
 
 sealed case class RedisSetPair(oldSet: RedisKeySet, newSet: RedisKeySet)
+
+sealed case class AnalyseAndStoreInRedisKey(
+  phrase: String,
+  redisKey: RedisKey,
+  dropBlacklisted: Boolean,
+  onlyWhitelisted: Boolean)
