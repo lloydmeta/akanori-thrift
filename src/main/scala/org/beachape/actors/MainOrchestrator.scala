@@ -1,6 +1,7 @@
 package org.beachape.actors
 
 import scala.concurrent.duration.DurationInt
+import org.beachape.analyze.MorphemeScoreRedisHelper
 
 import com.redis.RedisClient.DESC
 import com.redis.RedisClientPool
@@ -13,7 +14,23 @@ import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
 object MainOrchestrator {
-  def apply(redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int): Props = Props(new MainOrchestrator(redisPool, dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength, maxLength, top))
+  def apply(
+    redisPool: RedisClientPool,
+    dropBlacklisted: Boolean,
+    onlyWhitelisted: Boolean,
+    spanInSeconds: Int,
+    minOccurrence: Double,
+    minLength: Int,
+    maxLength: Int,
+    top: Int): Props =
+    Props(new MainOrchestrator(
+      redisPool,
+      dropBlacklisted,
+      onlyWhitelisted,
+      spanInSeconds,
+      minOccurrence,
+      minLength,
+      maxLength, top))
 }
 
 /*
@@ -23,7 +40,17 @@ object MainOrchestrator {
  * passed in from the command line
 */
 
-class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean, onlyWhitelisted: Boolean, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int) extends Actor with RedisStorageHelper {
+class MainOrchestrator(
+  val redisPool: RedisClientPool,
+  dropBlacklisted: Boolean,
+  onlyWhitelisted: Boolean,
+  spanInSeconds: Int,
+  minOccurrence: Double,
+  minLength: Int,
+  maxLength: Int,
+  top: Int) extends Actor
+  with RedisStorageHelper
+  with MorphemeScoreRedisHelper {
 
   import context.dispatcher
 
@@ -49,8 +76,8 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
       val cacheKey = RedisKey(defaultTrendCacheKey)
       val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
         redis.zrangebyscoreWithScore(cacheKey.redisKey, Double.NegativeInfinity, limit = None, sortAs = DESC)
-      }
-      sender ! listOfReverseSortedTermsAndScores
+      }.toList.flatten.filter(x => x._1 != zSetTotalScoreKey)
+      sender ! Some(listOfReverseSortedTermsAndScores)
     }
 
     // Replies with Some(List[(String, Double)]
