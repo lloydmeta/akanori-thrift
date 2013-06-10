@@ -45,7 +45,7 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
     }
 
     // Replies with Some(List[(String, Double)]
-    case 'getTrendsDefault => {
+    case GetDefaultTrends => {
       val cacheKey = RedisKey(defaultTrendCacheKey)
       val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
         redis.zrangebyscoreWithScore(cacheKey.redisKey, Double.NegativeInfinity, limit = None, sortAs = DESC)
@@ -54,9 +54,20 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
     }
 
     // Replies with Some(List[(String, Double)]
-    case message @ List('getTrendsEndingAt, (unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int, callDropBlacklisted: Boolean, callOnlyWhitelisted: Boolean)) => {
+    // Takes care of retrieving a cached set if it exists
+    // If not, generates and caches
+    case message: FetchTrendsEndingAt => {
       val zender = sender
-      val cachedKey = RedisKey(customTrendCacheKey(unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop, callDropBlacklisted, callOnlyWhitelisted))
+      val cachedKey = RedisKey(
+        customTrendCacheKey(
+          message.unixEndAtTime,
+          message.spanInSeconds,
+          message.minOccurrence,
+          message.minLength,
+          message.maxLength,
+          message.top,
+          message.dropBlacklisted,
+          message.onlyWhitelisted))
 
       if (cachedKeyExists(cachedKey)) {
         val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
@@ -64,7 +75,16 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
         }
         sender ! listOfReverseSortedTermsAndScores
       } else {
-        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? GenerateAndCacheTrendsFor(cachedKey, unixEndAtTime, spanInSeconds, callMinOccurrence, callMinLength, callMaxLength, callTop, callDropBlacklisted, callOnlyWhitelisted)
+        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? GenerateAndCacheTrendsFor(
+          cachedKey,
+          message.unixEndAtTime,
+          message.spanInSeconds,
+          message.minOccurrence,
+          message.minLength,
+          message.maxLength,
+          message.top,
+          message.dropBlacklisted,
+          message.onlyWhitelisted)
         listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
           zender ! Some(listOfReverseSortedTermsAndScores)
         }

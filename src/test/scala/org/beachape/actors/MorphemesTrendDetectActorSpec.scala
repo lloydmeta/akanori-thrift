@@ -49,9 +49,9 @@ class MorphemesTrendDetectActorSpec extends TestKit(ActorSystem("akkaTest"))
 
   describe("sending messages") {
 
-    describe("sending 'calculateAndStoreTrendiness ") {
+    describe("sending CalculateAndStoreTrendiness ") {
 
-      val message = List('calculateAndStoreTrendiness, (
+      val message = CalculateAndStoreTrendiness(
         "lol",
         3.0,
         RedisKey("a key"),
@@ -60,7 +60,7 @@ class MorphemesTrendDetectActorSpec extends TestKit(ActorSystem("akkaTest"))
         oldSetObservedTotalScore,
         oldSetExpectedTotalScore,
         newSetObservedTotalScore,
-        newSetExpectedTotalScore))
+        newSetExpectedTotalScore)
 
       it("should return a RedisKeySet") {
         morphemesTrendDetectActorRef ! message

@@ -23,23 +23,20 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
   def receive = {
 
-    case List('calculateAndStoreTrendiness, (
-      term: String,
-      newObservedScore: Double,
-      trendsCacheKey: RedisKey,
-      oldSetMorphemesRetriever: MorphemesRedisRetriever,
-      newSetMorphemesRetriever: MorphemesRedisRetriever,
-      oldSetObservedTotalScore: Double,
-      oldSetExpectedTotalScore: Double,
-      newSetObservedTotalScore: Double,
-      newSetExpectedTotalScore: Double
-      )) => {
+    case message: CalculateAndStoreTrendiness => {
 
-      val newSetChiSquaredForTerm = newSetMorphemesRetriever.chiSquaredForTerm(term, newObservedScore, newSetExpectedTotalScore, newSetObservedTotalScore)
-      val oldSetChiSquaredForTerm = oldSetMorphemesRetriever.chiSquaredForTerm(term, oldSetExpectedTotalScore, oldSetObservedTotalScore)
+      val newSetChiSquaredForTerm = message.newSetMorphemesRetriever.chiSquaredForTerm(
+          message.term,
+          message.newObservedScore,
+          message.newSetExpectedTotalScore,
+          message.newSetObservedTotalScore)
+      val oldSetChiSquaredForTerm = message.oldSetMorphemesRetriever.chiSquaredForTerm(
+          message.term,
+          message.oldSetExpectedTotalScore,
+          message.oldSetObservedTotalScore)
 
       if (newSetChiSquaredForTerm > oldSetChiSquaredForTerm) {
-        cacheChiSquaredDiff(trendsCacheKey, term, (newSetChiSquaredForTerm - oldSetChiSquaredForTerm))
+        cacheChiSquaredDiff(message.trendsCacheKey, message.term, (newSetChiSquaredForTerm - oldSetChiSquaredForTerm))
       }
       sender ! true
     }
