@@ -34,7 +34,7 @@ class MainOrchestrator(val redisPool: RedisClientPool, dropBlacklisted: Boolean,
 
   def receive = {
 
-    case message @ List('storeString, (stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)) => {
+    case message: StoreString => {
       stringToRedisRoundRobin ! message
     }
 

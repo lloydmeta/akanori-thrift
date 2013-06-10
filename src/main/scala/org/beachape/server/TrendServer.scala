@@ -1,5 +1,6 @@
 package org.beachape.server
 
+import org.beachape.actors._
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -47,7 +48,7 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
   }
 
   override def storeString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int): Unit = {
-    mainOrchestrator ! List('storeString, (stringToStore, unixCreatedAtTime, weeksAgoDataToExpire))
+    mainOrchestrator ! StoreString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
   }
 
 }
