@@ -14,7 +14,26 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
+/** Factory for Props used to instantiate [[org.beachape.actors.MainOrchestrator]] */
 object MainOrchestrator {
+
+  /**
+   * @constructor create the props necessary to spawn a
+   * new orchestrator  with a given RedisClientPool,
+   * dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength
+   * maxLength and top as default trend creation options
+   *
+   * @param redisPool the RedisClientPool to use
+   * @param dropBlacklisted whether to drop blacklisted morphemes by default
+   * @param onlyWhitelisted whether to only use whitelisted morphemes by default
+   * @param spanInSeconds default span in seconds to the past from current time
+   * @param minOccurrence default minimum times that a morpheme has to have
+   * occurred in a timespan before it gets counted
+   * @param minLength default minimum length of morphemes to retrieve
+   * @param maxLength default maximum length of morphemes to retrieve
+   * @param top default top most trendy morphemes to retrieve
+   *
+   */
   def apply(
     redisPool: RedisClientPool,
     dropBlacklisted: Boolean,
@@ -34,13 +53,14 @@ object MainOrchestrator {
       maxLength, top))
 }
 
-/*
- * As the name suggests, the main actor that takes care of sending and receiving
- * messages from other actors.
- * Also acts as a container for the arguments for certain default options
- * passed in from the command line
-*/
-
+/**
+ * Actor that acts as the main interface for the Actor
+ * system that takes care of storing strings and extracting
+ * and calculating trends
+ *
+ * Should be instantiated via the factory method in
+ * the companion object above
+ */
 class MainOrchestrator(
   val redisPool: RedisClientPool,
   dropBlacklisted: Boolean,
@@ -136,16 +156,28 @@ class MainOrchestrator(
     case unneededMessage @ _ => println(unneededMessage)
   }
 
+  /**
+   * Returns a string that can be used as a cacheKey for calculated
+   * trendiness of morphemes
+   *
+   * @param spanInSeconds default span in seconds to the past from current time
+   * @param minOccurrence default minimum times that a morpheme has to have
+   * occurred in a timespan before it gets counted
+   * @param minLength default minimum length of morphemes to retrieve
+   * @param maxLength default maximum length of morphemes to retrieve
+   * @param dropBlacklisted whether to drop blacklisted morphemes by default
+   * @param onlyWhitelisted whether to only use whitelisted morphemes by default
+   */
   def customTrendCacheKey(
     unixEndAtTime: Int,
     spanInSeconds: Int,
-    callMinOccurrence: Double,
-    callMinLength: Int,
-    callMaxLength: Int,
-    callTop: Int,
-    callDropBlacklisted: Boolean,
-    callOnlyWhitelisted: Boolean): String = {
-    f"$customTrendCacheKeyEndingNow%s-unixEndAtTime$unixEndAtTime%d-span$spanInSeconds%s-minOccurence$callMinOccurrence%f-minLength-$callMinLength%d-maxLength$callMaxLength%d-callTop$callTop%d-callDropBlacklisted$callDropBlacklisted%b-callOnlyWhitelisted$callOnlyWhitelisted%b"
+    minOccurrence: Double,
+    minLength: Int,
+    maxLength: Int,
+    top: Int,
+    dropBlacklisted: Boolean,
+    onlyWhitelisted: Boolean): String = {
+    f"$customTrendCacheKeyEndingNow%s-unixEndAtTime$unixEndAtTime%d-span$spanInSeconds%s-minOccurence$minOccurrence%f-minLength-$minLength%d-maxLength$maxLength%d-callTop$top%d-callDropBlacklisted$dropBlacklisted%b-callOnlyWhitelisted$onlyWhitelisted%b"
   }
 
 }

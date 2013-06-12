@@ -10,10 +10,30 @@ import akka.actor.Props
 import akka.actor.actorRef2Scala
 import akka.util.Timeout
 
+/** Factory for Props used to instantiate [[org.beachape.actors.MorphemesTrendDetectActor]] */
 object MorphemesTrendDetectActor {
+
+  /**
+   * Returns the Props required to spawn an instance of MorphemesTrendDetectActor
+   *
+   * @params redisPool a RedisClientPool that will be used by the actor
+   */
   def apply(redisPool: RedisClientPool) = Props(new MorphemesTrendDetectActor(redisPool))
 }
 
+/**
+ * Actor that calculates the trendiness of a given term
+ * and caches it.
+ *
+ * Message sent should contain the term, the term's new
+ * observed occurrence, the total number of occurrences across
+ * all terms in the new expected and observed sets as well
+ * as the total number of occurrences in the old expected
+ * and observed sets (see org.beachape.actors.Messages.CalculateAndStoreTrendiness)
+ *
+ * Should be instantiated via the factory method in
+ * the companion object above
+ */
 class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
   import context.dispatcher
