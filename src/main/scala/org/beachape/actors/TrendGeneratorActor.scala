@@ -15,6 +15,10 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
+object TrendGeneratorActor{
+  def apply(redisPool: RedisClientPool) = Props(new TrendGeneratorActor(redisPool))
+}
+
 class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
   import context.dispatcher

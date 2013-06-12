@@ -56,8 +56,12 @@ class MainOrchestrator(
 
   implicit val timeout = Timeout(600 seconds)
 
-  val stringToRedisRoundRobin = context.actorOf(Props(new StringToRedisActor(redisPool)).withRouter(SmallestMailboxRouter(5)), "mainOrchestratorStringToRedisRoundRobin")
-  val trendGeneratorRoundRobin = context.actorOf(Props(new TrendGeneratorActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "trendGeneratorRoundRobin")
+  val stringToRedisRoundRobin = context.actorOf(
+    StringToRedisActor(redisPool).withRouter(SmallestMailboxRouter(5)),
+    "mainOrchestratorStringToRedisRoundRobin")
+  val trendGeneratorRoundRobin = context.actorOf(
+    TrendGeneratorActor(redisPool).withRouter(SmallestMailboxRouter(3)),
+    "mainOrchestratorTrendGeneratorRoundRobin")
 
   def receive = {
 

@@ -7,6 +7,11 @@ import com.github.nscala_time.time.Imports.RichReadableInstant
 import com.redis.RedisClientPool
 
 import akka.actor.Actor
+import akka.actor.Props
+
+object StringToRedisActor {
+  def apply(redisPool: RedisClientPool) = Props(new StringToRedisActor(redisPool))
+}
 
 class StringToRedisActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
