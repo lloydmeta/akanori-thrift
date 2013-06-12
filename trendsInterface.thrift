@@ -5,7 +5,7 @@ typedef i64 Timestamp
 
 struct TrendResult {
 	1: required string term;
-	2: required double termScore;
+	2: required double trendiness;
 }
 
 service TrendThriftServer {

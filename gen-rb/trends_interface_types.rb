@@ -11,18 +11,18 @@ module TrendServer
     class TrendResult
       include ::Thrift::Struct, ::Thrift::Struct_Union
       TERM = 1
-      TERMSCORE = 2
+      TRENDINESS = 2
 
       FIELDS = {
         TERM => {:type => ::Thrift::Types::STRING, :name => 'term'},
-        TERMSCORE => {:type => ::Thrift::Types::DOUBLE, :name => 'termScore'}
+        TRENDINESS => {:type => ::Thrift::Types::DOUBLE, :name => 'trendiness'}
       }
 
       def struct_fields; FIELDS; end
 
       def validate
         raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field term is unset!') unless @term
-        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field termScore is unset!') unless @termScore
+        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field trendiness is unset!') unless @trendiness
       end
 
       ::Thrift::Struct.generate_accessors self

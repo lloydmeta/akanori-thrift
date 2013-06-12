@@ -34,7 +34,7 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("TrendResult");
 
   private static final org.apache.thrift.protocol.TField TERM_FIELD_DESC = new org.apache.thrift.protocol.TField("term", org.apache.thrift.protocol.TType.STRING, (short)1);
-  private static final org.apache.thrift.protocol.TField TERM_SCORE_FIELD_DESC = new org.apache.thrift.protocol.TField("termScore", org.apache.thrift.protocol.TType.DOUBLE, (short)2);
+  private static final org.apache.thrift.protocol.TField TRENDINESS_FIELD_DESC = new org.apache.thrift.protocol.TField("trendiness", org.apache.thrift.protocol.TType.DOUBLE, (short)2);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -43,12 +43,12 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
   }
 
   public String term; // required
-  public double termScore; // required
+  public double trendiness; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     TERM((short)1, "term"),
-    TERM_SCORE((short)2, "termScore");
+    TRENDINESS((short)2, "trendiness");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -65,8 +65,8 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
       switch(fieldId) {
         case 1: // TERM
           return TERM;
-        case 2: // TERM_SCORE
-          return TERM_SCORE;
+        case 2: // TRENDINESS
+          return TRENDINESS;
         default:
           return null;
       }
@@ -107,14 +107,14 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
   }
 
   // isset id assignments
-  private static final int __TERMSCORE_ISSET_ID = 0;
+  private static final int __TRENDINESS_ISSET_ID = 0;
   private byte __isset_bitfield = 0;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.TERM, new org.apache.thrift.meta_data.FieldMetaData("term", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-    tmpMap.put(_Fields.TERM_SCORE, new org.apache.thrift.meta_data.FieldMetaData("termScore", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+    tmpMap.put(_Fields.TRENDINESS, new org.apache.thrift.meta_data.FieldMetaData("trendiness", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TrendResult.class, metaDataMap);
@@ -125,12 +125,12 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
 
   public TrendResult(
     String term,
-    double termScore)
+    double trendiness)
   {
     this();
     this.term = term;
-    this.termScore = termScore;
-    setTermScoreIsSet(true);
+    this.trendiness = trendiness;
+    setTrendinessIsSet(true);
   }
 
   /**
@@ -141,7 +141,7 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
     if (other.isSetTerm()) {
       this.term = other.term;
     }
-    this.termScore = other.termScore;
+    this.trendiness = other.trendiness;
   }
 
   public TrendResult deepCopy() {
@@ -151,8 +151,8 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
   @Override
   public void clear() {
     this.term = null;
-    setTermScoreIsSet(false);
-    this.termScore = 0.0;
+    setTrendinessIsSet(false);
+    this.trendiness = 0.0;
   }
 
   public String getTerm() {
@@ -179,27 +179,27 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
     }
   }
 
-  public double getTermScore() {
-    return this.termScore;
+  public double getTrendiness() {
+    return this.trendiness;
   }
 
-  public TrendResult setTermScore(double termScore) {
-    this.termScore = termScore;
-    setTermScoreIsSet(true);
+  public TrendResult setTrendiness(double trendiness) {
+    this.trendiness = trendiness;
+    setTrendinessIsSet(true);
     return this;
   }
 
-  public void unsetTermScore() {
-    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __TERMSCORE_ISSET_ID);
+  public void unsetTrendiness() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __TRENDINESS_ISSET_ID);
   }
 
-  /** Returns true if field termScore is set (has been assigned a value) and false otherwise */
-  public boolean isSetTermScore() {
-    return EncodingUtils.testBit(__isset_bitfield, __TERMSCORE_ISSET_ID);
+  /** Returns true if field trendiness is set (has been assigned a value) and false otherwise */
+  public boolean isSetTrendiness() {
+    return EncodingUtils.testBit(__isset_bitfield, __TRENDINESS_ISSET_ID);
   }
 
-  public void setTermScoreIsSet(boolean value) {
-    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __TERMSCORE_ISSET_ID, value);
+  public void setTrendinessIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __TRENDINESS_ISSET_ID, value);
   }
 
   public void setFieldValue(_Fields field, Object value) {
@@ -212,11 +212,11 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
       }
       break;
 
-    case TERM_SCORE:
+    case TRENDINESS:
       if (value == null) {
-        unsetTermScore();
+        unsetTrendiness();
       } else {
-        setTermScore((Double)value);
+        setTrendiness((Double)value);
       }
       break;
 
@@ -228,8 +228,8 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
     case TERM:
       return getTerm();
 
-    case TERM_SCORE:
-      return Double.valueOf(getTermScore());
+    case TRENDINESS:
+      return Double.valueOf(getTrendiness());
 
     }
     throw new IllegalStateException();
@@ -244,8 +244,8 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
     switch (field) {
     case TERM:
       return isSetTerm();
-    case TERM_SCORE:
-      return isSetTermScore();
+    case TRENDINESS:
+      return isSetTrendiness();
     }
     throw new IllegalStateException();
   }
@@ -272,12 +272,12 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
         return false;
     }
 
-    boolean this_present_termScore = true;
-    boolean that_present_termScore = true;
-    if (this_present_termScore || that_present_termScore) {
-      if (!(this_present_termScore && that_present_termScore))
+    boolean this_present_trendiness = true;
+    boolean that_present_trendiness = true;
+    if (this_present_trendiness || that_present_trendiness) {
+      if (!(this_present_trendiness && that_present_trendiness))
         return false;
-      if (this.termScore != that.termScore)
+      if (this.trendiness != that.trendiness)
         return false;
     }
 
@@ -307,12 +307,12 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
         return lastComparison;
       }
     }
-    lastComparison = Boolean.valueOf(isSetTermScore()).compareTo(typedOther.isSetTermScore());
+    lastComparison = Boolean.valueOf(isSetTrendiness()).compareTo(typedOther.isSetTrendiness());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetTermScore()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.termScore, typedOther.termScore);
+    if (isSetTrendiness()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.trendiness, typedOther.trendiness);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -345,8 +345,8 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
     }
     first = false;
     if (!first) sb.append(", ");
-    sb.append("termScore:");
-    sb.append(this.termScore);
+    sb.append("trendiness:");
+    sb.append(this.trendiness);
     first = false;
     sb.append(")");
     return sb.toString();
@@ -357,7 +357,7 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
     if (term == null) {
       throw new org.apache.thrift.protocol.TProtocolException("Required field 'term' was not present! Struct: " + toString());
     }
-    // alas, we cannot check 'termScore' because it's a primitive and you chose the non-beans generator.
+    // alas, we cannot check 'trendiness' because it's a primitive and you chose the non-beans generator.
     // check for sub-struct validity
   }
 
@@ -405,10 +405,10 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 2: // TERM_SCORE
+          case 2: // TRENDINESS
             if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
-              struct.termScore = iprot.readDouble();
-              struct.setTermScoreIsSet(true);
+              struct.trendiness = iprot.readDouble();
+              struct.setTrendinessIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -421,8 +421,8 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
       iprot.readStructEnd();
 
       // check for required fields of primitive type, which can't be checked in the validate method
-      if (!struct.isSetTermScore()) {
-        throw new org.apache.thrift.protocol.TProtocolException("Required field 'termScore' was not found in serialized data! Struct: " + toString());
+      if (!struct.isSetTrendiness()) {
+        throw new org.apache.thrift.protocol.TProtocolException("Required field 'trendiness' was not found in serialized data! Struct: " + toString());
       }
       struct.validate();
     }
@@ -436,8 +436,8 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
         oprot.writeString(struct.term);
         oprot.writeFieldEnd();
       }
-      oprot.writeFieldBegin(TERM_SCORE_FIELD_DESC);
-      oprot.writeDouble(struct.termScore);
+      oprot.writeFieldBegin(TRENDINESS_FIELD_DESC);
+      oprot.writeDouble(struct.trendiness);
       oprot.writeFieldEnd();
       oprot.writeFieldStop();
       oprot.writeStructEnd();
@@ -457,7 +457,7 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
     public void write(org.apache.thrift.protocol.TProtocol prot, TrendResult struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       oprot.writeString(struct.term);
-      oprot.writeDouble(struct.termScore);
+      oprot.writeDouble(struct.trendiness);
     }
 
     @Override
@@ -465,8 +465,8 @@ public class TrendResult implements org.apache.thrift.TBase<TrendResult, TrendRe
       TTupleProtocol iprot = (TTupleProtocol) prot;
       struct.term = iprot.readString();
       struct.setTermIsSet(true);
-      struct.termScore = iprot.readDouble();
-      struct.setTermScoreIsSet(true);
+      struct.trendiness = iprot.readDouble();
+      struct.setTrendinessIsSet(true);
     }
   }
 
