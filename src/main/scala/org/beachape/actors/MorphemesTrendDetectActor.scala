@@ -1,9 +1,6 @@
 package org.beachape.actors
 
-import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-
-import org.beachape.analyze.MorphemesRedisRetriever
 
 import com.github.nscala_time.time.Imports.RichInt
 import com.redis.RedisClientPool
@@ -11,9 +8,11 @@ import com.redis.RedisClientPool
 import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.actorRef2Scala
-import akka.pattern.ask
-import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
+
+object MorphemesTrendDetectActor {
+  def apply(redisPool: RedisClientPool) = Props(new MorphemesTrendDetectActor(redisPool))
+}
 
 class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
 
@@ -26,14 +25,14 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
     case message: CalculateAndStoreTrendiness => {
 
       val newSetChiSquaredForTerm = message.newSetMorphemesRetriever.chiSquaredForTerm(
-          message.term,
-          message.newObservedScore,
-          message.newSetExpectedTotalScore,
-          message.newSetObservedTotalScore)
+        message.term,
+        message.newObservedScore,
+        message.newSetExpectedTotalScore,
+        message.newSetObservedTotalScore)
       val oldSetChiSquaredForTerm = message.oldSetMorphemesRetriever.chiSquaredForTerm(
-          message.term,
-          message.oldSetExpectedTotalScore,
-          message.oldSetObservedTotalScore)
+        message.term,
+        message.oldSetExpectedTotalScore,
+        message.oldSetObservedTotalScore)
 
       if (newSetChiSquaredForTerm > oldSetChiSquaredForTerm) {
         cacheChiSquaredDiff(message.trendsCacheKey, message.term, (newSetChiSquaredForTerm - oldSetChiSquaredForTerm))

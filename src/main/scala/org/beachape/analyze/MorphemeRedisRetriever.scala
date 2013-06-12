@@ -1,11 +1,14 @@
 package org.beachape.analyze
 
-import com.github.nscala_time.time.Imports.RichInt
 import com.redis.RedisClient.DESC
 import com.redis.RedisClient.SortOrder
 import com.redis.RedisClientPool
 
-case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected: String, redisKeyObserved: String, minScore: Double = 10) extends ChiSquare with MorphemeScoreRedisHelper {
+case class MorphemesRedisRetriever(
+  redisPool: RedisClientPool,
+  redisKeyExpected: String,
+  redisKeyObserved: String,
+  minScore: Double = 10) extends ChiSquare with MorphemeScoreRedisHelper {
 
   def forEachPageOfObservedTermsWithScores[A](pageCount: Int = 300)(callBack: Option[List[(String, Double)]] => A): Option[List[A]] = {
     val newObservedSetCard = observedZCard
@@ -37,10 +40,18 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected:
     zCard(redisKeyObserved)
   }
 
-  def chiSquaredForTerm(term: String, observedScoreForTerm: Double, expectedSetTotalScore: Double, observedSetTotalScore: Double) = {
+  def chiSquaredForTerm(
+    term: String,
+    observedScoreForTerm: Double,
+    expectedSetTotalScore: Double,
+    observedSetTotalScore: Double) = {
     val expectedScoreForTerm = getExpectedScoreForTerm(term)
     if (observedScoreForTerm > expectedScoreForTerm)
-      calculateChiSquaredForTerm(expectedScoreForTerm, observedScoreForTerm, expectedSetTotalScore, observedSetTotalScore)
+      calculateChiSquaredForTerm(
+        expectedScoreForTerm,
+        observedScoreForTerm,
+        expectedSetTotalScore,
+        observedSetTotalScore)
     else
       0
   }
@@ -50,7 +61,11 @@ case class MorphemesRedisRetriever(redisPool: RedisClientPool, redisKeyExpected:
     chiSquaredForTerm(term, observedScoreForTerm, expectedSetTotalScore, observedSetTotalScore)
   }
 
-  private def termsWithScoresList(redisKey: String, min: Double = Double.NegativeInfinity, limit: Option[(Int, Int)] = None, sort: SortOrder = DESC) = {
+  private def termsWithScoresList(
+    redisKey: String,
+    min: Double = Double.NegativeInfinity,
+    limit: Option[(Int, Int)] = None,
+    sort: SortOrder = DESC) = {
     redisPool.withClient { redis =>
       redis.zrangebyscoreWithScore(redisKey, min, limit = limit, sortAs = sort)
     }

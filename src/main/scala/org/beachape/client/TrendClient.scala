@@ -1,9 +1,10 @@
 package org.beachape.client
 
-import trendServer.gen.TrendThriftServer
+import org.apache.thrift.protocol.TBinaryProtocol
 import org.apache.thrift.transport.TFramedTransport
 import org.apache.thrift.transport.TSocket
-import org.apache.thrift.protocol.TBinaryProtocol
+
+import trendServer.gen.TrendThriftServer
 
 object TrendClient {
 

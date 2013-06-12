@@ -1,7 +1,5 @@
 package org.beachape.analyze
 
-import scala.runtime.ZippedTraversable2.zippedTraversable2ToTraversable
-
 import org.beachape.actors.RedisKey
 import org.beachape.actors.RedisKeySet
 import org.beachape.testing.Support

@@ -6,7 +6,12 @@ import org.beachape.analyze.MorphemeScoreRedisHelper
 import com.redis.RedisClientPool
 
 import akka.actor.Actor
+import akka.actor.Props
 import akka.actor.actorRef2Scala
+
+object MorphemesAnalyzerActor {
+  def apply(redisPool: RedisClientPool) = Props(new MorphemesAnalyzerActor(redisPool))
+}
 
 class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor
   with MorphemeScoreRedisHelper
@@ -16,7 +21,8 @@ class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor
 
     case message: AnalyseAndStoreInRedisKey => {
       val morphemes = Morpheme.stringToMorphemesReverse(
-        message.phrase, message.dropBlacklisted,
+        message.phrase,
+        message.dropBlacklisted,
         message.onlyWhitelisted)
       storeAllInRedis(morphemes, message.redisKey)
       sender ! true

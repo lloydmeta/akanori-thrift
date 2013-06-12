@@ -1,7 +1,8 @@
 import scala.util.Success
 
+import org.beachape.actors.AnalyseAndStoreInRedisKey
 import org.beachape.actors.MorphemesAnalyzerActor
-import org.beachape.actors.{RedisKey, AnalyseAndStoreInRedisKey}
+import org.beachape.actors.RedisKey
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
@@ -54,7 +55,7 @@ class MorphemesAnalyzerActorSpec extends TestKit(ActorSystem("akkaTest"))
     describe("checking on the redis key") {
 
       it("should create a key so that it exists") {
-        val verifyKeyExists = {() =>
+        val verifyKeyExists = { () =>
           val keyExists = redisPool.withClient { redis => redis.exists(redisKey) }
           keyExists should be(true)
         }
@@ -62,7 +63,7 @@ class MorphemesAnalyzerActorSpec extends TestKit(ActorSystem("akkaTest"))
       }
 
       it("should have a zCard above zero") {
-        val verifyzCardMoreThanZero = {() =>
+        val verifyzCardMoreThanZero = { () =>
           redisPool.withClient { redis =>
             redis.zcard(redisKey) match {
               case Some(card: Long) => card.toInt should be > (0)

@@ -13,12 +13,18 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
+object RedisStringSetToMorphemesOrchestrator {
+  def apply(redisPool: RedisClientPool) = Props(new RedisStringSetToMorphemesOrchestrator(redisPool))
+}
+
 class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val redisStringSetToMorphemesActorsRoundRobin = context.actorOf(Props(new RedisStringSetToMorphemesActor(redisPool)).withRouter(SmallestMailboxRouter(4)), "redisStringSetToMorphemesActorsRoundRobin")
+  val redisStringSetToMorphemesActorsRoundRobin = context.actorOf(
+    RedisStringSetToMorphemesActor(redisPool).withRouter(SmallestMailboxRouter(4)),
+    "redisStringSetToMorphemesActorsRoundRobin")
 
   def receive = {
 
@@ -42,10 +48,22 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
       val oldExpectedSetUnixTimeSpan = UnixTimeSpan(UnixTime(oldExpectedSetStartScore.toInt), UnixTime(oldExpectedSetEndScore.toInt))
 
       val listOfRedisKeyFutures = List(
-        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(oldExpectedSetUnixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted)).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(oldObservedSetUnixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted)).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(newExpectedSetUnixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted)).mapTo[RedisKey],
-        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(newObservedSetUnixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted)).mapTo[RedisKey])
+        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(
+            oldExpectedSetUnixTimeSpan,
+            message.dropBlacklisted,
+            message.onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(
+            oldObservedSetUnixTimeSpan,
+            message.dropBlacklisted,
+            message.onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(
+            newExpectedSetUnixTimeSpan,
+            message.dropBlacklisted,
+            message.onlyWhitelisted)).mapTo[RedisKey],
+        ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(
+            newObservedSetUnixTimeSpan,
+            message.dropBlacklisted,
+            message.onlyWhitelisted)).mapTo[RedisKey])
 
       val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
       futureListOfRedisKeys map { redisKeysList =>

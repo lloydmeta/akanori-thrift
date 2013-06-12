@@ -1,4 +1,5 @@
 package org.beachape.actors
+
 import org.beachape.analyze.MorphemesRedisRetriever
 
 // Message definitions

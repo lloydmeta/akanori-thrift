@@ -1,16 +1,20 @@
 package org.beachape.server
 
+import org.apache.thrift.protocol.TBinaryProtocol
 import org.apache.thrift.server.TThreadedSelectorServer
+import org.apache.thrift.transport.TFramedTransport
 import org.apache.thrift.transport.TNonblockingServerSocket
-import org.apache.thrift.transport._
-import org.apache.thrift.protocol._
 
 import akka.actor.ActorRef
 import trendServer.gen.TrendThriftServer
 
 object TrendServerBuilder {
 
-  def buildServer(socket: Int = 9090, mainOrchestratorRoundRobin: ActorRef, selectorThreads: Int = 16, workerThreads: Int = 32): TThreadedSelectorServer = {
+  def buildServer(
+    socket: Int = 9090,
+    mainOrchestratorRoundRobin: ActorRef,
+    selectorThreads: Int = 16,
+    workerThreads: Int = 32): TThreadedSelectorServer = {
     val transport = new TNonblockingServerSocket(socket)
     val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestratorRoundRobin))
     val transportFactory = new TFramedTransport.Factory()

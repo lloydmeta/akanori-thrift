@@ -1,6 +1,5 @@
 package org.beachape.actors
 
-import com.redis._
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.FunSpec

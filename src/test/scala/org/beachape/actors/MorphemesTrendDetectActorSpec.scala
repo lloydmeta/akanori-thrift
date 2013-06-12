@@ -1,7 +1,7 @@
 package org.beachape.actors
 
-import org.beachape.testing.Support
 import org.beachape.analyze.MorphemesRedisRetriever
+import org.beachape.testing.Support
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers

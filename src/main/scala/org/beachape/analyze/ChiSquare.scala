@@ -4,7 +4,11 @@ import scala.math.pow
 
 trait ChiSquare {
 
-  def calculateChiSquaredForTerm(oldTermScore: Double, termScore: Double, oldSetTotalScore: Double, newSetTotalScore: Double): Double = {
+  def calculateChiSquaredForTerm(
+    oldTermScore: Double,
+    termScore: Double,
+    oldSetTotalScore: Double,
+    newSetTotalScore: Double): Double = {
 
     // Calculate frequencies with add 1 smoothing
     val observedTermFrequency = termScore / (if (newSetTotalScore > 0) newSetTotalScore else 1)

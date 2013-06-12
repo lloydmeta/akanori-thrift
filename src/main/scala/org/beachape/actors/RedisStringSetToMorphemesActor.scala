@@ -3,8 +3,6 @@ package org.beachape.actors
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-import org.beachape.support.RichRange.range2RichRange
-
 import com.github.nscala_time.time.Imports.RichInt
 import com.redis.RedisClientPool
 
@@ -15,12 +13,18 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
+object RedisStringSetToMorphemesActor {
+  def apply(redisPool: RedisClientPool) = Props(new RedisStringSetToMorphemesActor(redisPool))
+}
+
 class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
-  val morphemeAnalyzerRoundRobin = context.actorOf(Props(new MorphemesAnalyzerActor(redisPool)).withRouter(SmallestMailboxRouter(3)), "redisStringSetToMorphemesMorphemesAnalyzerRoundRobin")
+  val morphemeAnalyzerRoundRobin = context.actorOf(
+    MorphemesAnalyzerActor(redisPool).withRouter(SmallestMailboxRouter(3)),
+    "redisStringSetToMorphemesActorMorphemesAnalyzerRoundRobin")
 
   def receive = {
 
@@ -28,11 +32,20 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
     // the morphemes
     case message: GenerateMorphemesForSpan => {
       val zender = sender
-      val redisKey = RedisKey(redisKeyForUnixTimeSpanWithOptions(message.unixTimeSpan, message.dropBlacklisted, message.onlyWhitelisted))
+      val redisKey = RedisKey(redisKeyForUnixTimeSpanWithOptions(
+        message.unixTimeSpan,
+        message.dropBlacklisted,
+        message.onlyWhitelisted))
       if (cachedKeyExists(redisKey)) {
         zender ! redisKey
       } else {
-        val analyzeAndDumpResultsList: List[Boolean] = forEachPagedListOfTermsInUnixTimeSpan(message.unixTimeSpan)(dumpListOfStringsToMorphemes(_: List[String], redisKey, message.dropBlacklisted, message.onlyWhitelisted))
+        val analyzeAndDumpResultsList = forEachPagedListOfTermsInUnixTimeSpan(
+          message.unixTimeSpan)(dumpListOfStringsToMorphemes(
+            _: List[String],
+            redisKey,
+            message.dropBlacklisted,
+            message.onlyWhitelisted))
+
         analyzeAndDumpResultsList match {
           case x: List[Boolean] if x.forall(_ == true) => {
             setExpiryOnRedisKey(redisKey, (RichInt(15).minutes.millis / 1000).toInt)
@@ -64,11 +77,23 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
     })(collection.breakOut)
   }
 
-  def dumpListOfStringsToMorphemes(listOfTerms: List[String], redisKey: RedisKey, dropBlacklisted: Boolean, onlyWhitelisted: Boolean): Boolean = {
+  def dumpListOfStringsToMorphemes(
+    listOfTerms: List[String],
+    redisKey: RedisKey,
+    dropBlacklisted: Boolean,
+    onlyWhitelisted: Boolean): Boolean = {
     // Split into two
     val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
-    val futureStringOneDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(listOfStringsOne.mkString(sys.props("line.separator")), redisKey, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
-    val futureStringTwoDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(listOfStringsTwo.mkString(sys.props("line.separator")), redisKey, dropBlacklisted, onlyWhitelisted)).mapTo[Boolean]
+    val futureStringOneDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
+        listOfStringsOne.mkString(sys.props("line.separator")),
+        redisKey,
+        dropBlacklisted,
+        onlyWhitelisted)).mapTo[Boolean]
+    val futureStringTwoDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
+        listOfStringsTwo.mkString(sys.props("line.separator")),
+        redisKey,
+        dropBlacklisted,
+        onlyWhitelisted)).mapTo[Boolean]
 
     Await.result(futureStringOneDump, timeout.duration).asInstanceOf[Boolean] &&
       Await.result(futureStringTwoDump, timeout.duration).asInstanceOf[Boolean]

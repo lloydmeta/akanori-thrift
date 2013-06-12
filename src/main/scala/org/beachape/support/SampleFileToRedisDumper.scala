@@ -64,7 +64,7 @@ case class SampleFileToRedisDumper(redisPool: RedisClientPool)
           val dateTime = (dateUnix * 1000L).toDateTime
           println(s"$string inserted at $dateTime")
         } catch {
-          case _:Throwable =>
+          case _: Throwable =>
         }
     }
     reader.close

@@ -1,5 +1,8 @@
 package org.beachape.server
 
+import scala.collection.JavaConversions.bufferAsJavaList
+import scala.collection.mutable.ListBuffer
+
 import org.beachape.actors.MainOrchestrator
 import org.beachape.testing.Support
 import org.scalatest.BeforeAndAfter
@@ -11,9 +14,6 @@ import com.redis.RedisClientPool
 import akka.actor.ActorSystem
 import akka.routing.SmallestMailboxRouter
 import trendServer.gen.TrendResult
-
-import scala.collection.JavaConversions._
-import scala.collection.mutable.ListBuffer
 
 class TrendServerSpec
   extends FunSpec

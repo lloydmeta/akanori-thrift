@@ -1,9 +1,12 @@
 package org.beachape.server
 
-import org.beachape.actors._
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+
+import org.beachape.actors.FetchTrendsEndingAt
+import org.beachape.actors.GetDefaultTrends
+import org.beachape.actors.StoreString
 
 import akka.actor.ActorRef
 import akka.actor.actorRef2Scala
@@ -31,7 +34,14 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
     for ((term: String, score: Double) <- listOfReverseSortedTermsAndScores.getOrElse(Nil)) yield new TrendResult(term, score)
   }
 
-  override def currentTrends(spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) = {
+  override def currentTrends(
+    spanInSeconds: Int,
+    minOccurrence: Double,
+    minLength: Int,
+    maxLength: Int,
+    top: Int,
+    dropBlacklisted: Boolean,
+    onlyWhitelisted: Boolean) = {
     (System.currentTimeMillis / 1000).toInt
     val listOfReverseSortedTermsAndScoresFuture = mainOrchestrator ? FetchTrendsEndingAt(
       (System.currentTimeMillis / 1000).toInt,
@@ -46,7 +56,15 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
     for ((term: String, score: Double) <- listOfReverseSortedTermsAndScores.getOrElse(Nil)) yield new TrendResult(term, score)
   }
 
-  override def trendsEndingAt(unixEndAtTime: Int, spanInSeconds: Int, minOccurrence: Double, minLength: Int, maxLength: Int, top: Int, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) = {
+  override def trendsEndingAt(
+    unixEndAtTime: Int,
+    spanInSeconds: Int,
+    minOccurrence: Double,
+    minLength: Int,
+    maxLength: Int,
+    top: Int,
+    dropBlacklisted: Boolean,
+    onlyWhitelisted: Boolean) = {
     val listOfReverseSortedTermsAndScoresFuture = mainOrchestrator ? FetchTrendsEndingAt(
       unixEndAtTime,
       spanInSeconds,

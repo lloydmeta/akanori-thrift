@@ -2,7 +2,10 @@ package org.beachape.analyze
 
 import com.redis.RedisClientPool
 
-case class MorphemesRedisTracker(morphemeList: List[Morpheme], redisPool: RedisClientPool, redisKey: String) extends MorphemeScoreRedisHelper {
+case class MorphemesRedisTracker(
+  morphemeList: List[Morpheme],
+  redisPool: RedisClientPool,
+  redisKey: String) extends MorphemeScoreRedisHelper {
 
   def storeAllInRedis = {
     for (morpheme <- morphemeList) {
