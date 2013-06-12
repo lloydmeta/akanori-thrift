@@ -24,11 +24,11 @@ class StringToRedisActor(val redisPool: RedisClientPool) extends Actor with Redi
     case _ => println("StringToRedisActor says 'huh?'")
   }
 
-  def oldestScoreToKeep(weeksAgoDataToExpire: Int = 2) = {
+  def oldestScoreToKeep(weeksAgoDataToExpire: Int = 2): Double = {
     ((DateTime.now - weeksAgoDataToExpire.weeks).millis / 1000).toDouble
   }
 
-  def storeString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int) = {
+  def storeString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int) {
     val storableString = stringToSetStorableString(stringToStore, unixCreatedAtTime)
     redisPool.withClient {
       redis =>

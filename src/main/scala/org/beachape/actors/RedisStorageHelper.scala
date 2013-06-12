@@ -17,13 +17,13 @@ trait RedisStorageHelper extends StringToStorableStringHelper {
     }
   }
 
-  def setExpiryOnRedisKey(key: RedisKey, expiryInSeconds: Int) = {
+  def setExpiryOnRedisKey(key: RedisKey, expiryInSeconds: Int) {
     redisPool.withClient { redis =>
       redis.pexpire(key.redisKey, RichInt(expiryInSeconds).seconds.millis.toInt)
     }
   }
 
-  def deleteKey(key: RedisKey) = {
+  def deleteKey(key: RedisKey) {
     redisPool.withClient { redis =>
       redis.del(key.redisKey)
     }

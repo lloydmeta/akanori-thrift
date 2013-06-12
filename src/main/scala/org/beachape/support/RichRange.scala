@@ -8,7 +8,7 @@ object RichRange {
 
 case class RichRange(range: Range) {
 
-  def listOfConsecutivePairsInSteps(step: Int) = {
+  def listOfConsecutivePairsInSteps(step: Int): List[(Int, Int)] = {
     val steppedRange = range by step
 
     @tailrec def splitIntoConsecutivePairs(xs: List[Int], acc: List[(Int, Int)]): List[(Int, Int)] = {

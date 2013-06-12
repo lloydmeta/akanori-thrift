@@ -111,7 +111,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
       None
   }
 
-  def retrieveTrendsFromKey(cacheKey: RedisKey, limit: Option[(Int, Int)] = None) = {
+  def retrieveTrendsFromKey(cacheKey: RedisKey, limit: Option[(Int, Int)] = None): Option[List[(String, Double)]] = {
     redisPool.withClient { redis =>
       redis.zrangebyscoreWithScore(cacheKey.redisKey, min = 0, limit = limit, sortAs = DESC)
     }

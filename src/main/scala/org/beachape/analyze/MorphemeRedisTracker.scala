@@ -7,13 +7,13 @@ case class MorphemesRedisTracker(
   redisPool: RedisClientPool,
   redisKey: String) extends MorphemeScoreRedisHelper {
 
-  def storeAllInRedis = {
+  def storeAllInRedis {
     for (morpheme <- morphemeList) {
       storeInRedis(morpheme)
     }
   }
 
-  private def storeInRedis(morpheme: Morpheme) = {
+  private def storeInRedis(morpheme: Morpheme) {
     redisPool.withClient {
       redis =>
         {

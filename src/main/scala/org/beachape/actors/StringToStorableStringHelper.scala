@@ -2,13 +2,13 @@ package org.beachape.actors
 
 trait StringToStorableStringHelper {
 
-  def stringToSetStorableString(stringToStore: String, unixCreateTime: Int) = {
+  def stringToSetStorableString(stringToStore: String, unixCreateTime: Int): String = {
     val uniqueMarker = storedStringUniqueMarker(unixCreateTime)
     val stringWithoutExcessiveRepeats = removeExcessiveRepeatedChars(stringToStore)
     f"$uniqueMarker%s$stringWithoutExcessiveRepeats%s"
   }
 
-  def storedStringToString(storedString: String) = {
+  def storedStringToString(storedString: String): String = {
     storedString.replaceFirst(f"$storedStringUniqueMarkerOpener%s.*$storedStringUniqueMarkerCloser%s", "")
   }
 

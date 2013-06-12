@@ -144,7 +144,7 @@ class MainOrchestrator(
     callMaxLength: Int,
     callTop: Int,
     callDropBlacklisted: Boolean,
-    callOnlyWhitelisted: Boolean) = {
+    callOnlyWhitelisted: Boolean): String = {
     f"$customTrendCacheKeyEndingNow%s-unixEndAtTime$unixEndAtTime%d-span$spanInSeconds%s-minOccurence$callMinOccurrence%f-minLength-$callMinLength%d-maxLength$callMaxLength%d-callTop$callTop%d-callDropBlacklisted$callDropBlacklisted%b-callOnlyWhitelisted$callOnlyWhitelisted%b"
   }
 

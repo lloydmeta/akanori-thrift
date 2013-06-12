@@ -60,7 +60,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
     case _ => println("RedisStringSetToMorphemesActor says 'huh?'")
   }
 
-  def listOfTermsInUnixTimeSpan(timeSpan: UnixTimeSpan, limit: Option[(Int, Int)] = None) = {
+  def listOfTermsInUnixTimeSpan(timeSpan: UnixTimeSpan, limit: Option[(Int, Int)] = None): List[String] = {
     redisPool.withClient { redis =>
       redis.zrangebyscore(storedStringsSetKey, timeSpan.start.time.toDouble, true, timeSpan.end.time.toDouble, true, limit) match {
         case Some(x: List[String]) => {
@@ -85,21 +85,21 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
     // Split into two
     val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
     val futureStringOneDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
-        listOfStringsOne.mkString(sys.props("line.separator")),
-        redisKey,
-        dropBlacklisted,
-        onlyWhitelisted)).mapTo[Boolean]
+      listOfStringsOne.mkString(sys.props("line.separator")),
+      redisKey,
+      dropBlacklisted,
+      onlyWhitelisted)).mapTo[Boolean]
     val futureStringTwoDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
-        listOfStringsTwo.mkString(sys.props("line.separator")),
-        redisKey,
-        dropBlacklisted,
-        onlyWhitelisted)).mapTo[Boolean]
+      listOfStringsTwo.mkString(sys.props("line.separator")),
+      redisKey,
+      dropBlacklisted,
+      onlyWhitelisted)).mapTo[Boolean]
 
     Await.result(futureStringOneDump, timeout.duration).asInstanceOf[Boolean] &&
       Await.result(futureStringTwoDump, timeout.duration).asInstanceOf[Boolean]
   }
 
-  def countOfTermsInSpan(unixTimeSpan: UnixTimeSpan) = {
+  def countOfTermsInSpan(unixTimeSpan: UnixTimeSpan): Int = {
     redisPool.withClient { redis =>
       redis.zcount(storedStringsSetKey, unixTimeSpan.start.time.toDouble, unixTimeSpan.end.time.toDouble, true, true) match {
         case Some(x: Long) => x.toInt

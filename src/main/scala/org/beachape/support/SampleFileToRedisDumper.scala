@@ -14,7 +14,7 @@ import com.redis.RedisClientPool
 case class SampleFileToRedisDumper(redisPool: RedisClientPool)
   extends RedisStorageHelper {
 
-  def dumpToRedis(filePath: String, unixStartTime: Int, unixEndTime: Int) = {
+  def dumpToRedis(filePath: String, unixStartTime: Int, unixEndTime: Int) {
     if (filePath.contains(".csv")) {
       dumpFromCSV(filePath)
     } else {
@@ -34,7 +34,7 @@ case class SampleFileToRedisDumper(redisPool: RedisClientPool)
 
   }
 
-  def storeLineInRedis(redisKey: String, line: String, unixTimeStamp: Int) = {
+  def storeLineInRedis(redisKey: String, line: String, unixTimeStamp: Int) {
     redisPool.withClient {
       redis =>
         {
@@ -43,14 +43,14 @@ case class SampleFileToRedisDumper(redisPool: RedisClientPool)
     }
   }
 
-  def linesPerSecondAdjusted(filePath: String, unixStartTime: Int, unixEndTime: Int) = {
+  def linesPerSecondAdjusted(filePath: String, unixStartTime: Int, unixEndTime: Int): Int = {
     if (unixStartTime == unixEndTime) throw new Exception("start time is end time")
     val linesInFile = Source.fromFile(filePath).getLines.size
     val linesPerSecond = linesInFile / (unixEndTime - unixStartTime).abs
     if (linesPerSecond < 1) 1 else linesPerSecond
   }
 
-  def dumpFromCSV(filePath: String) = {
+  def dumpFromCSV(filePath: String) {
     val reader = new ScalaCSVReader(new FileReader(filePath))
     val currentTime = System.currentTimeMillis / 1000
 

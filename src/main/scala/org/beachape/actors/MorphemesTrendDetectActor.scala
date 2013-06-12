@@ -43,7 +43,7 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
     case _ => println("MorphemesTrendDetectActor says 'huh???'")
   }
 
-  def cacheChiSquaredDiff(cacheKey: RedisKey, term: String, difference: Double) = {
+  private def cacheChiSquaredDiff(cacheKey: RedisKey, term: String, difference: Double) {
     redisPool.withClient { redis =>
       {
         redis.pipeline { pipe =>

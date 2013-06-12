@@ -20,23 +20,23 @@ case class MorphemesRedisRetriever(
     })(collection.breakOut))
   }
 
-  def getExpectedScoreForTerm(term: String) = {
+  def getExpectedScoreForTerm(term: String): Double = {
     getScoreForTerm(redisKeyExpected, term)
   }
 
-  def getObservedScoreForTerm(term: String) = {
+  def getObservedScoreForTerm(term: String): Double = {
     getScoreForTerm(redisKeyObserved, term)
   }
 
-  def totalExpectedSetMorphemesScore = {
+  def totalExpectedSetMorphemesScore: Double = {
     totalMorphemesScoreAtSet(redisKeyExpected)
   }
 
-  def totalObservedSetMorphemesScore = {
+  def totalObservedSetMorphemesScore: Double = {
     totalMorphemesScoreAtSet(redisKeyObserved)
   }
 
-  def observedZCard = {
+  def observedZCard: Int = {
     zCard(redisKeyObserved)
   }
 
@@ -44,7 +44,7 @@ case class MorphemesRedisRetriever(
     term: String,
     observedScoreForTerm: Double,
     expectedSetTotalScore: Double,
-    observedSetTotalScore: Double) = {
+    observedSetTotalScore: Double): Double = {
     val expectedScoreForTerm = getExpectedScoreForTerm(term)
     if (observedScoreForTerm > expectedScoreForTerm)
       calculateChiSquaredForTerm(
