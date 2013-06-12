@@ -72,7 +72,16 @@ class MainOrchestrator(
     case GenerateDefaultTrends => {
       val cacheKey = RedisKey(defaultTrendCacheKey)
       deleteKey(cacheKey)
-      trendGeneratorRoundRobin ! GenerateAndCacheTrendsFor(cacheKey, (System.currentTimeMillis / 1000).toInt, spanInSeconds, minOccurrence, minLength, maxLength, top, dropBlacklisted, onlyWhitelisted)
+      trendGeneratorRoundRobin ! GenerateAndCacheTrendsFor(
+        cacheKey,
+        (System.currentTimeMillis / 1000).toInt,
+        spanInSeconds,
+        minOccurrence,
+        minLength,
+        maxLength,
+        top,
+        dropBlacklisted,
+        onlyWhitelisted)
     }
 
     // Replies with Some(List[(String, Double)]
@@ -126,7 +135,15 @@ class MainOrchestrator(
     case unneededMessage @ _ => println(unneededMessage)
   }
 
-  def customTrendCacheKey(unixEndAtTime: Int, spanInSeconds: Int, callMinOccurrence: Double, callMinLength: Int, callMaxLength: Int, callTop: Int, callDropBlacklisted: Boolean, callOnlyWhitelisted: Boolean) = {
+  def customTrendCacheKey(
+    unixEndAtTime: Int,
+    spanInSeconds: Int,
+    callMinOccurrence: Double,
+    callMinLength: Int,
+    callMaxLength: Int,
+    callTop: Int,
+    callDropBlacklisted: Boolean,
+    callOnlyWhitelisted: Boolean) = {
     f"$customTrendCacheKeyEndingNow%s-unixEndAtTime$unixEndAtTime%d-span$spanInSeconds%s-minOccurence$callMinOccurrence%f-minLength-$callMinLength%d-maxLength$callMaxLength%d-callTop$callTop%d-callDropBlacklisted$callDropBlacklisted%b-callOnlyWhitelisted$callOnlyWhitelisted%b"
   }
 

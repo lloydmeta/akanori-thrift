@@ -102,28 +102,33 @@ object TrendApp {
     val redisDb = options.getOrElse('redisPort, 7).asInstanceOf[Int]
     val sampleDataFilepath = options.getOrElse('sampleDataFilepath, "").toString
     val sampleDataFrom = options.getOrElse('sampleDataFrom,
-        (System.currentTimeMillis / 1000 - 259200).toInt).asInstanceOf[Int]
+      (System.currentTimeMillis / 1000 - 259200).toInt).asInstanceOf[Int]
     val sampleDataUntil = options.getOrElse('sampleDataUntil,
-        (System.currentTimeMillis / 1000).toInt).asInstanceOf[Int]
+      (System.currentTimeMillis / 1000).toInt).asInstanceOf[Int]
 
     val redisPool = new RedisClientPool(redisHost, redisPort, database = redisDb)
     if (clearRedis) redisPool.withClient { _.flushdb }
 
     val system = ActorSystem("akanoriSystem")
     val mainOrchestratorRoundRobin = system.actorOf(
-        MainOrchestrator(
-            redisPool, dropBlacklisted, onlyWhitelisted,
-            spanInSeconds, minOccurrence, minLength,
-            maxLength, top).
-            withRouter(SmallestMailboxRouter(3)), "mainOrchestrator")
+      MainOrchestrator(
+        redisPool,
+        dropBlacklisted,
+        onlyWhitelisted,
+        spanInSeconds,
+        minOccurrence,
+        minLength,
+        maxLength,
+        top).
+        withRouter(SmallestMailboxRouter(3)), "mainOrchestrator")
 
     import system.dispatcher
     val generateDefaultTrendsCancellableSchedule = system.scheduler.schedule(
-        5 seconds,
-        1 minute,
-        mainOrchestratorRoundRobin, GenerateDefaultTrends)
+      5 seconds,
+      1 minute,
+      mainOrchestratorRoundRobin, GenerateDefaultTrends)
 
-    if (! sampleDataFilepath.isEmpty) {
+    if (!sampleDataFilepath.isEmpty) {
       println(s"Dumping sample data from file")
       SampleFileToRedisDumper(redisPool).dumpToRedis(sampleDataFilepath, sampleDataFrom, sampleDataUntil)
     }

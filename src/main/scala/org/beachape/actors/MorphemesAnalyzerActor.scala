@@ -8,12 +8,16 @@ import com.redis.RedisClientPool
 import akka.actor.Actor
 import akka.actor.actorRef2Scala
 
-class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor with MorphemeScoreRedisHelper with RedisStorageHelper {
+class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor
+  with MorphemeScoreRedisHelper
+  with RedisStorageHelper {
 
   def receive = {
 
-    case message: AnalyseAndStoreInRedisKey=> {
-      val morphemes = Morpheme.stringToMorphemesReverse(message.phrase, message.dropBlacklisted, message.onlyWhitelisted)
+    case message: AnalyseAndStoreInRedisKey => {
+      val morphemes = Morpheme.stringToMorphemesReverse(
+        message.phrase, message.dropBlacklisted,
+        message.onlyWhitelisted)
       storeAllInRedis(morphemes, message.redisKey)
       sender ! true
     }
