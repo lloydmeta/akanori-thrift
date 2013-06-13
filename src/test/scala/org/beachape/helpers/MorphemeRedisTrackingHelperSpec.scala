@@ -1,5 +1,6 @@
-package org.beachape.actors
+package org.beachape.helpers
 
+import org.beachape.actors.RedisKey
 import org.beachape.analyze.Morpheme
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec

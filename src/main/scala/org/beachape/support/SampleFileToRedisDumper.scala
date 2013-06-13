@@ -4,7 +4,7 @@ import java.io.FileReader
 
 import scala.io.Source
 
-import org.beachape.actors.RedisStorageHelper
+import org.beachape.helpers.RedisStorageHelper
 
 import com.github.nscala_time.time.Imports.RichLong
 import com.github.nscala_time.time.Imports.RichReadableInstant

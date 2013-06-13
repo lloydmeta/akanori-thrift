@@ -1,5 +1,7 @@
 package org.beachape.analyze
 
+import org.beachape.helpers.MorphemeScoreRedisHelper
+
 import com.redis.RedisClient.DESC
 import com.redis.RedisClient.SortOrder
 import com.redis.RedisClientPool

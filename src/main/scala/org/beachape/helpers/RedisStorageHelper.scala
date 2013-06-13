@@ -1,4 +1,6 @@
-package org.beachape.actors
+package org.beachape.helpers
+
+import org.beachape.actors.RedisKey
 
 import com.github.nscala_time.time.Imports.RichInt
 import com.redis.RedisClientPool
@@ -29,7 +31,7 @@ trait RedisStorageHelper extends StringToStorableStringHelper {
 
   def setExpiryOnRedisKey(key: RedisKey, expiryInSeconds: Int) {
     redisPool.withClient { redis =>
-      redis.pexpire(key.redisKey, RichInt(expiryInSeconds).seconds.millis.toInt)
+      redis.pexpire(key.redisKey, expiryInSeconds.seconds.millis.toInt)
     }
   }
 
