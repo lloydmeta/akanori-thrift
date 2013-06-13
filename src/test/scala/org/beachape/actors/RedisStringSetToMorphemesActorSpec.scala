@@ -49,10 +49,10 @@ class RedisStringSetToMorphemesActorSpec extends TestKit(ActorSystem("akkaTest")
 
   describe("methods testing") {
 
-    describe("#forEachPagedListOfTermsInUnixTimeSpan") {
+    describe("#mapEachPagedListOfTermsInUnixTimeSpan") {
 
       it("should return a list of the return callback function type") {
-        val returnsList = redisStringSetToMorphemesActor.forEachPagedListOfTermsInUnixTimeSpan(unixTimeSpan) {
+        val returnsList = redisStringSetToMorphemesActor.mapEachPagedListOfTermsInUnixTimeSpan(unixTimeSpan) {
           listTerms => true
         }
         returnsList.forall(_ == true) should be(true)

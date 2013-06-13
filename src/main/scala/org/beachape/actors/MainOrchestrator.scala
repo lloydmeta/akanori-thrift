@@ -14,11 +14,14 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
-/** Factory for Props used to instantiate [[org.beachape.actors.MainOrchestrator]] */
+/**
+ * Companion object housing the factory for Props used to instantiate
+ *  [[org.beachape.actors.MainOrchestrator]]
+ */
 object MainOrchestrator {
 
   /**
-   * @constructor create the props necessary to spawn a
+   * Returns the props necessary to spawn a
    * new orchestrator  with a given RedisClientPool,
    * dropBlacklisted, onlyWhitelisted, spanInSeconds, minOccurrence, minLength
    * maxLength and top as default trend creation options

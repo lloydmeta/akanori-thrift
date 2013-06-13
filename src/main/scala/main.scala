@@ -2,7 +2,7 @@ import scala.concurrent.duration.DurationInt
 
 import org.beachape.actors.GenerateDefaultTrends
 import org.beachape.actors.MainOrchestrator
-import org.beachape.server.TrendServerBuilder
+import org.beachape.server.TrendServer
 import org.beachape.support.SampleFileToRedisDumper
 
 import com.redis.RedisClientPool
@@ -134,7 +134,7 @@ object TrendApp {
     }
 
     println("Server is ready for duty.")
-    val server = TrendServerBuilder.buildServer(thriftServerPort, mainOrchestratorRoundRobin)
+    val server = TrendServer(mainOrchestratorRoundRobin, thriftServerPort)
     server.serve
   }
 }
