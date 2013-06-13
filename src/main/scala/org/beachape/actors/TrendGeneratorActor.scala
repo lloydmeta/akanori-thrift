@@ -4,6 +4,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 import org.beachape.analyze.MorphemesRedisRetriever
+import org.beachape.helpers.RedisStorageHelper
 
 import com.redis.RedisClient.DESC
 import com.redis.RedisClientPool

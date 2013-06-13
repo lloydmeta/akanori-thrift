@@ -1,5 +1,7 @@
 package org.beachape.actors
 
+import org.beachape.helpers.RedisStorageHelper
+
 import com.github.nscala_time.time.Imports.DateTime
 import com.github.nscala_time.time.Imports.RichDateTime
 import com.github.nscala_time.time.Imports.RichInt

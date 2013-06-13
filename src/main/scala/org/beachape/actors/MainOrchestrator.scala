@@ -2,7 +2,8 @@ package org.beachape.actors
 
 import scala.concurrent.duration.DurationInt
 
-import org.beachape.analyze.MorphemeScoreRedisHelper
+import org.beachape.helpers.MorphemeScoreRedisHelper
+import org.beachape.helpers.RedisStorageHelper
 
 import com.redis.RedisClient.DESC
 import com.redis.RedisClientPool

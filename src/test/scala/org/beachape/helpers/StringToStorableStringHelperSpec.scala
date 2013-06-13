@@ -1,4 +1,4 @@
-package org.beachape.actors
+package org.beachape.helpers
 
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.BeforeAndAfterEach
