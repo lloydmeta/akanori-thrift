@@ -134,27 +134,20 @@ class MainOrchestrator(
           message.dropBlacklisted,
           message.onlyWhitelisted))
 
-      if (cachedKeyExists(cachedKey)) {
-        val listOfReverseSortedTermsAndScores = redisPool.withClient { redis =>
-          redis.zrangebyscoreWithScore(cachedKey.redisKey, Double.NegativeInfinity, limit = None, sortAs = DESC)
-        }
-        sender ! listOfReverseSortedTermsAndScores
-      } else {
-        val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? GenerateAndCacheTrendsFor(
-          cachedKey,
-          message.unixEndAtTime,
-          message.spanInSeconds,
-          message.minOccurrence,
-          message.minLength,
-          message.maxLength,
-          message.top,
-          message.dropBlacklisted,
-          message.onlyWhitelisted)
-        listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
-          zender ! Some(listOfReverseSortedTermsAndScores)
-        }
-      }
+      val listOfReverseSortedTermsAndScoresFuture = trendGeneratorRoundRobin ? GenerateAndCacheTrendsFor(
+        cachedKey,
+        message.unixEndAtTime,
+        message.spanInSeconds,
+        message.minOccurrence,
+        message.minLength,
+        message.maxLength,
+        message.top,
+        message.dropBlacklisted,
+        message.onlyWhitelisted)
 
+      listOfReverseSortedTermsAndScoresFuture map { listOfReverseSortedTermsAndScores =>
+        zender ! Some(listOfReverseSortedTermsAndScores)
+      }
     }
 
     case unneededMessage @ _ => println(unneededMessage)
