@@ -13,10 +13,37 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
+/**
+ * Companion object that houses the factory apply
+ * method that returns the Props required to instantiate
+ * a [[org.beachape.actors.RedisStringSetToMorphemesOrchestrator]]
+ */
 object RedisStringSetToMorphemesOrchestrator {
+
+  /**
+   * Returns the Props required to spawn an instance of RedisStringSetToMorphemesOrchestrator
+   *
+   * @param redisPool a RedisClientPool that will be used by the actor
+   */
   def apply(redisPool: RedisClientPool) = Props(new RedisStringSetToMorphemesOrchestrator(redisPool))
 }
 
+/**
+ * Ochestrator Actor that turns a single request to generate morphemes
+ * for a given unix end at time and a given span in seconds (and thus a timespan)
+ * and breaks it up in to the smaller individual relevant unix time spans
+ * to be processed by RedisStringSetToMorphemesActors in parallel.
+ *
+ * Receives GenerateMorphemesFor messages and breaks it down into
+ * the period requested (termed 'new observed set'), the period immediately before
+ * with the same span (termed 'new expected set'), and the corresponding versions
+ * of them 24 hours ago ('old observed set' and 'old expected set'). These
+ * spans are then sent to a round robin of RedisStringSetToMorphemesActors to be processed
+ * so that the morphemes for those respective periods are counted up and cached.
+ * The receive method then sends back to the sender the Redis keys at which the
+ * morphemes have been tallied up for those respective periods as a RedisSetPair
+ * (see [[org.beachape.actors.Messages]])
+ */
 class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
@@ -49,21 +76,21 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
 
       val listOfRedisKeyFutures = List(
         ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(
-            oldExpectedSetUnixTimeSpan,
-            message.dropBlacklisted,
-            message.onlyWhitelisted)).mapTo[RedisKey],
+          oldExpectedSetUnixTimeSpan,
+          message.dropBlacklisted,
+          message.onlyWhitelisted)).mapTo[RedisKey],
         ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(
-            oldObservedSetUnixTimeSpan,
-            message.dropBlacklisted,
-            message.onlyWhitelisted)).mapTo[RedisKey],
+          oldObservedSetUnixTimeSpan,
+          message.dropBlacklisted,
+          message.onlyWhitelisted)).mapTo[RedisKey],
         ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(
-            newExpectedSetUnixTimeSpan,
-            message.dropBlacklisted,
-            message.onlyWhitelisted)).mapTo[RedisKey],
+          newExpectedSetUnixTimeSpan,
+          message.dropBlacklisted,
+          message.onlyWhitelisted)).mapTo[RedisKey],
         ask(redisStringSetToMorphemesActorsRoundRobin, GenerateMorphemesForSpan(
-            newObservedSetUnixTimeSpan,
-            message.dropBlacklisted,
-            message.onlyWhitelisted)).mapTo[RedisKey])
+          newObservedSetUnixTimeSpan,
+          message.dropBlacklisted,
+          message.onlyWhitelisted)).mapTo[RedisKey])
 
       val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
       futureListOfRedisKeys map { redisKeysList =>
