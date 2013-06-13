@@ -27,7 +27,8 @@ object StringToRedisActor {
 /**
  * Actor that receives StoreString messages (see [[org.beachape.actors.Messages]]),
  * which contains a string to store, a unixCreatedAtTime, and weeksAgoDataToExpire
- * and stores the string in the Redis string sorted set
+ * and stores the string in the Redis string sorted set. Should be instantiated via the
+ * Props returned from the companion object's apply method.
  *
  * The helper function storedStringsSetKey is used to determine the key at which the sorted
  * set should be stored, the unixCreatedAtTime is used as the score of the member

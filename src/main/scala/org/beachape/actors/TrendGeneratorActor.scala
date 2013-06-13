@@ -15,10 +15,31 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
+/**
+ * Companion object that houses the factory apply
+ * method that returns the Props required to instantiate
+ * a [[org.beachape.actors.TrendGeneratorActor]]
+ */
 object TrendGeneratorActor {
+
+  /**
+   * Returns the Props required to spawn an instance of StringToRedisActor
+   *
+   * @param redisPool a RedisClientPool that will be used by the actor
+   */
   def apply(redisPool: RedisClientPool) = Props(new TrendGeneratorActor(redisPool))
 }
 
+/**
+ * Actor that receives GenerateAndCacheTrendsFor messages (see [[org.beachape.actors.Messages]]),
+ * which and calls the necessary Actors to generate and cache the trendiness of the morphemes
+ * in the given time span. The actor replies with a list of morphemes in reverse trendiness.
+ * Should be instantiated via props returned from the companion object's apply method.
+ *
+ * GenerateAndCacheTrendsFor messages will have a unixEndAtTime, spanInSeconds, dropBlacklisted,
+ * onlyWhitelisted, and cacheKey in them. TrendGeneratorActor has it's own round robin
+ * MorphemesTrendDetectActor as well as a RedisStringSetToMorphemesOrchestrator.
+ */
 class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
   import context.dispatcher
@@ -61,7 +82,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
 
   //Using the morphemes for each for the time periods(old observed vs expected and
   // new observed vs expected), generate the ChiSquared scores for each term and store
-  def generateTrends(
+  private def generateTrends(
     trendsCacheKey: RedisKey,
     oldSet: RedisKeySet,
     newSet: RedisKeySet,
@@ -111,7 +132,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
       None
   }
 
-  def retrieveTrendsFromKey(cacheKey: RedisKey, limit: Option[(Int, Int)] = None): Option[List[(String, Double)]] = {
+  private def retrieveTrendsFromKey(cacheKey: RedisKey, limit: Option[(Int, Int)] = None): Option[List[(String, Double)]] = {
     redisPool.withClient { redis =>
       redis.zrangebyscoreWithScore(cacheKey.redisKey, min = 0, limit = limit, sortAs = DESC)
     }

@@ -2,8 +2,23 @@ package org.beachape.analyze
 
 import scala.math.pow
 
+/**
+ * Provides functions that calculate ChiSquared
+ *  given observed score, total observed score,
+ *  expected score, and total expected score
+ *
+ */
 trait ChiSquare {
 
+  /**
+   * Returns ChiSquared for a given observed score,
+   * total observed score, expected score, and
+   * total expected score
+   *
+   * Essentially ChiSquare is adapted into a frequency,
+   * then calculated via add one smoothing and Yates
+   * in order to make sure low frequencies don't dominate
+   */
   def calculateChiSquaredForTerm(
     oldTermScore: Double,
     termScore: Double,

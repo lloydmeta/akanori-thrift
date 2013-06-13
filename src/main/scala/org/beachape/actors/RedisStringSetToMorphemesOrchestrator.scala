@@ -32,7 +32,8 @@ object RedisStringSetToMorphemesOrchestrator {
  * Ochestrator Actor that turns a single request to generate morphemes
  * for a given unix end at time and a given span in seconds (and thus a timespan)
  * and breaks it up in to the smaller individual relevant unix time spans
- * to be processed by RedisStringSetToMorphemesActors in parallel.
+ * to be processed by RedisStringSetToMorphemesActors in parallel. Should be instantiated
+ * via the Props returned from companion object's apply method.
  *
  * Receives GenerateMorphemesFor messages and breaks it down into
  * the period requested (termed 'new observed set'), the period immediately before
