@@ -156,6 +156,6 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   }
 
   private def redisKeyForUnixTimeSpanWithOptions(timeSpan: UnixTimeSpan, dropBlacklisted: Boolean, onlyWhitelisted: Boolean) =
-    f"trends:$timeSpan%s"
+    f"morphemes_set:$timeSpan%s-dropBlacklisted$dropBlacklisted%b-onlyWhitelisted$onlyWhitelisted%b"
 
 }
