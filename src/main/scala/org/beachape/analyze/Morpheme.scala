@@ -6,6 +6,15 @@ import scala.annotation.tailrec
 import org.chasen.mecab.Node
 import org.chasen.mecab.Tagger
 
+/**
+ *  Companion / Factory object for instantiating a List of morphemes
+ *  (individual components, e.g. nouns, words, etc) from a single
+ *  Japanese string.
+ *
+ *  Depends on the Mecab-Java library for parsing. This allows us to
+ *  take a Japanese string (with no spaces) and break it up into smaller
+ *  components that can then be used for trend detection.
+ */
 object Morpheme {
 
   type Words = List[String]
@@ -33,11 +42,25 @@ object Morpheme {
     attributeValueWhitelistMap.getOrElse('hinsi, List()).contains(x.hinsi)
   }
 
+  /**
+   * Returns a list of Morpheme objects based on a string passed in
+   * and onlyBlacklisted and onlyWhitelisted options
+   *
+   * @param str the string to parse into a list of Morphemes
+   * @param dropBlacklisted drop blacklisted morphemes
+   * @param onlyWhitelisted return only whitelisted morphemes
+   */
   def stringToMorphemes(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
     stringToMorphemesReverse(str, dropBlacklisted, onlyWhitelisted).reverse
   }
 
-  // Just slightly faster than the above variant because doesn't use reversing
+  /**
+   *  Returns a list of morphemes in reverse order of the way
+   *  they appear in the string passed in.
+   *
+   *  Slightly faster variant of stringToMorphemes because the list
+   *  is constructed via :: and then returned without running .reverse
+   */
   def stringToMorphemesReverse(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
     System.loadLibrary("MeCab")
     val tagger = new Tagger
@@ -60,6 +83,12 @@ object Morpheme {
       justMorphemes
   }
 
+  /**
+   * Returns a List[String], aka Words based on a
+   * string passed in
+   *
+   * @param str String to parse into individual words
+   */
   def stringToWords(str: String): Words = {
     stringToMorphemes(str) map { _.surface }
   }
@@ -98,6 +127,13 @@ object Morpheme {
   }
 }
 
+/**
+ * Holds a morpheme's surface value (what it appeared as in
+ * the string used to create it), and other information
+ *
+ * Should be instantiated via the factory methods in the companion
+ * object above
+ */
 class Morpheme(val surface: String,
   val hinsi: String,
   val hinsi1: String,

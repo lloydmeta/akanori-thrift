@@ -10,13 +10,16 @@ import akka.actor.Props
 import akka.actor.actorRef2Scala
 import akka.util.Timeout
 
-/** Factory for Props used to instantiate [[org.beachape.actors.MorphemesTrendDetectActor]] */
+/**
+ * Companion object that houses the factory for
+ *  Props used to instantiate [[org.beachape.actors.MorphemesTrendDetectActor]]
+ */
 object MorphemesTrendDetectActor {
 
   /**
    * Returns the Props required to spawn an instance of MorphemesTrendDetectActor
    *
-   * @params redisPool a RedisClientPool that will be used by the actor
+   * @param redisPool a RedisClientPool that will be used by the actor
    */
   def apply(redisPool: RedisClientPool) = Props(new MorphemesTrendDetectActor(redisPool))
 }
