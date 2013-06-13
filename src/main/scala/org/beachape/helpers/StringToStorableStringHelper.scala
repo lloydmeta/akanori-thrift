@@ -1,4 +1,4 @@
-package org.beachape.actors
+package org.beachape.helpers
 
 trait StringToStorableStringHelper {
 

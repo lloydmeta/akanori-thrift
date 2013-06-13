@@ -1,7 +1,8 @@
 package org.beachape.actors
 
 import org.beachape.analyze.Morpheme
-import org.beachape.analyze.MorphemeScoreRedisHelper
+import org.beachape.helpers.MorphemesRedisTrackingHelper
+import org.beachape.helpers.RedisStorageHelper
 
 import com.redis.RedisClientPool
 
@@ -32,7 +33,7 @@ object MorphemesAnalyzerActor {
  * the companion object above
  */
 class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor
-  with MorphemeScoreRedisHelper
+  with MorphemesRedisTrackingHelper
   with RedisStorageHelper {
 
   def receive = {
@@ -47,22 +48,6 @@ class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor
     }
 
     case _ => println("MorphemesAnalyzerActor says 'huh? '")
-  }
-
-  private def storeAllInRedis(morphemeList: List[Morpheme], redisKey: RedisKey) = {
-    for (morpheme <- morphemeList) {
-      storeInRedis(morpheme, redisKey)
-    }
-  }
-
-  private def storeInRedis(morpheme: Morpheme, redisKey: RedisKey) = {
-    redisPool.withClient {
-      redis =>
-        {
-          redis.zincrby(redisKey.redisKey, 1, morpheme.surface)
-          redis.zincrby(redisKey.redisKey, 1, zSetTotalScoreKey)
-        }
-    }
   }
 
 }

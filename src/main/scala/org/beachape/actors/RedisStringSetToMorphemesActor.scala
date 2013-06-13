@@ -3,6 +3,8 @@ package org.beachape.actors
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
+import org.beachape.helpers.RedisStorageHelper
+
 import com.github.nscala_time.time.Imports.RichInt
 import com.redis.RedisClientPool
 
