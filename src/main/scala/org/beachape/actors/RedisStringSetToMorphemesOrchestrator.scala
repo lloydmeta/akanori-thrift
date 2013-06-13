@@ -32,8 +32,7 @@ object RedisStringSetToMorphemesOrchestrator {
  * Ochestrator Actor that turns a single request to generate morphemes
  * for a given unix end at time and a given span in seconds (and thus a timespan)
  * and breaks it up in to the smaller individual relevant unix time spans
- * to be processed by RedisStringSetToMorphemesActors in parallel. Should be instantiated
- * via the Props returned from companion object's apply method.
+ * to be processed by RedisStringSetToMorphemesActors in parallel.
  *
  * Receives GenerateMorphemesFor messages and breaks it down into
  * the period requested (termed 'new observed set'), the period immediately before
@@ -44,6 +43,8 @@ object RedisStringSetToMorphemesOrchestrator {
  * The receive method then sends back to the sender the Redis keys at which the
  * morphemes have been tallied up for those respective periods as a RedisSetPair
  * (see [[org.beachape.actors.Messages]])
+ *
+ * Should be instantiated via the Props returned from companion object's apply method.
  */
 class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 

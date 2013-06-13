@@ -27,10 +27,10 @@ class MorphemesRedisRetrieverSpec extends FunSpec
     dumpMorphemesToRedis
   }
 
-  describe("#forEachPageOfObservedTermsWithScores") {
+  describe("#mapEachPageOfObservedTermsWithScores") {
 
     it("should yield for every page found") {
-      morphemeRedisRetriever.forEachPageOfObservedTermsWithScores() { _ => true }.forall(list => list.forall(x => x == true)) should be(true)
+      morphemeRedisRetriever.mapEachPageOfObservedTermsWithScores() { _ => true }.forall(list => list.forall(x => x == true)) should be(true)
     }
 
   }

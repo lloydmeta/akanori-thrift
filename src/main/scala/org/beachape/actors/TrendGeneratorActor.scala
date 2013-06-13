@@ -34,11 +34,12 @@ object TrendGeneratorActor {
  * Actor that receives GenerateAndCacheTrendsFor messages (see [[org.beachape.actors.Messages]]),
  * which and calls the necessary Actors to generate and cache the trendiness of the morphemes
  * in the given time span. The actor replies with a list of morphemes in reverse trendiness.
- * Should be instantiated via props returned from the companion object's apply method.
  *
  * GenerateAndCacheTrendsFor messages will have a unixEndAtTime, spanInSeconds, dropBlacklisted,
  * onlyWhitelisted, and cacheKey in them. TrendGeneratorActor has it's own round robin
  * MorphemesTrendDetectActor as well as a RedisStringSetToMorphemesOrchestrator.
+ *
+ * Should be instantiated via props returned from the companion object's apply method.
  */
 class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
@@ -104,7 +105,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
     val newSetExpectedTotalScore = newSetMorphemesRetriever.totalExpectedSetMorphemesScore
     val newSetObservedTotalScore = newSetMorphemesRetriever.totalObservedSetMorphemesScore
 
-    val results = newSetMorphemesRetriever.forEachPageOfObservedTermsWithScores(500) { termsWithScoresList =>
+    val results = newSetMorphemesRetriever.mapEachPageOfObservedTermsWithScores(500) { termsWithScoresList =>
       // pass to roundRobin to calculate ChiChi and store in the cachedkey set.
       val listOfChichiSquareCalculationResultFutures = for ((term, newObservedScore) <- termsWithScoresList.getOrElse(Nil)) yield {
         ask(morphemesTrendDetectRoundRobin, CalculateAndStoreTrendiness(

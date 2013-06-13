@@ -9,6 +9,10 @@ import akka.actor.ActorSystem
 import akka.actor.actorRef2Scala
 import akka.routing.SmallestMailboxRouter
 
+/**
+ * Helps devlepment by creating a console server...
+ * Stub for now
+ */
 case class ConsoleServer(redisHost: String = "localhost", redisPort: Int = 6379, redisDb: Int = 7) {
 
   val redisPool = new RedisClientPool(redisHost, redisPort, database = redisDb)

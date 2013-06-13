@@ -31,8 +31,7 @@ object RedisStringSetToMorphemesActor {
 /**
  * Actor that looks through the stored strings sorted set and counts
  * the morphemes in the strings for that span, then caches the counts
- * per morpheme in a given redis sorted set. Should be instantiated
- * using the props returned by the companion object.
+ * per morpheme in a given redis sorted set.
  *
  * Receives generateMorphemesForSpan messages and
  * based on the unixTimeSpan, dropBlacklisted and onlyWhitelisted
@@ -40,6 +39,8 @@ object RedisStringSetToMorphemesActor {
  * sorted set where strings are stored, breaks things out into morphemes
  * and stores the count of each morpheme in that time period the cacheKey
  * as a sorted set
+ *
+ * Should be instantiated using the props returned by the companion object.
  */
 class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
 
@@ -90,7 +91,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
    * (see [[org.beachape.actors.Messages]]), and an optional count,
    *
    * @param unixTimeSpan see [[org.beachape.actors.Messages]]
-   * @param count optional, defaults to 300 the number of strings per page to return
+   * @param count the number of strings per page to return (optional, defaults to 300)
    * @param callBack a function that takes a list of strings and returns a result
    */
   def mapEachPagedListOfTermsInUnixTimeSpan[A](unixTimeSpan: UnixTimeSpan, count: Int = 300)(callBack: List[String] => A): List[A] = {

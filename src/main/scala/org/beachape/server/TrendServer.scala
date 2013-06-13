@@ -4,6 +4,10 @@ import scala.collection.JavaConversions.seqAsJavaList
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
+import org.apache.thrift.protocol.TBinaryProtocol
+import org.apache.thrift.server.TThreadedSelectorServer
+import org.apache.thrift.transport.TFramedTransport
+import org.apache.thrift.transport.TNonblockingServerSocket
 import org.beachape.actors.FetchTrendsEndingAt
 import org.beachape.actors.GetDefaultTrends
 import org.beachape.actors.StoreString
@@ -15,6 +19,48 @@ import akka.util.Timeout
 import trendServer.gen.TrendResult
 import trendServer.gen.TrendThriftServer
 
+/**
+ * Companion object that holds the factory for TrendServer
+ */
+object TrendServer {
+
+  /**
+   * Returns a TThreadedSelectorserver instance
+   *
+   * @param mainOrchestrator an ActorRef pointing to a MainOrchestrator actor
+   * @param socket to run the Thrift server at (defaults to 9090)
+   * @param selectorThreads number of selector threads (network thread) to run (defaults to 16)
+   * @param workerThreads number of worker threads to run (defaults to 32)
+   */
+  def apply(
+    mainOrchestrator: ActorRef,
+    socket: Int = 9090,
+    selectorThreads: Int = 16,
+    workerThreads: Int = 32): TThreadedSelectorServer = {
+    val transport = new TNonblockingServerSocket(socket)
+    val processor = new TrendThriftServer.Processor(new TrendServer(mainOrchestrator))
+    val transportFactory = new TFramedTransport.Factory()
+    val protocolFactory = new TBinaryProtocol.Factory()
+
+    val args = new TThreadedSelectorServer.Args(transport)
+    args.processor(processor)
+    args.transportFactory(transportFactory)
+    args.protocolFactory(protocolFactory)
+    args.selectorThreads(selectorThreads)
+    args.workerThreads(workerThreads)
+
+    new TThreadedSelectorServer(args)
+  }
+
+}
+
+/**
+ * TrendServer implementation of the Thrift server interface.
+ *
+ * Overrides a bunch of methods as required
+ *
+ * Should be constructed via the factory method in the companion object
+ */
 class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
   implicit val timeout = Timeout(600 seconds)
 

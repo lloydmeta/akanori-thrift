@@ -26,7 +26,7 @@ object MorphemesAnalyzerActor {
  * and onlyWhitelisted options, and a RedisKey to
  * store results in, then counts the number
  * of morphemes in the phrase and stores them in the key
- * as a zSet
+ * as a sorted set
  *
  * Should be instantiated via the factory method in
  * the companion object above
