@@ -97,13 +97,11 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
           message.onlyWhitelisted)).mapTo[RedisKey])
 
       val futureListOfRedisKeys = Future.sequence(listOfRedisKeyFutures)
-      futureListOfRedisKeys map { redisKeysList =>
-        redisKeysList match {
-          case List(oldExpectedKey: RedisKey, oldObservedKey: RedisKey, newExpectedKey: RedisKey, newObservedKey: RedisKey) => {
-            zender ! RedisSetPair(RedisKeySet(oldExpectedKey, oldObservedKey), RedisKeySet(newExpectedKey, newObservedKey))
-          }
-          case _ => throw new Exception("RedisStringSetToMorphemesOrchestrator did not receive proper Redis Keys pointing to morphemes")
+      futureListOfRedisKeys map {
+        case List(oldExpectedKey: RedisKey, oldObservedKey: RedisKey, newExpectedKey: RedisKey, newObservedKey: RedisKey) => {
+          zender ! RedisSetPair(RedisKeySet(oldExpectedKey, oldObservedKey), RedisKeySet(newExpectedKey, newObservedKey))
         }
+        case _ => throw new Exception("RedisStringSetToMorphemesOrchestrator did not receive proper Redis Keys pointing to morphemes")
       }
     }
 

@@ -64,17 +64,15 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
         message.spanInSeconds,
         message.dropBlacklisted,
         message.onlyWhitelisted))
-      redisKeySetPairFuture map { redisKeySetPair =>
-        redisKeySetPair match {
-          case pair: RedisSetPair => {
-            generateTrends(message.redisCacheKey, pair.oldSet, pair.newSet, message.minOccurrence)
-            // This .toList.flatten.filter works because the type returned by retrieveTrendsFromKey is Option[List[(String, Double)]]
-            // So even if we were to filter on an empty list with None, it doesn't blow up doing ._2
-            zender ! retrieveTrendsFromKey(message.redisCacheKey).toList.flatten.
-              filter(x => ((message.minLength to message.maxLength) contains x._1.length)).take(message.top)
-          }
-          case _ => throw new Exception("TrendGeneratorActor did not receive proper Redis keys pointing to morphemes")
+      redisKeySetPairFuture map {
+        case pair: RedisSetPair => {
+          generateTrends(message.redisCacheKey, pair.oldSet, pair.newSet, message.minOccurrence)
+          // This .toList.flatten.filter works because the type returned by retrieveTrendsFromKey is Option[List[(String, Double)]]
+          // So even if we were to filter on an empty list with None, it doesn't blow up doing ._2
+          zender ! retrieveTrendsFromKey(message.redisCacheKey).toList.flatten.
+            filter(x => ((message.minLength to message.maxLength) contains x._1.length)).take(message.top)
         }
+        case _ => throw new Exception("TrendGeneratorActor did not receive proper Redis keys pointing to morphemes")
       }
     }
 
