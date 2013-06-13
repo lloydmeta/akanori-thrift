@@ -1,10 +1,9 @@
 package org.beachape.actors
 
+import org.beachape.analyze.Morpheme
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-
-import org.beachape.analyze.Morpheme
 
 import com.redis.RedisClientPool
 

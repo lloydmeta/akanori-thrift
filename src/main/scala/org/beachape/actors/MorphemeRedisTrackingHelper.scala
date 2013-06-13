@@ -2,6 +2,7 @@ package org.beachape.actors
 
 import com.redis.RedisClientPool
 import org.beachape.analyze.Morpheme
+import org.beachape.analyze.MorphemeScoreRedisHelper
 
 /**
  * Tracker of morphemes and the number of times they occurred

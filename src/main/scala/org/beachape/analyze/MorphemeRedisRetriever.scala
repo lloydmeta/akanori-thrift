@@ -3,7 +3,6 @@ package org.beachape.analyze
 import com.redis.RedisClient.DESC
 import com.redis.RedisClient.SortOrder
 import com.redis.RedisClientPool
-import org.beachape.actors.MorphemeScoreRedisHelper
 
 /**
  * Retriever of morphemes and their respective counts

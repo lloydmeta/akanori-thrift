@@ -1,4 +1,4 @@
-package org.beachape.actors
+package org.beachape.analyze
 
 /** Provides a single helper to standardize
  *  the member used for tracking the total score of
