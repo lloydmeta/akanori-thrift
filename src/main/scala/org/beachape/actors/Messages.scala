@@ -2,7 +2,10 @@ package org.beachape.actors
 
 import org.beachape.analyze.MorphemesRedisRetriever
 
-// Message definitions
+/**
+ * Message case classes to make passing messages
+ *  between actors safer and easier
+ */
 
 // Common types
 sealed case class RedisKey(redisKey: String)

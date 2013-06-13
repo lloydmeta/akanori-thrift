@@ -3,6 +3,16 @@ package org.beachape.actors
 import com.github.nscala_time.time.Imports.RichInt
 import com.redis.RedisClientPool
 
+/** Provides helpers for RedisFunctions
+ *
+ *  Helpers for referencing Redis access keys and
+ *  basic checking of whether a key exists in Redis,
+ *  deletion of a key and setting the expiry of a key
+ *
+ *  Classes that mix in this trait need to have a
+ *   - val redisPool defined
+ *
+ */
 trait RedisStorageHelper extends StringToStorableStringHelper {
   val redisPool: RedisClientPool
 
