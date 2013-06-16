@@ -1,9 +1,9 @@
 import scala.concurrent.duration.DurationInt
 
-import org.beachape.actors.GenerateDefaultTrends
-import org.beachape.actors.MainOrchestrator
-import org.beachape.server.TrendServer
-import org.beachape.support.SampleFileToRedisDumper
+import com.beachape.actors.GenerateDefaultTrends
+import com.beachape.actors.MainOrchestrator
+import com.beachape.server.TrendServer
+import com.beachape.support.SampleFileToRedisDumper
 
 import com.redis.RedisClientPool
 
