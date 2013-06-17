@@ -19,6 +19,9 @@ import akka.util.Timeout
 import trendServer.gen.TrendResult
 import trendServer.gen.TrendThriftServer
 
+import scala.language.postfixOps
+import scala.language.implicitConversions
+
 /**
  * Companion object that holds the factory for TrendServer
  */

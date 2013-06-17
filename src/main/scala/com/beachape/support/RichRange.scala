@@ -2,6 +2,8 @@ package com.beachape.support
 
 import scala.annotation.tailrec
 
+import scala.language.implicitConversions
+
 object RichRange {
   implicit def range2RichRange(r: Range) = RichRange(r)
 }

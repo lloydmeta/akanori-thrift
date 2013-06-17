@@ -9,6 +9,8 @@ import com.redis.RedisClientPool
 import akka.actor.ActorSystem
 import akka.routing.SmallestMailboxRouter
 
+import scala.language.postfixOps
+
 object TrendApp {
 
   val usage = """

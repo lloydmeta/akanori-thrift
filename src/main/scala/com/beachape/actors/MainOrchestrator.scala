@@ -14,6 +14,8 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
+import scala.language.postfixOps
+
 /**
  * Companion object housing the factory for Props used to instantiate
  *  [[com.beachape.actors.MainOrchestrator]]

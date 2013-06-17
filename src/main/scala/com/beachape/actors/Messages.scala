@@ -17,8 +17,8 @@ sealed case class UnixTimeSpan(start: UnixTime, end: UnixTime)
 sealed case class StoreString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)
 
 //Main Orchestrator Messages
-sealed case class GenerateDefaultTrends
-sealed case class GetDefaultTrends
+sealed case class GenerateDefaultTrends()
+sealed case class GetDefaultTrends()
 sealed case class FetchTrendsEndingAt(
   unixEndAtTime: Int,
   spanInSeconds: Int,

@@ -15,6 +15,8 @@ import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
+import scala.language.postfixOps
+
 /**
  * Companion object that houses the factory apply
  * method that returns the Props required to instantiate
