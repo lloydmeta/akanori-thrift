@@ -1,7 +1,7 @@
 package com.beachape.support;
+
 import java.io.FileWriter
 
-import com.beachape.support.SampleFileToRedisDumper
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers

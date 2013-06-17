@@ -1,9 +1,7 @@
 package com.beachape.actors;
+
 import scala.util.Success
 
-import com.beachape.actors.AnalyseAndStoreInRedisKey
-import com.beachape.actors.MorphemesAnalyzerActor
-import com.beachape.actors.RedisKey
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers

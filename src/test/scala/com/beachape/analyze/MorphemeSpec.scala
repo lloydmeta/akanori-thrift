@@ -7,8 +7,6 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import com.beachape.analyze.Morpheme;
-
 class MorphemeSpec extends FunSpec
   with ShouldMatchers
   with BeforeAndAfterEach

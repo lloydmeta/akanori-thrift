@@ -3,7 +3,6 @@ package com.beachape.actors
 import com.beachape.analyze.Morpheme
 import com.beachape.helpers.MorphemesRedisTrackingHelper
 import com.beachape.helpers.RedisStorageHelper
-
 import com.redis.RedisClientPool
 
 import akka.actor.Actor

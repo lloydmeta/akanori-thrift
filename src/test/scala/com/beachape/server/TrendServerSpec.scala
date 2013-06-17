@@ -3,13 +3,12 @@ package com.beachape.server
 import scala.collection.JavaConversions.bufferAsJavaList
 import scala.collection.mutable.ListBuffer
 
-import com.beachape.actors.MainOrchestrator
-import com.beachape.testing.Support
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import com.beachape.server.TrendServer;
+import com.beachape.actors.MainOrchestrator
+import com.beachape.testing.Support
 import com.redis.RedisClientPool
 
 import akka.actor.ActorSystem

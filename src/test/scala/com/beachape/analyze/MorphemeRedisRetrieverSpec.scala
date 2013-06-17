@@ -1,13 +1,12 @@
 package com.beachape.analyze
 
-import com.beachape.actors.RedisKey
-import com.beachape.actors.RedisKeySet
-import com.beachape.testing.Support
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import com.beachape.analyze.MorphemesRedisRetriever;
+import com.beachape.actors.RedisKey
+import com.beachape.actors.RedisKeySet
+import com.beachape.testing.Support
 import com.redis.RedisClientPool
 
 class MorphemesRedisRetrieverSpec extends FunSpec

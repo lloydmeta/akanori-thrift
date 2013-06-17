@@ -2,7 +2,6 @@ package com.beachape.helpers
 
 import com.beachape.actors.RedisKey
 import com.beachape.analyze.Morpheme
-
 import com.redis.RedisClientPool
 
 /**

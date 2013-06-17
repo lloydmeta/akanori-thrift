@@ -4,7 +4,6 @@ import com.beachape.actors.GenerateDefaultTrends
 import com.beachape.actors.MainOrchestrator
 import com.beachape.server.TrendServer
 import com.beachape.support.SampleFileToRedisDumper
-
 import com.redis.RedisClientPool
 
 import akka.actor.ActorSystem

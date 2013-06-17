@@ -5,7 +5,6 @@ import scala.concurrent.duration.DurationInt
 
 import com.beachape.analyze.MorphemesRedisRetriever
 import com.beachape.helpers.RedisStorageHelper
-
 import com.redis.RedisClient.DESC
 import com.redis.RedisClientPool
 

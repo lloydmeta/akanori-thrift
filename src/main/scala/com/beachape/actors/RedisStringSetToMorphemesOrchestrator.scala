@@ -4,7 +4,6 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
 import com.beachape.helpers.RedisStorageHelper
-
 import com.github.nscala_time.time.Imports.RichInt
 import com.redis.RedisClientPool
 
