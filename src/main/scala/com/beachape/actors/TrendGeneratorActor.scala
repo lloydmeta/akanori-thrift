@@ -116,10 +116,12 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
     val newSetExpectedTotalScore = newSetMorphemesRetriever.totalExpectedSetMorphemesScore
     val newSetObservedTotalScore = newSetMorphemesRetriever.totalObservedSetMorphemesScore
 
-    val results = newSetMorphemesRetriever.mapEachPageOfObservedTermsWithScores(500) { termsWithScoresList =>
+    val results = newSetMorphemesRetriever.mapEachPageOfObservedTermsWithScores(500) { termsWithScoresListMaybe =>
       // pass to roundRobin to calculate ChiChi and store in the cachedkey set.
-      val listOfChichiSquareCalculationResultFutures = for ((term, newObservedScore) <- termsWithScoresList.getOrElse(Nil)) yield {
-        ask(morphemesTrendDetectRoundRobin, CalculateAndStoreTrendiness(
+      val listOfChichiSquareCalculationResultFuturesOption = termsWithScoresListMaybe.map { termsWithScoresList =>
+        for ((term, newObservedScore) <- termsWithScoresList)
+        yield
+          ask(morphemesTrendDetectRoundRobin, CalculateAndStoreTrendiness(
           term,
           newObservedScore,
           trendsCacheKey,
@@ -135,13 +137,20 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
       // we might hit memory problems -> segmentation fault land
       // Warning, it doesn't seem like you can turn it into a Future[List[Boolean]]
       // Using Future.sequence and just call await on that...
-      val resultsInternal = for (f <- listOfChichiSquareCalculationResultFutures) yield Await.result(f, timeout.duration).asInstanceOf[Boolean]
-      resultsInternal.forall(x => x == true)
+      val resultsInternal = listOfChichiSquareCalculationResultFuturesOption.map{listOfChichiSquareCalculationResultFutures =>
+        for (f <- listOfChichiSquareCalculationResultFutures)
+          yield Await.result(f, timeout.duration)
+      }
+
+      resultsInternal match {
+        case Some(x: List[Boolean]) => x.forall(_ == true)
+        case _ => false
+      }
     }
-    if (results.getOrElse(Nil).forall(x => x == true))
-      Some(trendsCacheKey)
-    else
-      None
+    results match {
+      case Some(x: List[Boolean]) if x.forall(_ == true) => Some(trendsCacheKey)
+      case _ => None
+    }
   }
 
   private def retrieveTrendsFromKey(cacheKey: RedisKey, minLength: Int, maxLength: Int, top: Int): List[(String, Double)] = {
@@ -149,7 +158,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
       redis.zrangebyscoreWithScore(cacheKey.redisKey, min = 0, limit = None, sortAs = DESC)
     }.toList.
       flatten.
-      filter(x => ((minLength to maxLength) contains x._1.length)).
+      filter(x => minLength to maxLength contains x._1.length).
       take(top)
   }
 
