@@ -55,7 +55,7 @@ class RedisStringSetToMorphemesActorSpec extends TestKit(ActorSystem("akkaTest")
         val returnsList = redisStringSetToMorphemesActor.mapEachPagedListOfTermsInUnixTimeSpan(unixTimeSpan) {
           listTerms => true
         }
-        returnsList.forall(_ == true) should be(true)
+        returnsList.map(_.forall(_ == true) should be(true))
       }
 
     }
@@ -63,7 +63,7 @@ class RedisStringSetToMorphemesActorSpec extends TestKit(ActorSystem("akkaTest")
     describe("#dumpListOfStringsToMorphemes") {
 
       it("should return true") {
-        redisStringSetToMorphemesActor.dumpListOfStringsToMorphemes(listOfStrings, RedisKey("testing"), true, true) should be(true)
+        redisStringSetToMorphemesActor.dumpListOfStringsToMorphemes(Some(listOfStrings), RedisKey("testing"), true, true) should be(Some(true))
       }
 
     }

@@ -65,21 +65,19 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
       if (cachedKeyExists(redisKey)) {
         zender ! redisKey
       } else {
-        val analyzeAndDumpResultsList = mapEachPagedListOfTermsInUnixTimeSpan(
+        val analyzeAndDumpResultsListMaybe = mapEachPagedListOfTermsInUnixTimeSpan(
           message.unixTimeSpan)(dumpListOfStringsToMorphemes(
-            _: List[String],
-            redisKey,
-            message.dropBlacklisted,
-            message.onlyWhitelisted))
-
-        analyzeAndDumpResultsList match {
-          case x: List[Boolean] if x.forall(_ == true) => {
+          _: Option[List[String]],
+          redisKey,
+          message.dropBlacklisted,
+          message.onlyWhitelisted))
+        analyzeAndDumpResultsListMaybe.map {
+          case x:List[Option[Boolean]] if x.forall(_ == Some(true)) => {
             setExpiryOnRedisKey(redisKey, (RichInt(15).minutes.millis / 1000).toInt)
             zender ! redisKey
           }
           case _ => throw new Exception("morphemeAnalyzerRoundRobin failed to generate morphemes for that timespan")
         }
-
       }
     }
 
@@ -95,10 +93,10 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
    * @param count the number of strings per page to return (optional, defaults to 300)
    * @param callBack a function that takes a list of strings and returns a result
    */
-  def mapEachPagedListOfTermsInUnixTimeSpan[A](unixTimeSpan: UnixTimeSpan, count: Int = 300)(callBack: List[String] => A): List[A] = {
-    (for (offSet <- (0 to countOfTermsInSpan(unixTimeSpan) by count)) yield {
-      callBack(listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count)))
-    })(collection.breakOut)
+  def mapEachPagedListOfTermsInUnixTimeSpan[A](unixTimeSpan: UnixTimeSpan, count: Int = 300)(callBack: Option[List[String]] => A): Option[List[A]] = {
+    Some(
+      (for (offSet <- (0 to countOfTermsInSpan(unixTimeSpan) by count)) yield {
+        callBack(listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count)))}).toList)
   }
 
   /**
@@ -113,25 +111,27 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
    * @param onlyWhitelisted keep only whitelisted terms (see [[com.beachape.analyze.Morpheme]])
    */
   def dumpListOfStringsToMorphemes(
-    listOfTerms: List[String],
-    redisKey: RedisKey,
-    dropBlacklisted: Boolean,
-    onlyWhitelisted: Boolean): Boolean = {
+                                    someListOfTerms: Option[List[String]],
+                                    redisKey: RedisKey,
+                                    dropBlacklisted: Boolean,
+                                    onlyWhitelisted: Boolean): Option[Boolean] = {
+    someListOfTerms.map{ listOfTerms =>
     // Split into two
-    val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
-    val futureStringOneDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
-      listOfStringsOne.mkString(sys.props("line.separator")),
-      redisKey,
-      dropBlacklisted,
-      onlyWhitelisted)).mapTo[Boolean]
-    val futureStringTwoDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
-      listOfStringsTwo.mkString(sys.props("line.separator")),
-      redisKey,
-      dropBlacklisted,
-      onlyWhitelisted)).mapTo[Boolean]
+      val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
+      val futureStringOneDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
+        listOfStringsOne.mkString(sys.props("line.separator")),
+        redisKey,
+        dropBlacklisted,
+        onlyWhitelisted)).mapTo[Boolean]
+      val futureStringTwoDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
+        listOfStringsTwo.mkString(sys.props("line.separator")),
+        redisKey,
+        dropBlacklisted,
+        onlyWhitelisted)).mapTo[Boolean]
 
-    Await.result(futureStringOneDump, timeout.duration).asInstanceOf[Boolean] &&
-      Await.result(futureStringTwoDump, timeout.duration).asInstanceOf[Boolean]
+      Await.result(futureStringOneDump, timeout.duration).asInstanceOf[Boolean] &&
+        Await.result(futureStringTwoDump, timeout.duration).asInstanceOf[Boolean]
+    }
   }
 
   private def countOfTermsInSpan(unixTimeSpan: UnixTimeSpan): Int = {
@@ -143,13 +143,14 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
     }
   }
 
-  private def listOfTermsInUnixTimeSpan(timeSpan: UnixTimeSpan, limit: Option[(Int, Int)] = None): List[String] = {
+  private def listOfTermsInUnixTimeSpan(timeSpan: UnixTimeSpan, limit: Option[(Int, Int)] = None): Option[List[String]] = {
     redisPool.withClient { redis =>
-      redis.zrangebyscore(storedStringsSetKey, timeSpan.start.time.toDouble, true, timeSpan.end.time.toDouble, true, limit) match {
-        case Some(x: List[String]) => {
-          x map (storedStringToString(_))
-        }
-        case _ => throw new Exception("morphemeAnalyzerRoundRobin couldn't retrieve strings for that timespan")
+      redis.zrangebyscore(
+        storedStringsSetKey,
+        timeSpan.start.time.toDouble,
+        true, timeSpan.end.time.toDouble,
+        true, limit).map{ list =>
+        list.map(storedStringToString(_))
       }
     }
   }
