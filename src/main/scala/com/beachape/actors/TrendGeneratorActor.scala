@@ -116,7 +116,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
     val newSetExpectedTotalScore = newSetMorphemesRetriever.totalExpectedSetMorphemesScore
     val newSetObservedTotalScore = newSetMorphemesRetriever.totalObservedSetMorphemesScore
 
-    val results = newSetMorphemesRetriever.mapEachPageOfObservedTermsWithScores(500) { termsWithScoresListMaybe =>
+    val results = newSetMorphemesRetriever.mapEachPageOfObservedTermsWithScores(5000) { termsWithScoresListMaybe =>
       // pass to roundRobin to calculate ChiChi and store in the cachedkey set.
       val listOfChichiSquareCalculationResultFuturesOption = termsWithScoresListMaybe.map { termsWithScoresList =>
         for ((term, newObservedScore) <- termsWithScoresList)

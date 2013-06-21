@@ -22,18 +22,15 @@ trait MorphemesRedisTrackingHelper extends MorphemeScoreRedisHelper {
    * @redisKey key to store the sorted set at
    */
   def storeAllInRedis(morphemeList: List[Morpheme], redisKey: RedisKey) {
-    for (morpheme <- morphemeList) {
-      storeInRedis(morpheme, redisKey)
-    }
+    morphemeList.par.foreach(storeInRedis(_, redisKey))
   }
 
   private def storeInRedis(morpheme: Morpheme, redisKey: RedisKey) = {
     redisPool.withClient {
-      redis =>
-        {
-          redis.zincrby(redisKey.redisKey, 1, morpheme.surface)
-          redis.zincrby(redisKey.redisKey, 1, zSetTotalScoreKey)
-        }
+      redis => {
+        redis.zincrby(redisKey.redisKey, 1, morpheme.surface)
+        redis.zincrby(redisKey.redisKey, 1, zSetTotalScoreKey)
+      }
     }
   }
 
