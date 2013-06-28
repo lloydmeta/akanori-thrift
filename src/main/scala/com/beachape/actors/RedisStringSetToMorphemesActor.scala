@@ -97,7 +97,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   def mapEachPagedListOfTermsInUnixTimeSpan[A](unixTimeSpan: UnixTimeSpan, count: Int = 300)(callBack: Option[List[String]] => A): Option[List[A]] = {
     Some(
       (for (offSet <- (0 to countOfTermsInSpan(unixTimeSpan) by count)) yield {
-        callBack(listOfTermsInUnixTimeSpan(unixTimeSpan, Some(offSet, count)))}).toList)
+        callBack(listOfTermsInUnixTimeSpan(unixTimeSpan, Some((offSet, count))))}).toList)
   }
 
   /**
