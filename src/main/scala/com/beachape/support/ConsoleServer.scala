@@ -31,7 +31,7 @@ case class ConsoleServer(redisHost: String = "localhost", redisPort: Int = 6379,
 
   def currentTrendsDefault = server.currentTrendsDefault
 
-  def generateCurrentTrends = mainOrchestratorRoundRobin ! List('generateDefaultTrends)
+  def generateCurrentTrends() = mainOrchestratorRoundRobin ! List('generateDefaultTrends)
 
   def trendsEndingAt(
     unixEndAtTime: Int,
