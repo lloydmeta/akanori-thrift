@@ -1,4 +1,4 @@
-akanori-thrift
+akanori-thrift [![Build Status](https://travis-ci.org/lloydmeta/akanori-thrift.png?branch=master)](https://travis-ci.org/lloydmeta/akanori-thrift)
 ------------------
 
 Scala Thrift project/tool for extracting trends from Japanese phrases. Still in development.
