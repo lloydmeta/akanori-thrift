@@ -11,6 +11,7 @@ import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.actorRef2Scala
 import akka.pattern.ask
+import scala.concurrent.Future
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
@@ -49,7 +50,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
   val morphemeAnalyzerRoundRobin = context.actorOf(
-    MorphemesAnalyzerActor(redisPool).withRouter(SmallestMailboxRouter(3)),
+    MorphemesAnalyzerActor(redisPool).withRouter(SmallestMailboxRouter(30)),
     "redisStringSetToMorphemesActorMorphemesAnalyzerRoundRobin")
 
   def receive = {
@@ -116,21 +117,17 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
                                     dropBlacklisted: Boolean,
                                     onlyWhitelisted: Boolean): Option[Boolean] = {
     someListOfTerms.map{ listOfTerms =>
-    // Split into two
-      val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
-      val futureStringOneDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
-        listOfStringsOne.mkString(sys.props("line.separator")),
-        redisKey,
-        dropBlacklisted,
-        onlyWhitelisted)).mapTo[Boolean]
-      val futureStringTwoDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
-        listOfStringsTwo.mkString(sys.props("line.separator")),
-        redisKey,
-        dropBlacklisted,
-        onlyWhitelisted)).mapTo[Boolean]
 
-      Await.result(futureStringOneDump, timeout.duration).asInstanceOf[Boolean] &&
-        Await.result(futureStringTwoDump, timeout.duration).asInstanceOf[Boolean]
+      val listOfAnalyzeAndDumpFutures = for (term <- listOfTerms)
+        yield
+        (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
+          term,
+          redisKey,
+          dropBlacklisted,
+          onlyWhitelisted)).mapTo[Boolean]
+
+      val futureListOfAnalyzeAndDumpResults = Future.sequence(listOfAnalyzeAndDumpFutures)
+      Await.result(futureListOfAnalyzeAndDumpResults, timeout.duration).forall(_ == true)
     }
   }
 
