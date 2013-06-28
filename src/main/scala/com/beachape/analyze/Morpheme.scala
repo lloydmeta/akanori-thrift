@@ -17,6 +17,9 @@ object Morpheme {
 
   type Words = List[String]
 
+  // Kuromoji is supposedly thread safe, so lets do this proper
+  private val tokenizer = Tokenizer.builder().build()
+
   val attributeValueBlackistMap = Map(
     'surface -> (
       List("ﾟ", "д", "Д", "ーーー", "ーー", "ー", "ｰ", "m", "目", "о", "ぐはじめました")
@@ -60,7 +63,6 @@ object Morpheme {
    *  is constructed via :: and then returned without running .reverse
    */
   def stringToMorphemesReverse(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
-    val tokenizer = Tokenizer.builder().build()
     val tokens = tokenizer.tokenize(str).toList
 
     val morphemes = for (token <- tokens) yield parseMorpheme(token.getSurfaceForm, token.getAllFeatures)
@@ -91,7 +93,6 @@ object Morpheme {
       case 9 => data
       case x if x < 9 => data ::: (for (i <- 1 to (9 - x)) yield "*").toList
     }
-    println(data_adjusted)
     new Morpheme(surface,
       data_adjusted(0),
       data_adjusted(1),
