@@ -1,10 +1,8 @@
 // from http://blog.kenkov.jp/2013/04/04/mecab_scala.html
 package com.beachape.analyze
 
-import scala.annotation.tailrec
-
-import org.chasen.mecab.Node
-import org.chasen.mecab.Tagger
+import scala.collection.JavaConversions._
+import org.atilika.kuromoji.Tokenizer
 
 /**
  *  Companion / Factory object for instantiating a List of morphemes
@@ -62,25 +60,19 @@ object Morpheme {
    *  is constructed via :: and then returned without running .reverse
    */
   def stringToMorphemesReverse(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
-    System.loadLibrary("MeCab")
-    val tagger = new Tagger
-    tagger.parse(str) //wtf
-    val node = tagger.parseToNode(str)
+    val tokenizer = Tokenizer.builder().build()
+    val tokens = tokenizer.tokenize(str).toList
 
-    val morphemes = nodeToListReverse(node) map { x =>
-      parseMorpheme(x.getSurface.trim, x.getFeature)
-    }
-
-    val justMorphemes = morphemes.dropRight(1) // drops the BOS/EOS, which comes first, or in this case last
+    val morphemes = for (token <- tokens) yield parseMorpheme(token.getSurfaceForm, token.getAllFeatures)
 
     if (dropBlacklisted && onlyWhitelisted)
-      justMorphemes.filter(whiteListFilter).filter(blackListFilter)
+      morphemes.filter(whiteListFilter).filter(blackListFilter)
     else if (dropBlacklisted)
-      justMorphemes.filter(blackListFilter)
+      morphemes.filter(blackListFilter)
     else if (onlyWhitelisted)
-      justMorphemes.filter(whiteListFilter)
+      morphemes.filter(whiteListFilter)
     else
-      justMorphemes
+      morphemes
   }
 
   /**
@@ -93,27 +85,13 @@ object Morpheme {
     stringToMorphemes(str) map { _.surface }
   }
 
-  private def nodeToList(node: Node): List[Node] = {
-    nodeToListReverse(node).reverse
-  }
-
-  // Slightly faster than nodeToList because no reversing
-  private def nodeToListReverse(node: Node): List[Node] = {
-    @tailrec def nodeToListSupport(node: Node, acc: List[Node]): List[Node] = {
-      node.getNext match {
-        case null => acc
-        case next: Node => nodeToListSupport(next, node :: acc)
-      }
-    }
-    nodeToListSupport(node, Nil)
-  }
-
-  private def parseMorpheme(surface: String, chasenData: String): Morpheme = {
-    val data = chasenData.split(",").toList
+  private def parseMorpheme(surface: String, features: String): Morpheme = {
+    val data = features.split(",").toList
     val data_adjusted = data.length match {
       case 9 => data
       case x if x < 9 => data ::: (for (i <- 1 to (9 - x)) yield "*").toList
     }
+    println(data_adjusted)
     new Morpheme(surface,
       data_adjusted(0),
       data_adjusted(1),

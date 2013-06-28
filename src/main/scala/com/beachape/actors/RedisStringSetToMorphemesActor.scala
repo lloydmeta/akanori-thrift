@@ -49,7 +49,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
   implicit val timeout = Timeout(DurationInt(600).seconds)
 
   val morphemeAnalyzerRoundRobin = context.actorOf(
-    MorphemesAnalyzerActor(redisPool).withRouter(SmallestMailboxRouter(3)),
+    MorphemesAnalyzerActor(redisPool).withRouter(SmallestMailboxRouter(30)),
     "redisStringSetToMorphemesActorMorphemesAnalyzerRoundRobin")
 
   def receive = {
@@ -116,7 +116,8 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
                                     dropBlacklisted: Boolean,
                                     onlyWhitelisted: Boolean): Option[Boolean] = {
     someListOfTerms.map{ listOfTerms =>
-    // Split into two
+
+          
       val (listOfStringsOne: List[String], listOfStringsTwo: List[String]) = listOfTerms.splitAt(listOfTerms.length / 2)
       val futureStringOneDump = (morphemeAnalyzerRoundRobin ? AnalyseAndStoreInRedisKey(
         listOfStringsOne.mkString(sys.props("line.separator")),
