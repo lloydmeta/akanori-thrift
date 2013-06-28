@@ -35,7 +35,7 @@ case class MorphemesRedisRetriever(
     val offSets = 0 to newObservedSetCard by pageCount // Generate range to page over the new set
 
     Some((for (offSet <- offSets) yield {
-      val morphemesWithScoresAtOffSet = newTermsWithScoresListWithLimit(Some(offSet, pageCount))
+      val morphemesWithScoresAtOffSet = newTermsWithScoresListWithLimit(Some((offSet, pageCount)))
       callBack(morphemesWithScoresAtOffSet)
     })(collection.breakOut))
   }
@@ -147,7 +147,7 @@ case class MorphemesRedisRetriever(
     }
   }
 
-  private def newTermsWithScoresListWithLimit(limitDesired: Option[(Int, Int)] = Some(0, 50)) = {
+  private def newTermsWithScoresListWithLimit(limitDesired: Option[(Int, Int)] = Some((0, 50))) = {
     termsWithScoresList(redisKeyObserved, min = minScore, limit = limitDesired, sort = DESC)
   }
 
