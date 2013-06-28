@@ -44,25 +44,13 @@ object Morpheme {
   }
 
   /**
-   * Returns a list of Morpheme objects based on a string passed in
-   * and onlyBlacklisted and onlyWhitelisted options
-   *
-   * @param str the string to parse into a list of Morphemes
-   * @param dropBlacklisted drop blacklisted morphemes
-   * @param onlyWhitelisted return only whitelisted morphemes
-   */
-  def stringToMorphemes(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
-    stringToMorphemesReverse(str, dropBlacklisted, onlyWhitelisted).reverse
-  }
-
-  /**
-   *  Returns a list of morphemes in reverse order of the way
+   *  Returns a list of morphemes in order of the way
    *  they appear in the string passed in.
    *
    *  Slightly faster variant of stringToMorphemes because the list
    *  is constructed via :: and then returned without running .reverse
    */
-  def stringToMorphemesReverse(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
+  def stringToMorphemes(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
     val tokens = tokenizer.tokenize(str).toList
 
     val morphemes = for (token <- tokens) yield parseMorpheme(token.getSurfaceForm, token.getAllFeatures)
