@@ -7,7 +7,7 @@ Thrift clients send strings to the Scala server, which then stores it initially.
 
 Todo
 ===
-* Return trends as TrendResults from MorphemesTrendDetectorActor?
+* Make Storage access more abstract to enable the use of other non-Redis backends (interface trait?)
 * More tests
 * Less usage of futures with closures and move towards FSM ?
 
