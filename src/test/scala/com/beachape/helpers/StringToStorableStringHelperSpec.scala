@@ -29,6 +29,13 @@ class RedisStorageHelperSpec extends FunSpec
       dummy.stringToSetStorableString(testString, "system", fakeUnixTime) should include("system")
     }
 
+    it("should create the same string within a timespan that is as long as the createdAtFloorToNearest span") {
+      val storable = dummy.stringToSetStorableString(testString, "system", 0)
+      for (i <- (1 until dummy.createdAtFloorToNearest)) {
+        dummy.stringToSetStorableString(testString, "system", i) should be(storable)
+      }
+    }
+
     it("should have the actual string in there") {
       dummy.stringToSetStorableString(testString, "system", fakeUnixTime) should include(testString)
     }
