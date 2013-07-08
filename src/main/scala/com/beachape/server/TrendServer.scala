@@ -127,8 +127,8 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
     for ((term: String, score: Double) <- listOfReverseSortedTermsAndScores.getOrElse(Nil)) yield new TrendResult(term, score)
   }
 
-  override def storeString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int): Unit = {
-    mainOrchestrator ! StoreString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
+  override def storeString(stringToStore: String, userId: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int): Unit = {
+    mainOrchestrator ! StoreString(stringToStore, userId, unixCreatedAtTime, weeksAgoDataToExpire)
   }
 
 }
