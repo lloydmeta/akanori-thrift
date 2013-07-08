@@ -45,8 +45,8 @@ trait Support extends RedisStorageHelper {
 
   def dumpStringsToRedisStoredStringSet: Map[Symbol, Int] = {
     val unixStartTime = 478000
-    val unixEndTime = 1086400
-    val span = 1800
+    val unixEndTime = 1104400
+    val span = 10800
 
     val timeStampsToStringFrequencyMap = Map(
       //oldExpectedStrings
@@ -88,7 +88,7 @@ trait Support extends RedisStorageHelper {
       for ((term, frequency) <- frequencyMap) {
         for (i <- (0 to (frequency - 1))) {
           val uniquishTimestamp = unixTime + i
-          val storableString = stringToSetStorableString(term, uniquishTimestamp)
+          val storableString = stringToSetStorableString(term, f"system$i%d", uniquishTimestamp)
           redisPool.withClient { redis =>
             redis.zadd(storedStringsSetKey, uniquishTimestamp, storableString)
           }

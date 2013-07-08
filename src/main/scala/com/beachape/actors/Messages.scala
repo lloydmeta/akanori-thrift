@@ -14,7 +14,7 @@ sealed case class RedisKeySet(expectedKey: RedisKey, observedKey: RedisKey)
 sealed case class UnixTime(time: Int)
 sealed case class UnixTimeSpan(start: UnixTime, end: UnixTime)
 
-sealed case class StoreString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)
+sealed case class StoreString(stringToStore: String, userId: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int)
 
 //Main Orchestrator Messages
 sealed case class GenerateDefaultTrends()
