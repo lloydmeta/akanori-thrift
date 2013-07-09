@@ -53,7 +53,7 @@ object Morpheme {
    *  is constructed via :: and then returned without running .reverse
    */
   def stringToMorphemes(str: String, dropBlacklisted: Boolean = false, onlyWhitelisted: Boolean = false): List[Morpheme] = {
-    val tokens = tokenizerAgent().tokenize(str).toList
+    val tokens = tokenizer.tokenize(str).toList
 
     val morphemes = for (token <- tokens) yield parseMorpheme(token.getSurfaceForm, token.getAllFeatures)
 
@@ -86,7 +86,7 @@ object Morpheme {
    *
    * @param tokenizer A new tokenizer instance to use
    */
-  def tokenizer_=(tokenizer: Tokenizer) {tokenizerAgent send tokenizer}
+  def tokenizer_=(tokenizer: Tokenizer) { tokenizerAgent send tokenizer }
 
   /**
    * Returns the current instance of tokenizer being

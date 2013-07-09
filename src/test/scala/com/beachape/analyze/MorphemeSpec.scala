@@ -2,14 +2,18 @@ package com.beachape.analyze
 
 import scala.runtime.ZippedTraversable2.zippedTraversable2ToTraversable
 
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.FunSpec
+import org.scalatest.{PrivateMethodTester, BeforeAndAfterAll, BeforeAndAfterEach, FunSpec}
 import org.scalatest.matchers.ShouldMatchers
 import org.atilika.kuromoji.Tokenizer
+import java.io.{FileWriter, BufferedWriter}
+import scala.collection.JavaConversions._
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.agent.Agent
 
 class MorphemeSpec extends FunSpec
   with ShouldMatchers
+  with PrivateMethodTester
   with BeforeAndAfterEach
   with BeforeAndAfterAll {
 
@@ -67,7 +71,43 @@ class MorphemeSpec extends FunSpec
 
       describe(".tokenizer_=") {
 
-        
+        implicit val timeout = Timeout(5 seconds)
+        val privateTokenizerAgentAccessor = PrivateMethod[Agent[Tokenizer]]('tokenizerAgent)
+
+        it("should assign a new tokenizer") {
+          // Create a temporary dictionary file
+          val tempFile = java.io.File.createTempFile("fakeDictionary", ".txt")
+          val writer = new BufferedWriter(new FileWriter(tempFile))
+          writer.write(
+            """
+              |##
+              |## This file should use UTF-8 encoding
+              |##
+              |## User dictionary format:
+              |##   <text>,<token1> <token2> ... <tokenn>,<reading1> <reading2> ... <readingn>,<part-of-speech>
+              |##
+              |
+              |# Custom segmentation for long entries
+              |日本経済新聞,日本 経済 新聞,ニホン ケイザイ シンブン,カスタム名詞
+              |関西国際空港,関西 国際 空港,カンサイ コクサイ クウコウ,テスト名詞
+              |
+              |# Custom reading for former sumo wrestler Asashoryu
+              |朝青龍,朝青龍,アサショウリュウ,カスタム人名
+            """.stripMargin)
+          writer.close
+
+          //Note that we wait to make sure that the Agent has had all updates written to
+          val newTokenizer = Tokenizer.builder().userDictionary(tempFile.getAbsolutePath).build()
+          val newTokenizerTokens = newTokenizer.tokenize("朝青龍")
+          val defaultTokenizer = Morpheme.invokePrivate(privateTokenizerAgentAccessor()).await
+          val defaultTokenizerTokens = defaultTokenizer.tokenize("朝青龍")
+          defaultTokenizerTokens.head.getSurfaceForm should not be(newTokenizerTokens.head.getSurfaceForm)
+
+          Morpheme.tokenizer = newTokenizer
+          val assignedTokenizer = Morpheme.invokePrivate(privateTokenizerAgentAccessor()).await
+          val assignedTokenizerTokens = assignedTokenizer.tokenize("朝青龍")
+          assignedTokenizerTokens.head.getSurfaceForm should be(newTokenizerTokens.head.getSurfaceForm)
+        }
       }
     }
 
