@@ -42,6 +42,8 @@ public class TrendThriftServer {
 
     public List<TrendResult> trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted) throws org.apache.thrift.TException;
 
+    public List<String> stringToWords(String stringToAnalyze) throws org.apache.thrift.TException;
+
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException;
 
   }
@@ -55,6 +57,8 @@ public class TrendThriftServer {
     public void currentTrends(int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.currentTrends_call> resultHandler) throws org.apache.thrift.TException;
 
     public void trendsEndingAt(int unixEndAtTime, int spanInSeconds, double minOccurrence, int minLength, int maxLength, int top, boolean dropBlacklisted, boolean onlyWhitelisted, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.trendsEndingAt_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void stringToWords(String stringToAnalyze, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.stringToWords_call> resultHandler) throws org.apache.thrift.TException;
 
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.storeString_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -181,6 +185,29 @@ public class TrendThriftServer {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "trendsEndingAt failed: unknown result");
+    }
+
+    public List<String> stringToWords(String stringToAnalyze) throws org.apache.thrift.TException
+    {
+      send_stringToWords(stringToAnalyze);
+      return recv_stringToWords();
+    }
+
+    public void send_stringToWords(String stringToAnalyze) throws org.apache.thrift.TException
+    {
+      stringToWords_args args = new stringToWords_args();
+      args.setStringToAnalyze(stringToAnalyze);
+      sendBase("stringToWords", args);
+    }
+
+    public List<String> recv_stringToWords() throws org.apache.thrift.TException
+    {
+      stringToWords_result result = new stringToWords_result();
+      receiveBase(result, "stringToWords");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "stringToWords failed: unknown result");
     }
 
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException
@@ -376,6 +403,38 @@ public class TrendThriftServer {
       }
     }
 
+    public void stringToWords(String stringToAnalyze, org.apache.thrift.async.AsyncMethodCallback<stringToWords_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      stringToWords_call method_call = new stringToWords_call(stringToAnalyze, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class stringToWords_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String stringToAnalyze;
+      public stringToWords_call(String stringToAnalyze, org.apache.thrift.async.AsyncMethodCallback<stringToWords_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.stringToAnalyze = stringToAnalyze;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("stringToWords", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        stringToWords_args args = new stringToWords_args();
+        args.setStringToAnalyze(stringToAnalyze);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<String> getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_stringToWords();
+      }
+    }
+
     public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<storeString_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       storeString_call method_call = new storeString_call(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire, resultHandler, this, ___protocolFactory, ___transport);
@@ -430,6 +489,7 @@ public class TrendThriftServer {
       processMap.put("currentTrendsDefault", new currentTrendsDefault());
       processMap.put("currentTrends", new currentTrends());
       processMap.put("trendsEndingAt", new trendsEndingAt());
+      processMap.put("stringToWords", new stringToWords());
       processMap.put("storeString", new storeString());
       return processMap;
     }
@@ -511,6 +571,26 @@ public class TrendThriftServer {
       public trendsEndingAt_result getResult(I iface, trendsEndingAt_args args) throws org.apache.thrift.TException {
         trendsEndingAt_result result = new trendsEndingAt_result();
         result.success = iface.trendsEndingAt(args.unixEndAtTime, args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top, args.dropBlacklisted, args.onlyWhitelisted);
+        return result;
+      }
+    }
+
+    public static class stringToWords<I extends Iface> extends org.apache.thrift.ProcessFunction<I, stringToWords_args> {
+      public stringToWords() {
+        super("stringToWords");
+      }
+
+      public stringToWords_args getEmptyArgsInstance() {
+        return new stringToWords_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public stringToWords_result getResult(I iface, stringToWords_args args) throws org.apache.thrift.TException {
+        stringToWords_result result = new stringToWords_result();
+        result.success = iface.stringToWords(args.stringToAnalyze);
         return result;
       }
     }
@@ -4523,6 +4603,766 @@ public class TrendThriftServer {
               _elem23 = new TrendResult();
               _elem23.read(iprot);
               struct.success.add(_elem23);
+            }
+          }
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class stringToWords_args implements org.apache.thrift.TBase<stringToWords_args, stringToWords_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("stringToWords_args");
+
+    private static final org.apache.thrift.protocol.TField STRING_TO_ANALYZE_FIELD_DESC = new org.apache.thrift.protocol.TField("stringToAnalyze", org.apache.thrift.protocol.TType.STRING, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new stringToWords_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new stringToWords_argsTupleSchemeFactory());
+    }
+
+    public String stringToAnalyze; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      STRING_TO_ANALYZE((short)1, "stringToAnalyze");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // STRING_TO_ANALYZE
+            return STRING_TO_ANALYZE;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.STRING_TO_ANALYZE, new org.apache.thrift.meta_data.FieldMetaData("stringToAnalyze", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(stringToWords_args.class, metaDataMap);
+    }
+
+    public stringToWords_args() {
+    }
+
+    public stringToWords_args(
+      String stringToAnalyze)
+    {
+      this();
+      this.stringToAnalyze = stringToAnalyze;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public stringToWords_args(stringToWords_args other) {
+      if (other.isSetStringToAnalyze()) {
+        this.stringToAnalyze = other.stringToAnalyze;
+      }
+    }
+
+    public stringToWords_args deepCopy() {
+      return new stringToWords_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.stringToAnalyze = null;
+    }
+
+    public String getStringToAnalyze() {
+      return this.stringToAnalyze;
+    }
+
+    public stringToWords_args setStringToAnalyze(String stringToAnalyze) {
+      this.stringToAnalyze = stringToAnalyze;
+      return this;
+    }
+
+    public void unsetStringToAnalyze() {
+      this.stringToAnalyze = null;
+    }
+
+    /** Returns true if field stringToAnalyze is set (has been assigned a value) and false otherwise */
+    public boolean isSetStringToAnalyze() {
+      return this.stringToAnalyze != null;
+    }
+
+    public void setStringToAnalyzeIsSet(boolean value) {
+      if (!value) {
+        this.stringToAnalyze = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case STRING_TO_ANALYZE:
+        if (value == null) {
+          unsetStringToAnalyze();
+        } else {
+          setStringToAnalyze((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case STRING_TO_ANALYZE:
+        return getStringToAnalyze();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case STRING_TO_ANALYZE:
+        return isSetStringToAnalyze();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof stringToWords_args)
+        return this.equals((stringToWords_args)that);
+      return false;
+    }
+
+    public boolean equals(stringToWords_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_stringToAnalyze = true && this.isSetStringToAnalyze();
+      boolean that_present_stringToAnalyze = true && that.isSetStringToAnalyze();
+      if (this_present_stringToAnalyze || that_present_stringToAnalyze) {
+        if (!(this_present_stringToAnalyze && that_present_stringToAnalyze))
+          return false;
+        if (!this.stringToAnalyze.equals(that.stringToAnalyze))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(stringToWords_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      stringToWords_args typedOther = (stringToWords_args)other;
+
+      lastComparison = Boolean.valueOf(isSetStringToAnalyze()).compareTo(typedOther.isSetStringToAnalyze());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetStringToAnalyze()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.stringToAnalyze, typedOther.stringToAnalyze);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("stringToWords_args(");
+      boolean first = true;
+
+      sb.append("stringToAnalyze:");
+      if (this.stringToAnalyze == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.stringToAnalyze);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class stringToWords_argsStandardSchemeFactory implements SchemeFactory {
+      public stringToWords_argsStandardScheme getScheme() {
+        return new stringToWords_argsStandardScheme();
+      }
+    }
+
+    private static class stringToWords_argsStandardScheme extends StandardScheme<stringToWords_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, stringToWords_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // STRING_TO_ANALYZE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.stringToAnalyze = iprot.readString();
+                struct.setStringToAnalyzeIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, stringToWords_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.stringToAnalyze != null) {
+          oprot.writeFieldBegin(STRING_TO_ANALYZE_FIELD_DESC);
+          oprot.writeString(struct.stringToAnalyze);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class stringToWords_argsTupleSchemeFactory implements SchemeFactory {
+      public stringToWords_argsTupleScheme getScheme() {
+        return new stringToWords_argsTupleScheme();
+      }
+    }
+
+    private static class stringToWords_argsTupleScheme extends TupleScheme<stringToWords_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, stringToWords_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetStringToAnalyze()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetStringToAnalyze()) {
+          oprot.writeString(struct.stringToAnalyze);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, stringToWords_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.stringToAnalyze = iprot.readString();
+          struct.setStringToAnalyzeIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class stringToWords_result implements org.apache.thrift.TBase<stringToWords_result, stringToWords_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("stringToWords_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.LIST, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new stringToWords_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new stringToWords_resultTupleSchemeFactory());
+    }
+
+    public List<String> success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(stringToWords_result.class, metaDataMap);
+    }
+
+    public stringToWords_result() {
+    }
+
+    public stringToWords_result(
+      List<String> success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public stringToWords_result(stringToWords_result other) {
+      if (other.isSetSuccess()) {
+        List<String> __this__success = new ArrayList<String>();
+        for (String other_element : other.success) {
+          __this__success.add(other_element);
+        }
+        this.success = __this__success;
+      }
+    }
+
+    public stringToWords_result deepCopy() {
+      return new stringToWords_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public int getSuccessSize() {
+      return (this.success == null) ? 0 : this.success.size();
+    }
+
+    public java.util.Iterator<String> getSuccessIterator() {
+      return (this.success == null) ? null : this.success.iterator();
+    }
+
+    public void addToSuccess(String elem) {
+      if (this.success == null) {
+        this.success = new ArrayList<String>();
+      }
+      this.success.add(elem);
+    }
+
+    public List<String> getSuccess() {
+      return this.success;
+    }
+
+    public stringToWords_result setSuccess(List<String> success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((List<String>)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof stringToWords_result)
+        return this.equals((stringToWords_result)that);
+      return false;
+    }
+
+    public boolean equals(stringToWords_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(stringToWords_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      stringToWords_result typedOther = (stringToWords_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("stringToWords_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class stringToWords_resultStandardSchemeFactory implements SchemeFactory {
+      public stringToWords_resultStandardScheme getScheme() {
+        return new stringToWords_resultStandardScheme();
+      }
+    }
+
+    private static class stringToWords_resultStandardScheme extends StandardScheme<stringToWords_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, stringToWords_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+                {
+                  org.apache.thrift.protocol.TList _list24 = iprot.readListBegin();
+                  struct.success = new ArrayList<String>(_list24.size);
+                  for (int _i25 = 0; _i25 < _list24.size; ++_i25)
+                  {
+                    String _elem26; // required
+                    _elem26 = iprot.readString();
+                    struct.success.add(_elem26);
+                  }
+                  iprot.readListEnd();
+                }
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, stringToWords_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.success.size()));
+            for (String _iter27 : struct.success)
+            {
+              oprot.writeString(_iter27);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class stringToWords_resultTupleSchemeFactory implements SchemeFactory {
+      public stringToWords_resultTupleScheme getScheme() {
+        return new stringToWords_resultTupleScheme();
+      }
+    }
+
+    private static class stringToWords_resultTupleScheme extends TupleScheme<stringToWords_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, stringToWords_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          {
+            oprot.writeI32(struct.success.size());
+            for (String _iter28 : struct.success)
+            {
+              oprot.writeString(_iter28);
+            }
+          }
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, stringToWords_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          {
+            org.apache.thrift.protocol.TList _list29 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+            struct.success = new ArrayList<String>(_list29.size);
+            for (int _i30 = 0; _i30 < _list29.size; ++_i30)
+            {
+              String _elem31; // required
+              _elem31 = iprot.readString();
+              struct.success.add(_elem31);
             }
           }
           struct.setSuccessIsSet(true);

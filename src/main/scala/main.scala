@@ -1,3 +1,4 @@
+import com.beachape.analyze.Morpheme
 import scala.concurrent.duration.DurationInt
 
 import com.beachape.actors.MainActorSystem._ //implicit ActorSystem
@@ -10,6 +11,8 @@ import com.redis.RedisClientPool
 import akka.routing.SmallestMailboxRouter
 
 import scala.language.postfixOps
+
+import org.atilika.kuromoji.Tokenizer
 
 object TrendApp {
 
@@ -27,10 +30,8 @@ object TrendApp {
           [--redis-host String, defaults to localhost]
           [--redis-db Int, defaults to 0]
           [--redis-port Int, defaults to 6379]
-          [--sample-data-filepath String]
-          [--sample-data-from Unix timetamp, defaults to 3 days ago]
-          [--sample-data-until Unix timetamp, defaults to now]
-    """
+          [--custom-dictionary-path String, path to a dictionary file (txt). See Kuromoji's txt example, defaults to nothing]
+      """
 
   def main(args: Array[String]) {
 
@@ -78,6 +79,8 @@ object TrendApp {
           nextOption(map ++ Map('sampleDataFrom -> value.toInt), tail)
         case "--sample-data-until" :: value :: tail =>
           nextOption(map ++ Map('sampleDataUntil -> value.toInt), tail)
+        case "--custom-dictionary-path" :: value :: tail =>
+          nextOption(map ++ Map('customDictionaryPath -> value), tail)
         case option :: tail =>
           println("Unknown option " + option)
           sys.exit(1)
@@ -106,6 +109,7 @@ object TrendApp {
       (System.currentTimeMillis / 1000 - 259200).toInt).asInstanceOf[Int]
     val sampleDataUntil = options.getOrElse('sampleDataUntil,
       (System.currentTimeMillis / 1000).toInt).asInstanceOf[Int]
+    val customDictionaryPath = options.getOrElse('customDictionaryPath, "").toString
 
     val redisPool = new RedisClientPool(redisHost, redisPort, database = redisDb)
     if (clearRedis) redisPool.withClient { _.flushdb }
@@ -132,6 +136,14 @@ object TrendApp {
       println(s"Dumping sample data from file")
       SampleFileToRedisDumper(redisPool).dumpToRedis(sampleDataFilepath, sampleDataFrom, sampleDataUntil)
     }
+
+    if (!customDictionaryPath.isEmpty) {
+      println(s"Attempting to use dictionary from: $customDictionaryPath")
+      val customDictionaryTokenizer = Tokenizer.builder().userDictionary(customDictionaryPath).build()
+      Morpheme.tokenizer = customDictionaryTokenizer
+    }
+
+    println(Morpheme.stringToWords("朝青龍こんにちは自転車大谷旅人"))
 
     println("Server is ready for duty.")
     val server = TrendServer(mainOrchestratorRoundRobin, thriftServerPort)

@@ -21,6 +21,7 @@ import trendServer.gen.TrendThriftServer
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
+import com.beachape.analyze.Morpheme
 
 /**
  * Companion object that holds the factory for TrendServer
@@ -130,5 +131,7 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
   override def storeString(stringToStore: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int): Unit = {
     mainOrchestrator ! StoreString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
   }
+
+  override def stringToWords(stringToAnalyse: String) = Morpheme.stringToWords(stringToAnalyse)
 
 }

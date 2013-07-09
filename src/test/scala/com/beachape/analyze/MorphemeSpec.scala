@@ -83,16 +83,22 @@ class MorphemeSpec extends FunSpec
               |##
               |## This file should use UTF-8 encoding
               |##
+              |## NOTE: THIS IS NOT EXACTLY THE SAME FORMAT AS WHAT KUROMOJI USES
+              |## hinsi and hinsi1 are used for whitelisting and blacklisting when detecting
+              |## morphemes, so check out com.beachape.analyze.Morpheme
+              |##
               |## User dictionary format:
-              |##   <text>,<token1> <token2> ... <tokenn>,<reading1> <reading2> ... <readingn>,<part-of-speech>
+              |##   <text>,<text again>,<hinsi>,<hinsi1>
               |##
               |
               |# Custom segmentation for long entries
-              |日本経済新聞,日本 経済 新聞,ニホン ケイザイ シンブン,カスタム名詞
-              |関西国際空港,関西 国際 空港,カンサイ コクサイ クウコウ,テスト名詞
+              |日本経済新聞,日本経済新聞,名詞,一般
+              |関西国際空港,関西国際空港,名詞,一般
               |
               |# Custom reading for former sumo wrestler Asashoryu
-              |朝青龍,朝青龍,アサショウリュウ,カスタム人名
+              |朝青龍,朝青龍,名詞,一般
+              |
+              |坂本麻衣,坂本麻衣,名詞,一般
             """.stripMargin)
           writer.close
 

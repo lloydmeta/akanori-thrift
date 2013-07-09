@@ -73,6 +73,21 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'trendsEndingAt failed: unknown result')
         end
 
+        def stringToWords(stringToAnalyze)
+          send_stringToWords(stringToAnalyze)
+          return recv_stringToWords()
+        end
+
+        def send_stringToWords(stringToAnalyze)
+          send_message('stringToWords', StringToWords_args, :stringToAnalyze => stringToAnalyze)
+        end
+
+        def recv_stringToWords()
+          result = receive_message(StringToWords_result)
+          return result.success unless result.success.nil?
+          raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'stringToWords failed: unknown result')
+        end
+
         def storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
           send_storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
         end
@@ -111,6 +126,13 @@ module TrendServer
           result = TrendsEndingAt_result.new()
           result.success = @handler.trendsEndingAt(args.unixEndAtTime, args.spanInSeconds, args.minOccurrence, args.minLength, args.maxLength, args.top, args.dropBlacklisted, args.onlyWhitelisted)
           write_result(result, oprot, 'trendsEndingAt', seqid)
+        end
+
+        def process_stringToWords(seqid, iprot, oprot)
+          args = read_args(iprot, StringToWords_args)
+          result = StringToWords_result.new()
+          result.success = @handler.stringToWords(args.stringToAnalyze)
+          write_result(result, oprot, 'stringToWords', seqid)
         end
 
         def process_storeString(seqid, iprot, oprot)
@@ -265,6 +287,38 @@ module TrendServer
 
         FIELDS = {
           SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TrendServer::Gen::TrendResult}}
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class StringToWords_args
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+        STRINGTOANALYZE = 1
+
+        FIELDS = {
+          STRINGTOANALYZE => {:type => ::Thrift::Types::STRING, :name => 'stringToAnalyze'}
+        }
+
+        def struct_fields; FIELDS; end
+
+        def validate
+        end
+
+        ::Thrift::Struct.generate_accessors self
+      end
+
+      class StringToWords_result
+        include ::Thrift::Struct, ::Thrift::Struct_Union
+        SUCCESS = 0
+
+        FIELDS = {
+          SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}}
         }
 
         def struct_fields; FIELDS; end
