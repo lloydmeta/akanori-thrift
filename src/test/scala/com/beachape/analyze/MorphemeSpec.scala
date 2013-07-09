@@ -2,15 +2,20 @@ package com.beachape.analyze
 
 import scala.runtime.ZippedTraversable2.zippedTraversable2ToTraversable
 
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.FunSpec
+import org.scalatest.{PrivateMethodTester, BeforeAndAfterAll, BeforeAndAfterEach, FunSpec}
 import org.scalatest.matchers.ShouldMatchers
+import org.atilika.kuromoji.Tokenizer
+import java.io.{FileWriter, BufferedWriter}
+import scala.collection.JavaConversions._
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.agent.Agent
 
 class MorphemeSpec extends FunSpec
-  with ShouldMatchers
-  with BeforeAndAfterEach
-  with BeforeAndAfterAll {
+with ShouldMatchers
+with PrivateMethodTester
+with BeforeAndAfterEach
+with BeforeAndAfterAll {
 
   val stringToAnalyse = "隣の客はよく柿食う客だ"
   val knownMorphemeSurfaces = List("隣", "の", "客", "は", "よく", "柿", "食う", "客", "だ")
@@ -53,6 +58,63 @@ class MorphemeSpec extends FunSpec
         words.isInstanceOf[List[String]] should be(true)
       }
 
+    }
+
+    describe("tokenizer accessors") {
+
+      describe(".tokenizer") {
+
+        it("should return a tokenizer") {
+          Morpheme.tokenizer.isInstanceOf[Tokenizer] should be(true)
+        }
+      }
+
+      describe(".tokenizer_=") {
+
+        implicit val timeout = Timeout(5 seconds)
+        val privateTokenizerAgentAccessor = PrivateMethod[Agent[Tokenizer]]('tokenizerAgent)
+
+        it("should assign a new tokenizer") {
+          // Create a temporary dictionary file
+          val tempFile = java.io.File.createTempFile("fakeDictionary", ".txt")
+          val writer = new BufferedWriter(new FileWriter(tempFile))
+          writer.write(
+            """
+              |##
+              |## This file should use UTF-8 encoding
+              |##
+              |## NOTE: THIS IS NOT EXACTLY THE SAME FORMAT AS WHAT KUROMOJI USES
+              |## hinsi and hinsi1 are used for whitelisting and blacklisting when detecting
+              |## morphemes, so check out com.beachape.analyze.Morpheme
+              |##
+              |## User dictionary format:
+              |##   <text>,<text again>,<hinsi>,<hinsi1>
+              |##
+              |
+              |# Custom segmentation for long entries
+              |日本経済新聞,日本経済新聞,名詞,一般
+              |関西国際空港,関西国際空港,名詞,一般
+              |
+              |# Custom reading for former sumo wrestler Asashoryu
+              |朝青龍,朝青龍,名詞,一般
+              |
+              |坂本麻衣,坂本麻衣,名詞,一般
+            """.stripMargin)
+          writer.close
+
+          //Note that we wait to make sure that the Agent has had all updates written to
+          val newTokenizer = Tokenizer.builder().userDictionary(tempFile.getAbsolutePath).build()
+          val newTokenizerTokens = newTokenizer.tokenize("朝青龍")
+          val defaultTokenizer = Morpheme.invokePrivate(privateTokenizerAgentAccessor()).await
+          val defaultTokenizerTokens = defaultTokenizer.tokenize("朝青龍")
+          defaultTokenizerTokens.head.getSurfaceForm should not be (newTokenizerTokens.head.getSurfaceForm)
+
+          Morpheme.tokenizer = newTokenizer
+          val assignedTokenizer = Morpheme.invokePrivate(privateTokenizerAgentAccessor()).await
+          val assignedTokenizerTokens = assignedTokenizer.tokenize("朝青龍")
+          assignedTokenizerTokens.head.getSurfaceForm should be(newTokenizerTokens.head.getSurfaceForm)
+        }
+      }
     }
 
   }

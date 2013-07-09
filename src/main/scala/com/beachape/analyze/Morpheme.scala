@@ -1,6 +1,8 @@
 // from http://blog.kenkov.jp/2013/04/04/mecab_scala.html
 package com.beachape.analyze
 
+import com.beachape.actors.MainActorSystem._
+import akka.agent.Agent
 import scala.collection.JavaConversions._
 import org.atilika.kuromoji.Tokenizer
 
@@ -18,7 +20,7 @@ object Morpheme {
   type Words = List[String]
 
   // Kuromoji is supposedly thread safe, so lets do this proper
-  private val tokenizer = Tokenizer.builder().build()
+  private val tokenizerAgent = Agent(Tokenizer.builder().build())
 
   val attributeValueBlackistMap = Map(
     'surface -> (
@@ -74,6 +76,25 @@ object Morpheme {
   def stringToWords(str: String): Words = {
     stringToMorphemes(str) map { _.surface }
   }
+
+  /**
+   * Updates the current tokenizer used in this singleton
+   *
+   * Useful for when there is a need to update the tokenizer on
+   * the fly, for example if a dictionary file updates or is modified
+   * or is deleted, etc.
+   *
+   * @param tokenizer A new tokenizer instance to use
+   */
+  def tokenizer_=(tokenizer: Tokenizer) { tokenizerAgent send tokenizer }
+
+  /**
+   * Returns the current instance of tokenizer being
+   * used for morpheme analysis
+   *
+   * @return the current Tokenizer used
+   */
+  def tokenizer = tokenizerAgent()
 
   private def parseMorpheme(surface: String, features: String): Morpheme = {
     val data = features.split(",").toList
