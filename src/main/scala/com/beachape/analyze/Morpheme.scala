@@ -33,7 +33,7 @@ object Morpheme {
     'hinsi1 -> List("助数詞", "接尾", "数", "サ変接続", "非自立"))
 
   val attributeValueWhitelistMap = Map(
-    'hinsi -> List("名詞", "カスタム人名"))
+    'hinsi -> List("名詞"))
 
   val blackListFilter = { (x: Morpheme) =>
     !attributeValueBlackistMap.getOrElse('surface, List()).contains(x.surface) &&

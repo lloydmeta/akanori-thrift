@@ -12,10 +12,10 @@ import akka.util.Timeout
 import akka.agent.Agent
 
 class MorphemeSpec extends FunSpec
-  with ShouldMatchers
-  with PrivateMethodTester
-  with BeforeAndAfterEach
-  with BeforeAndAfterAll {
+with ShouldMatchers
+with PrivateMethodTester
+with BeforeAndAfterEach
+with BeforeAndAfterAll {
 
   val stringToAnalyse = "隣の客はよく柿食う客だ"
   val knownMorphemeSurfaces = List("隣", "の", "客", "は", "よく", "柿", "食う", "客", "だ")
@@ -107,7 +107,7 @@ class MorphemeSpec extends FunSpec
           val newTokenizerTokens = newTokenizer.tokenize("朝青龍")
           val defaultTokenizer = Morpheme.invokePrivate(privateTokenizerAgentAccessor()).await
           val defaultTokenizerTokens = defaultTokenizer.tokenize("朝青龍")
-          defaultTokenizerTokens.head.getSurfaceForm should not be(newTokenizerTokens.head.getSurfaceForm)
+          defaultTokenizerTokens.head.getSurfaceForm should not be (newTokenizerTokens.head.getSurfaceForm)
 
           Morpheme.tokenizer = newTokenizer
           val assignedTokenizer = Morpheme.invokePrivate(privateTokenizerAgentAccessor()).await

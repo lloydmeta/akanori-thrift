@@ -30,7 +30,7 @@ object TrendApp {
           [--redis-host String, defaults to localhost]
           [--redis-db Int, defaults to 0]
           [--redis-port Int, defaults to 6379]
-          [--custom-dictionary-path String, path to a dictionary file (txt). See Kuromoji's txt example, defaults to nothing]
+          [--custom-dictionary-path String, path to a dictionary file (txt). See src/example/customDictionary.txt]
       """
 
   def main(args: Array[String]) {
