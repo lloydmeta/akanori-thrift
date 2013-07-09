@@ -88,12 +88,12 @@ module TrendServer
           raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'stringToWords failed: unknown result')
         end
 
-        def storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
-          send_storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
+        def storeString(stringToStore, userId, unixCreatedAtTime, weeksAgoDataToExpire)
+          send_storeString(stringToStore, userId, unixCreatedAtTime, weeksAgoDataToExpire)
         end
 
-        def send_storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire)
-          send_message('storeString', StoreString_args, :stringToStore => stringToStore, :unixCreatedAtTime => unixCreatedAtTime, :weeksAgoDataToExpire => weeksAgoDataToExpire)
+        def send_storeString(stringToStore, userId, unixCreatedAtTime, weeksAgoDataToExpire)
+          send_message('storeString', StoreString_args, :stringToStore => stringToStore, :userId => userId, :unixCreatedAtTime => unixCreatedAtTime, :weeksAgoDataToExpire => weeksAgoDataToExpire)
         end
       end
 
@@ -137,7 +137,7 @@ module TrendServer
 
         def process_storeString(seqid, iprot, oprot)
           args = read_args(iprot, StoreString_args)
-          @handler.storeString(args.stringToStore, args.unixCreatedAtTime, args.weeksAgoDataToExpire)
+          @handler.storeString(args.stringToStore, args.userId, args.unixCreatedAtTime, args.weeksAgoDataToExpire)
           return
         end
 
@@ -332,11 +332,13 @@ module TrendServer
       class StoreString_args
         include ::Thrift::Struct, ::Thrift::Struct_Union
         STRINGTOSTORE = 1
-        UNIXCREATEDATTIME = 2
-        WEEKSAGODATATOEXPIRE = 3
+        USERID = 2
+        UNIXCREATEDATTIME = 3
+        WEEKSAGODATATOEXPIRE = 4
 
         FIELDS = {
           STRINGTOSTORE => {:type => ::Thrift::Types::STRING, :name => 'stringToStore'},
+          USERID => {:type => ::Thrift::Types::STRING, :name => 'userId'},
           UNIXCREATEDATTIME => {:type => ::Thrift::Types::I32, :name => 'unixCreatedAtTime'},
           WEEKSAGODATATOEXPIRE => {:type => ::Thrift::Types::I32, :name => 'weeksAgoDataToExpire'}
         }

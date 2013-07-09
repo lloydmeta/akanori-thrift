@@ -21,5 +21,5 @@ service TrendThriftServer {
 	// Method for extracting words from a string
 	list<string> stringToWords(1:string stringToAnalyze),
 	
-	oneway void storeString(1:string stringToStore, 2:i32 unixCreatedAtTime, 3:i32 weeksAgoDataToExpire)
+	oneway void storeString(1:string stringToStore, 2:string userId, 3:i32 unixCreatedAtTime, 4:i32 weeksAgoDataToExpire)
 }

@@ -44,7 +44,7 @@ public class TrendThriftServer {
 
     public List<String> stringToWords(String stringToAnalyze) throws org.apache.thrift.TException;
 
-    public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException;
+    public void storeString(String stringToStore, String userId, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException;
 
   }
 
@@ -60,7 +60,7 @@ public class TrendThriftServer {
 
     public void stringToWords(String stringToAnalyze, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.stringToWords_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.storeString_call> resultHandler) throws org.apache.thrift.TException;
+    public void storeString(String stringToStore, String userId, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.storeString_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -210,15 +210,16 @@ public class TrendThriftServer {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "stringToWords failed: unknown result");
     }
 
-    public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException
+    public void storeString(String stringToStore, String userId, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException
     {
-      send_storeString(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire);
+      send_storeString(stringToStore, userId, unixCreatedAtTime, weeksAgoDataToExpire);
     }
 
-    public void send_storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException
+    public void send_storeString(String stringToStore, String userId, int unixCreatedAtTime, int weeksAgoDataToExpire) throws org.apache.thrift.TException
     {
       storeString_args args = new storeString_args();
       args.setStringToStore(stringToStore);
+      args.setUserId(userId);
       args.setUnixCreatedAtTime(unixCreatedAtTime);
       args.setWeeksAgoDataToExpire(weeksAgoDataToExpire);
       sendBase("storeString", args);
@@ -435,20 +436,22 @@ public class TrendThriftServer {
       }
     }
 
-    public void storeString(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<storeString_call> resultHandler) throws org.apache.thrift.TException {
+    public void storeString(String stringToStore, String userId, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<storeString_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      storeString_call method_call = new storeString_call(stringToStore, unixCreatedAtTime, weeksAgoDataToExpire, resultHandler, this, ___protocolFactory, ___transport);
+      storeString_call method_call = new storeString_call(stringToStore, userId, unixCreatedAtTime, weeksAgoDataToExpire, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
     public static class storeString_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String stringToStore;
+      private String userId;
       private int unixCreatedAtTime;
       private int weeksAgoDataToExpire;
-      public storeString_call(String stringToStore, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<storeString_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public storeString_call(String stringToStore, String userId, int unixCreatedAtTime, int weeksAgoDataToExpire, org.apache.thrift.async.AsyncMethodCallback<storeString_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, true);
         this.stringToStore = stringToStore;
+        this.userId = userId;
         this.unixCreatedAtTime = unixCreatedAtTime;
         this.weeksAgoDataToExpire = weeksAgoDataToExpire;
       }
@@ -457,6 +460,7 @@ public class TrendThriftServer {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("storeString", org.apache.thrift.protocol.TMessageType.CALL, 0));
         storeString_args args = new storeString_args();
         args.setStringToStore(stringToStore);
+        args.setUserId(userId);
         args.setUnixCreatedAtTime(unixCreatedAtTime);
         args.setWeeksAgoDataToExpire(weeksAgoDataToExpire);
         args.write(prot);
@@ -609,7 +613,7 @@ public class TrendThriftServer {
       }
 
       public org.apache.thrift.TBase getResult(I iface, storeString_args args) throws org.apache.thrift.TException {
-        iface.storeString(args.stringToStore, args.unixCreatedAtTime, args.weeksAgoDataToExpire);
+        iface.storeString(args.stringToStore, args.userId, args.unixCreatedAtTime, args.weeksAgoDataToExpire);
         return null;
       }
     }
@@ -5376,8 +5380,9 @@ public class TrendThriftServer {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("storeString_args");
 
     private static final org.apache.thrift.protocol.TField STRING_TO_STORE_FIELD_DESC = new org.apache.thrift.protocol.TField("stringToStore", org.apache.thrift.protocol.TType.STRING, (short)1);
-    private static final org.apache.thrift.protocol.TField UNIX_CREATED_AT_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("unixCreatedAtTime", org.apache.thrift.protocol.TType.I32, (short)2);
-    private static final org.apache.thrift.protocol.TField WEEKS_AGO_DATA_TO_EXPIRE_FIELD_DESC = new org.apache.thrift.protocol.TField("weeksAgoDataToExpire", org.apache.thrift.protocol.TType.I32, (short)3);
+    private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("userId", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField UNIX_CREATED_AT_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("unixCreatedAtTime", org.apache.thrift.protocol.TType.I32, (short)3);
+    private static final org.apache.thrift.protocol.TField WEEKS_AGO_DATA_TO_EXPIRE_FIELD_DESC = new org.apache.thrift.protocol.TField("weeksAgoDataToExpire", org.apache.thrift.protocol.TType.I32, (short)4);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -5386,14 +5391,16 @@ public class TrendThriftServer {
     }
 
     public String stringToStore; // required
+    public String userId; // required
     public int unixCreatedAtTime; // required
     public int weeksAgoDataToExpire; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       STRING_TO_STORE((short)1, "stringToStore"),
-      UNIX_CREATED_AT_TIME((short)2, "unixCreatedAtTime"),
-      WEEKS_AGO_DATA_TO_EXPIRE((short)3, "weeksAgoDataToExpire");
+      USER_ID((short)2, "userId"),
+      UNIX_CREATED_AT_TIME((short)3, "unixCreatedAtTime"),
+      WEEKS_AGO_DATA_TO_EXPIRE((short)4, "weeksAgoDataToExpire");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -5410,9 +5417,11 @@ public class TrendThriftServer {
         switch(fieldId) {
           case 1: // STRING_TO_STORE
             return STRING_TO_STORE;
-          case 2: // UNIX_CREATED_AT_TIME
+          case 2: // USER_ID
+            return USER_ID;
+          case 3: // UNIX_CREATED_AT_TIME
             return UNIX_CREATED_AT_TIME;
-          case 3: // WEEKS_AGO_DATA_TO_EXPIRE
+          case 4: // WEEKS_AGO_DATA_TO_EXPIRE
             return WEEKS_AGO_DATA_TO_EXPIRE;
           default:
             return null;
@@ -5462,6 +5471,8 @@ public class TrendThriftServer {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.STRING_TO_STORE, new org.apache.thrift.meta_data.FieldMetaData("stringToStore", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("userId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       tmpMap.put(_Fields.UNIX_CREATED_AT_TIME, new org.apache.thrift.meta_data.FieldMetaData("unixCreatedAtTime", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.WEEKS_AGO_DATA_TO_EXPIRE, new org.apache.thrift.meta_data.FieldMetaData("weeksAgoDataToExpire", org.apache.thrift.TFieldRequirementType.DEFAULT, 
@@ -5475,11 +5486,13 @@ public class TrendThriftServer {
 
     public storeString_args(
       String stringToStore,
+      String userId,
       int unixCreatedAtTime,
       int weeksAgoDataToExpire)
     {
       this();
       this.stringToStore = stringToStore;
+      this.userId = userId;
       this.unixCreatedAtTime = unixCreatedAtTime;
       setUnixCreatedAtTimeIsSet(true);
       this.weeksAgoDataToExpire = weeksAgoDataToExpire;
@@ -5494,6 +5507,9 @@ public class TrendThriftServer {
       if (other.isSetStringToStore()) {
         this.stringToStore = other.stringToStore;
       }
+      if (other.isSetUserId()) {
+        this.userId = other.userId;
+      }
       this.unixCreatedAtTime = other.unixCreatedAtTime;
       this.weeksAgoDataToExpire = other.weeksAgoDataToExpire;
     }
@@ -5505,6 +5521,7 @@ public class TrendThriftServer {
     @Override
     public void clear() {
       this.stringToStore = null;
+      this.userId = null;
       setUnixCreatedAtTimeIsSet(false);
       this.unixCreatedAtTime = 0;
       setWeeksAgoDataToExpireIsSet(false);
@@ -5532,6 +5549,30 @@ public class TrendThriftServer {
     public void setStringToStoreIsSet(boolean value) {
       if (!value) {
         this.stringToStore = null;
+      }
+    }
+
+    public String getUserId() {
+      return this.userId;
+    }
+
+    public storeString_args setUserId(String userId) {
+      this.userId = userId;
+      return this;
+    }
+
+    public void unsetUserId() {
+      this.userId = null;
+    }
+
+    /** Returns true if field userId is set (has been assigned a value) and false otherwise */
+    public boolean isSetUserId() {
+      return this.userId != null;
+    }
+
+    public void setUserIdIsSet(boolean value) {
+      if (!value) {
+        this.userId = null;
       }
     }
 
@@ -5591,6 +5632,14 @@ public class TrendThriftServer {
         }
         break;
 
+      case USER_ID:
+        if (value == null) {
+          unsetUserId();
+        } else {
+          setUserId((String)value);
+        }
+        break;
+
       case UNIX_CREATED_AT_TIME:
         if (value == null) {
           unsetUnixCreatedAtTime();
@@ -5615,6 +5664,9 @@ public class TrendThriftServer {
       case STRING_TO_STORE:
         return getStringToStore();
 
+      case USER_ID:
+        return getUserId();
+
       case UNIX_CREATED_AT_TIME:
         return Integer.valueOf(getUnixCreatedAtTime());
 
@@ -5634,6 +5686,8 @@ public class TrendThriftServer {
       switch (field) {
       case STRING_TO_STORE:
         return isSetStringToStore();
+      case USER_ID:
+        return isSetUserId();
       case UNIX_CREATED_AT_TIME:
         return isSetUnixCreatedAtTime();
       case WEEKS_AGO_DATA_TO_EXPIRE:
@@ -5661,6 +5715,15 @@ public class TrendThriftServer {
         if (!(this_present_stringToStore && that_present_stringToStore))
           return false;
         if (!this.stringToStore.equals(that.stringToStore))
+          return false;
+      }
+
+      boolean this_present_userId = true && this.isSetUserId();
+      boolean that_present_userId = true && that.isSetUserId();
+      if (this_present_userId || that_present_userId) {
+        if (!(this_present_userId && that_present_userId))
+          return false;
+        if (!this.userId.equals(that.userId))
           return false;
       }
 
@@ -5704,6 +5767,16 @@ public class TrendThriftServer {
       }
       if (isSetStringToStore()) {
         lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.stringToStore, typedOther.stringToStore);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetUserId()).compareTo(typedOther.isSetUserId());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUserId()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.userId, typedOther.userId);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -5753,6 +5826,14 @@ public class TrendThriftServer {
         sb.append("null");
       } else {
         sb.append(this.stringToStore);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("userId:");
+      if (this.userId == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.userId);
       }
       first = false;
       if (!first) sb.append(", ");
@@ -5816,7 +5897,15 @@ public class TrendThriftServer {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 2: // UNIX_CREATED_AT_TIME
+            case 2: // USER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.userId = iprot.readString();
+                struct.setUserIdIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // UNIX_CREATED_AT_TIME
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.unixCreatedAtTime = iprot.readI32();
                 struct.setUnixCreatedAtTimeIsSet(true);
@@ -5824,7 +5913,7 @@ public class TrendThriftServer {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 3: // WEEKS_AGO_DATA_TO_EXPIRE
+            case 4: // WEEKS_AGO_DATA_TO_EXPIRE
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.weeksAgoDataToExpire = iprot.readI32();
                 struct.setWeeksAgoDataToExpireIsSet(true);
@@ -5850,6 +5939,11 @@ public class TrendThriftServer {
         if (struct.stringToStore != null) {
           oprot.writeFieldBegin(STRING_TO_STORE_FIELD_DESC);
           oprot.writeString(struct.stringToStore);
+          oprot.writeFieldEnd();
+        }
+        if (struct.userId != null) {
+          oprot.writeFieldBegin(USER_ID_FIELD_DESC);
+          oprot.writeString(struct.userId);
           oprot.writeFieldEnd();
         }
         oprot.writeFieldBegin(UNIX_CREATED_AT_TIME_FIELD_DESC);
@@ -5879,15 +5973,21 @@ public class TrendThriftServer {
         if (struct.isSetStringToStore()) {
           optionals.set(0);
         }
-        if (struct.isSetUnixCreatedAtTime()) {
+        if (struct.isSetUserId()) {
           optionals.set(1);
         }
-        if (struct.isSetWeeksAgoDataToExpire()) {
+        if (struct.isSetUnixCreatedAtTime()) {
           optionals.set(2);
         }
-        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetWeeksAgoDataToExpire()) {
+          optionals.set(3);
+        }
+        oprot.writeBitSet(optionals, 4);
         if (struct.isSetStringToStore()) {
           oprot.writeString(struct.stringToStore);
+        }
+        if (struct.isSetUserId()) {
+          oprot.writeString(struct.userId);
         }
         if (struct.isSetUnixCreatedAtTime()) {
           oprot.writeI32(struct.unixCreatedAtTime);
@@ -5900,16 +6000,20 @@ public class TrendThriftServer {
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, storeString_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(3);
+        BitSet incoming = iprot.readBitSet(4);
         if (incoming.get(0)) {
           struct.stringToStore = iprot.readString();
           struct.setStringToStoreIsSet(true);
         }
         if (incoming.get(1)) {
+          struct.userId = iprot.readString();
+          struct.setUserIdIsSet(true);
+        }
+        if (incoming.get(2)) {
           struct.unixCreatedAtTime = iprot.readI32();
           struct.setUnixCreatedAtTimeIsSet(true);
         }
-        if (incoming.get(2)) {
+        if (incoming.get(3)) {
           struct.weeksAgoDataToExpire = iprot.readI32();
           struct.setWeeksAgoDataToExpireIsSet(true);
         }

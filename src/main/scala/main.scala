@@ -143,8 +143,6 @@ object TrendApp {
       Morpheme.tokenizer = customDictionaryTokenizer
     }
 
-    println(Morpheme.stringToWords("朝青龍こんにちは自転車大谷旅人"))
-
     println("Server is ready for duty.")
     val server = TrendServer(mainOrchestratorRoundRobin, thriftServerPort)
     server.serve
