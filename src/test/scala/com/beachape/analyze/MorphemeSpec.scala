@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
+import org.atilika.kuromoji.Tokenizer
 
 class MorphemeSpec extends FunSpec
   with ShouldMatchers
@@ -53,6 +54,21 @@ class MorphemeSpec extends FunSpec
         words.isInstanceOf[List[String]] should be(true)
       }
 
+    }
+
+    describe("tokenizer accessors") {
+
+      describe(".tokenizer") {
+
+        it("should return a tokenizer") {
+          Morpheme.tokenizer.isInstanceOf[Tokenizer] should be(true)
+        }
+      }
+
+      describe(".tokenizer_=") {
+
+        
+      }
     }
 
   }

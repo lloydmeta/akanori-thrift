@@ -86,9 +86,7 @@ object Morpheme {
    *
    * @param tokenizer A new tokenizer instance to use
    */
-  def updateTokenizer(tokenizer: Tokenizer) {
-    tokenizerAgent send tokenizer
-  }
+  def tokenizer_=(tokenizer: Tokenizer) {tokenizerAgent send tokenizer}
 
   /**
    * Returns the current instance of tokenizer being
