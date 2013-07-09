@@ -1,12 +1,12 @@
 import scala.concurrent.duration.DurationInt
 
+import com.beachape.actors.MainActorSystem._ //implicit ActorSystem
 import com.beachape.actors.GenerateDefaultTrends
 import com.beachape.actors.MainOrchestrator
 import com.beachape.server.TrendServer
 import com.beachape.support.SampleFileToRedisDumper
 import com.redis.RedisClientPool
 
-import akka.actor.ActorSystem
 import akka.routing.SmallestMailboxRouter
 
 import scala.language.postfixOps
@@ -110,7 +110,6 @@ object TrendApp {
     val redisPool = new RedisClientPool(redisHost, redisPort, database = redisDb)
     if (clearRedis) redisPool.withClient { _.flushdb }
 
-    val system = ActorSystem("akanoriSystem")
     val mainOrchestratorRoundRobin = system.actorOf(
       MainOrchestrator(
         redisPool,
