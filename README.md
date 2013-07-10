@@ -1,6 +1,8 @@
 akanori-thrift [![Build Status](https://travis-ci.org/lloydmeta/akanori-thrift.png?branch=master)](https://travis-ci.org/lloydmeta/akanori-thrift)
 ------------------
 
+__Note__: Requires Java 7 because the [WatchService API](http://docs.oracle.com/javase/7/docs/api/java/nio/file/WatchService.html) in order to allow for on-the-fly updates of the dictionary used for tokenization.
+
 Scala Thrift project/tool for extracting trends from Japanese phrases. Still in development.
 
 Thrift clients send strings to the Scala server, which then stores it initially. Clients can then ask for trends at specific time slices in the past (granted the data for that timeslice), with certain parameters such as dropblacklisted, whitelisted only, etc, and the server will reply with a list of TrendResults by doing Chi-squared fitness tests and comparing results from the timeslice requested and the same timeslice 24 hours before.
