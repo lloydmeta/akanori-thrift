@@ -2,8 +2,7 @@ import com.beachape.analyze.Morpheme
 import scala.concurrent.duration.DurationInt
 
 import com.beachape.actors.MainActorSystem._ //implicit ActorSystem
-import com.beachape.actors.GenerateDefaultTrends
-import com.beachape.actors.MainOrchestrator
+import com.beachape.actors.{DictionaryMonitorActor, GenerateDefaultTrends, MainOrchestrator}
 import com.beachape.server.TrendServer
 import com.beachape.support.SampleFileToRedisDumper
 import com.redis.RedisClientPool
@@ -139,8 +138,14 @@ object TrendApp {
 
     if (!customDictionaryPath.isEmpty) {
       println(s"Attempting to use dictionary from: $customDictionaryPath")
-      val customDictionaryTokenizer = Tokenizer.builder().userDictionary(customDictionaryPath).build()
-      Morpheme.tokenizer = customDictionaryTokenizer
+      try {
+        val customDictionaryTokenizer = Tokenizer.builder().userDictionary(customDictionaryPath).build()
+        Morpheme.tokenizer = customDictionaryTokenizer
+      } catch {
+        case e:java.lang.ArrayIndexOutOfBoundsException => println("Formatting seems borked on the custom dictionary file, try fixing it (restart not required)")
+        case e:Exception => println("Something went wrong when trying to use the custom dictionary file, try fixing it (restart not required)")
+      }
+      system.actorOf(DictionaryMonitorActor(customDictionaryPath), "customDictionaryMonitor")
     }
 
     println("Server is ready for duty.")
