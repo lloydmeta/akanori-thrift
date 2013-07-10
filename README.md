@@ -1,7 +1,7 @@
 akanori-thrift [![Build Status](https://travis-ci.org/lloydmeta/akanori-thrift.png?branch=master)](https://travis-ci.org/lloydmeta/akanori-thrift)
 ------------------
 
-__Note__: Requires Java 7 because the [WatchService API](http://docs.oracle.com/javase/7/docs/api/java/nio/file/WatchService.html) in order to allow for on-the-fly updates of the dictionary used for tokenization.
+__Note__: Requires Java 7 because the [WatchService API](http://docs.oracle.com/javase/7/docs/api/java/nio/file/WatchService.html) allows updates in the custom dictionary file used for tokenization to take effect immediately, on-the-fly without restarting the service.
 
 Scala Thrift project/tool for extracting trends from Japanese phrases. Still in development.
 
