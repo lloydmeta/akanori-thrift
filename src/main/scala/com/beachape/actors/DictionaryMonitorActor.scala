@@ -39,7 +39,7 @@ class DictionaryMonitorActor(dictionaryPath: String) extends Actor {
   private val dictionaryDir = Paths.get(dictionaryDirString)
 
   private val watchService = dictionaryDir.getFileSystem.newWatchService
-  private val watchKey = dictionaryDir.register(watchService, ENTRY_MODIFY)
+  dictionaryDir.register(watchService, ENTRY_MODIFY)
 
   beginWatching()
 
@@ -49,7 +49,8 @@ class DictionaryMonitorActor(dictionaryPath: String) extends Actor {
 
   private def beginWatching() {
     while(true) {
-      for (event <- watchKey.pollEvents) {
+      val watchKey = watchService.take()
+      for (event <- watchKey.pollEvents()) {
         val changed = event.context.asInstanceOf[Path]
         System.out.println(s"Modified: $changed")
         if (changed.endsWith(dictionaryFileNameString)) {
@@ -57,7 +58,7 @@ class DictionaryMonitorActor(dictionaryPath: String) extends Actor {
         }
       }
       // reset the key
-      val valid = watchKey.reset
+      val valid = watchKey.reset()
       if (!valid) {
         System.out.println("Key has been unregistered")
       }
