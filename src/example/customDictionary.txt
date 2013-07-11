@@ -18,5 +18,5 @@
 
 坂本麻衣,坂本麻衣,名詞,一般
 
-# For matching terms with spaces in them, make sure the second term doesn't have any spaces
+# For matching terms with spaces in them, make sure the second term doesn't have any spaces (dashes work)
 SUMMER NUDE,SUMMER-NUDE,名詞,一般
