@@ -13,6 +13,7 @@ import akka.actor.actorRef2Scala
 import akka.pattern.ask
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * Companion object that houses the factory apply
@@ -47,7 +48,10 @@ object RedisStringSetToMorphemesOrchestrator {
  *
  * Should be instantiated via the Props returned from companion object's apply method.
  */
-class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
+class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool)
+  extends Actor
+  with RedisStorageHelper
+  with Logging {
 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
@@ -104,7 +108,7 @@ class RedisStringSetToMorphemesOrchestrator(val redisPool: RedisClientPool) exte
       }
     }
 
-    case _ => println("RedisStringSetToMorphemesOrchestrator says 'huh?'")
+    case _ => logger.error("RedisStringSetToMorphemesOrchestrator says 'huh?'")
   }
 
 }

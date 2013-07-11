@@ -10,9 +10,11 @@ import com.github.nscala_time.time.Imports.RichLong
 import com.github.nscala_time.time.Imports.RichReadableInstant
 import com.github.nscala_time.time.Imports.RichString
 import com.redis.RedisClientPool
+import com.typesafe.scalalogging.slf4j.Logging
 
 case class SampleFileToRedisDumper(redisPool: RedisClientPool)
-  extends RedisStorageHelper {
+  extends RedisStorageHelper
+  with Logging {
 
   def dumpToRedis(filePath: String, unixStartTime: Int, unixEndTime: Int) {
     if (filePath.contains(".csv")) {
@@ -62,7 +64,7 @@ case class SampleFileToRedisDumper(redisPool: RedisClientPool)
           val dateUnix = (dateString.toDateTime.millis / 1000).toInt
           storeLineInRedis(storedStringsSetKey, string, dateUnix)
           val dateTime = (dateUnix * 1000L).toDateTime
-          println(s"$string inserted at $dateTime")
+          logger.info(s"$string inserted at $dateTime")
         } catch {
           case _: Throwable =>
         }

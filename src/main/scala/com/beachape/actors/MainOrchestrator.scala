@@ -15,6 +15,7 @@ import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
 import scala.language.postfixOps
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * Companion object housing the factory for Props used to instantiate
@@ -76,7 +77,8 @@ class MainOrchestrator(
   maxLength: Int,
   top: Int) extends Actor
   with RedisStorageHelper
-  with MorphemeScoreRedisHelper {
+  with MorphemeScoreRedisHelper
+  with Logging {
 
   import context.dispatcher
 
@@ -151,7 +153,7 @@ class MainOrchestrator(
       }
     }
 
-    case unneededMessage @ _ => println(unneededMessage)
+    case unneededMessage @ _ => logger.debug("Main Orchestrator received an needed message")
   }
 
   /**

@@ -1,4 +1,5 @@
 import com.beachape.analyze.Morpheme
+import com.typesafe.scalalogging.slf4j.Logging
 import scala.concurrent.duration.DurationInt
 
 import com.beachape.actors.MainActorSystem._ //implicit ActorSystem
@@ -13,7 +14,7 @@ import scala.language.postfixOps
 
 import org.atilika.kuromoji.Tokenizer
 
-object TrendApp {
+object TrendApp extends Logging {
 
   val usage = """
       Usage: Akanori-thrift (options are for currentTrendsDefault)
@@ -35,7 +36,7 @@ object TrendApp {
   def main(args: Array[String]) {
 
     def printUsageAndExit[T](default: T = "String"): T = {
-      println(usage)
+      logger.error(usage)
       sys.exit(1)
       default
     }
@@ -81,7 +82,7 @@ object TrendApp {
         case "--custom-dictionary-path" :: value :: tail =>
           nextOption(map ++ Map('customDictionaryPath -> value), tail)
         case option :: tail =>
-          println("Unknown option " + option)
+          logger.error("Unknown option " + option)
           sys.exit(1)
       }
     }
@@ -132,23 +133,23 @@ object TrendApp {
       mainOrchestratorRoundRobin, GenerateDefaultTrends)
 
     if (!sampleDataFilepath.isEmpty) {
-      println(s"Dumping sample data from file")
+      logger.info(s"Dumping sample data from file")
       SampleFileToRedisDumper(redisPool).dumpToRedis(sampleDataFilepath, sampleDataFrom, sampleDataUntil)
     }
 
     if (!customDictionaryPath.isEmpty) {
-      println(s"Attempting to use dictionary from: $customDictionaryPath")
+      logger.info(s"Attempting to use dictionary from: $customDictionaryPath")
       try {
         val customDictionaryTokenizer = Tokenizer.builder().userDictionary(customDictionaryPath).build()
         Morpheme.tokenizer = customDictionaryTokenizer
       } catch {
-        case e:java.lang.ArrayIndexOutOfBoundsException => println("Formatting seems borked on the custom dictionary file, try fixing it (restart not required)")
-        case e:Exception => println("Something went wrong when trying to use the custom dictionary file, try fixing it (restart not required)")
+        case e:java.lang.ArrayIndexOutOfBoundsException => logger.error("Formatting seems borked on the custom dictionary file, try fixing it (restart not required)")
+        case e:Exception => logger.error("Something went wrong when trying to use the custom dictionary file, try fixing it (restart not required)")
       }
       system.actorOf(DictionaryMonitorActor(customDictionaryPath), "customDictionaryMonitor")
     }
 
-    println("Server is ready for duty.")
+    logger.debug("Server is ready for duty.")
     val server = TrendServer(mainOrchestratorRoundRobin, thriftServerPort)
     server.serve
   }

@@ -9,6 +9,7 @@ import com.redis.RedisClientPool
 
 import akka.actor.Actor
 import akka.actor.Props
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * Companion object that houses the factory apply
@@ -40,7 +41,10 @@ object StringToRedisActor {
  *
  * Should be instantiated via the Props returned from the companion object's apply method.
  */
-class StringToRedisActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
+class StringToRedisActor(val redisPool: RedisClientPool)
+  extends Actor
+  with RedisStorageHelper
+  with Logging {
 
   def receive = {
 
@@ -48,7 +52,7 @@ class StringToRedisActor(val redisPool: RedisClientPool) extends Actor with Redi
       storeString(message.stringToStore, message.userId, message.unixCreatedAtTime, message.weeksAgoDataToExpire)
     }
 
-    case _ => println("StringToRedisActor says 'huh?'")
+    case _ => logger.error("StringToRedisActor says 'huh?'")
   }
 
   private def storeString(stringToStore: String, userId: String, unixCreatedAtTime: Int, weeksAgoDataToExpire: Int) {

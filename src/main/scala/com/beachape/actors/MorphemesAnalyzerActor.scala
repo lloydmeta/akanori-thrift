@@ -8,6 +8,7 @@ import com.redis.RedisClientPool
 import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.actorRef2Scala
+import com.typesafe.scalalogging.slf4j.Logging
 
 /** Companion object housing the factory for Props used to instantiate
  *  [[com.beachape.actors.MorphemesAnalyzerActor]] */
@@ -33,7 +34,8 @@ object MorphemesAnalyzerActor {
  */
 class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor
   with MorphemesRedisTrackingHelper
-  with RedisStorageHelper {
+  with RedisStorageHelper
+  with Logging {
 
   def receive = {
 
@@ -46,7 +48,7 @@ class MorphemesAnalyzerActor(val redisPool: RedisClientPool) extends Actor
       sender ! true
     }
 
-    case _ => println("MorphemesAnalyzerActor says 'huh? '")
+    case _ => logger.error("MorphemesAnalyzerActor says 'huh? '")
   }
 
 }
