@@ -2,7 +2,7 @@ seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
 
 name := "akanori-thrift"
 
-version := "1.0"
+version := "1.1"
 
 scalaVersion := "2.10.1"
 
