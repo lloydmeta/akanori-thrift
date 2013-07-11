@@ -17,3 +17,6 @@
 朝青龍,朝青龍,名詞,一般
 
 坂本麻衣,坂本麻衣,名詞,一般
+
+# For matching terms with spaces in them, make sure the second term doesn't have any spaces
+SUMMER NUDE,SUMMER-NUDE,名詞,一般
