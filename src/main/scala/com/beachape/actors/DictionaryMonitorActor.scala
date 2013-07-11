@@ -9,6 +9,7 @@ import java.nio.file.StandardWatchEventKinds._
 import scala.collection.JavaConversions._
 import java.io.File
 import com.beachape.analyze.Morpheme
+import com.typesafe.scalalogging.slf4j.Logging
 
 /** Companion object housing the factory for Props used to instantiate
   *  [[com.beachape.actors.DictionaryMonitorActor]] */
@@ -30,7 +31,7 @@ object DictionaryMonitorActor {
  * Should be instantiated via the factory method in
  * the companion object above
  */
-class DictionaryMonitorActor(dictionaryPath: String) extends Actor {
+class DictionaryMonitorActor(dictionaryPath: String) extends Actor with Logging {
 
   // Get the directories and file sorted out
   private val dictionaryFile = new File(dictionaryPath)
@@ -44,7 +45,7 @@ class DictionaryMonitorActor(dictionaryPath: String) extends Actor {
   beginWatching()
 
   def receive = {
-    case _ => println("This actor does not care about messages.")
+    case _ => logger.error("This actor does not care about messages.")
   }
 
   private def beginWatching() {
@@ -52,7 +53,7 @@ class DictionaryMonitorActor(dictionaryPath: String) extends Actor {
       val watchKey = watchService.take()
       for (event <- watchKey.pollEvents()) {
         val changed = event.context.asInstanceOf[Path]
-        System.out.println(s"Modified: $changed")
+        logger.info(s"Modified: $changed")
         if (changed.endsWith(dictionaryFileNameString)) {
           updateMorphemeTokenizer()
         }
@@ -60,20 +61,20 @@ class DictionaryMonitorActor(dictionaryPath: String) extends Actor {
       // reset the key
       val valid = watchKey.reset()
       if (!valid) {
-        System.out.println("Key has been unregistered")
+        logger.info("Key has been unregistered")
       }
     }
   }
 
   private def updateMorphemeTokenizer() {
-    System.out.println(s"Dictionary file updated $dictionaryFileNameString")
+    logger.info(s"Dictionary file updated $dictionaryFileNameString")
     try {
       val newTokenizer = Tokenizer.builder().userDictionary(dictionaryPath).build()
       Morpheme.tokenizer = newTokenizer
-      System.out.println("Morpheme Tokenizer updated")
+      logger.info("Morpheme Tokenizer updated")
     } catch {
-      case e:java.lang.ArrayIndexOutOfBoundsException => println("Formatting seems borked on updated dictionary file, try fixing it (restart not required)")
-      case e:Exception => println("Something went wrong when trying to update the Morphemes tokenizer with a new dictionary file, try fixing the file (restart not required)")
+      case e:java.lang.ArrayIndexOutOfBoundsException => logger.error("Formatting seems borked on updated dictionary file, try fixing it (restart not required)")
+      case e:Exception => logger.error("Something went wrong when trying to update the Morphemes tokenizer with a new dictionary file, try fixing the file (restart not required)")
     }
   }
 
