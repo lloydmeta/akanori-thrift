@@ -23,3 +23,10 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-api" % "1.7.1",
   "ch.qos.logback" % "logback-classic" % "1.0.3"
 )
+
+testOptions in Test += Tests.Setup(classLoader =>
+  classLoader
+    .loadClass("org.slf4j.LoggerFactory")
+    .getMethod("getLogger", classLoader.loadClass("java.lang.String"))
+    .invoke(null, "ROOT")
+)
