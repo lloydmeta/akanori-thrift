@@ -16,6 +16,7 @@ import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
 
 import scala.language.postfixOps
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * Companion object that houses the factory apply
@@ -43,7 +44,10 @@ object TrendGeneratorActor {
  *
  * Should be instantiated via props returned from the companion object's apply method.
  */
-class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
+class TrendGeneratorActor(val redisPool: RedisClientPool)
+  extends Actor
+  with RedisStorageHelper
+  with Logging {
 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600) seconds)
@@ -88,7 +92,7 @@ class TrendGeneratorActor(val redisPool: RedisClientPool) extends Actor with Red
       }
     }
 
-    case _ => println("TrendGeneratorActor says 'huh?'")
+    case _ => logger.error("TrendGeneratorActor says 'huh?'")
 
   }
 

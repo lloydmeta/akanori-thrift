@@ -14,6 +14,7 @@ import akka.pattern.ask
 import scala.concurrent.Future
 import akka.routing.SmallestMailboxRouter
 import akka.util.Timeout
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * Companion object that houses the factory apply
@@ -44,7 +45,10 @@ object RedisStringSetToMorphemesActor {
  *
  * Should be instantiated using the props returned by the companion object.
  */
-class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Actor with RedisStorageHelper {
+class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool)
+  extends Actor
+  with RedisStorageHelper
+  with Logging {
 
   import context.dispatcher
   implicit val timeout = Timeout(DurationInt(600).seconds)
@@ -82,7 +86,7 @@ class RedisStringSetToMorphemesActor(val redisPool: RedisClientPool) extends Act
       }
     }
 
-    case _ => println("RedisStringSetToMorphemesActor says 'huh?'")
+    case _ => logger.error("RedisStringSetToMorphemesActor says 'huh?'")
   }
 
   /**

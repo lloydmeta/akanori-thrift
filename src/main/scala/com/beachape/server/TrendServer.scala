@@ -22,6 +22,7 @@ import trendServer.gen.TrendThriftServer
 import scala.language.postfixOps
 import scala.language.implicitConversions
 import com.beachape.analyze.Morpheme
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * Companion object that holds the factory for TrendServer
@@ -65,7 +66,7 @@ object TrendServer {
  *
  * Should be constructed via the factory method in the companion object
  */
-class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
+class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface with Logging {
   implicit val timeout = Timeout(600 seconds)
 
   implicit def toIntegerTrendResultsList(lst: List[TrendResult]) =
@@ -73,7 +74,7 @@ class TrendServer(mainOrchestrator: ActorRef) extends TrendThriftServer.Iface {
 
   override def time: Long = {
     val now = System.currentTimeMillis / 1000
-    println("somebody just asked me what time it is: " + now)
+    logger.info("somebody just asked me what time it is: " + now)
     now
   }
 

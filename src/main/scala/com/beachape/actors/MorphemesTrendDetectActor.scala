@@ -9,6 +9,7 @@ import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.actorRef2Scala
 import akka.util.Timeout
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * Companion object that houses the factory for
@@ -37,7 +38,7 @@ object MorphemesTrendDetectActor {
  * Should be instantiated via the factory method in
  * the companion object above
  */
-class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
+class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor with Logging {
 
   import context.dispatcher
 
@@ -63,7 +64,7 @@ class MorphemesTrendDetectActor(redisPool: RedisClientPool) extends Actor {
       sender ! true
     }
 
-    case _ => println("MorphemesTrendDetectActor says 'huh???'")
+    case _ => logger.error("MorphemesTrendDetectActor says 'huh???'")
   }
 
   private def cacheChiSquaredDiff(cacheKey: RedisKey, term: String, difference: Double) {
